@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/consultas.css' %}" >
+{% endblock %}
+
+
+{% block title %}
+Consultas
+{% endblock %}
+
+
+
+{% block content %}
+
+<h1>
+Consultas
+</h1>
+
+<div class="filtros">
+
+    <form method="GET" id="form-filtros">
+
+        <div class="filtro">
+            <label>Fecha Diligenciamiento</label>
+            <input
+                type="date"
+                name="fecha"
+                value="{{ request.GET.fecha|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>Nombre Auditor</label>
+            <input
+                type="text"
+                name="nombre_auditor"
+                placeholder="Nombre auditor"
+                value="{{ request.GET.nombre_auditor|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>N° Cédula</label>
+            <input
+                type="text"
+                name="numero_cedula"
+                placeholder="Cédula"
+                value="{{ request.GET.numero_cedula|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>Aplicativo</label>
+            <input
+                type="text"
+                name="aplicativo"
+                placeholder="Aplicativo"
+                value="{{ request.GET.aplicativo|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>Fecha Operación</label>
+            <input
+                type="date"
+                name="fecha_operacion"
+                value="{{ request.GET.fecha_operacion|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>Nombre Técnico</label>
+            <input
+                type="text"
+                name="nombre_tecnico"
+                placeholder="Nombre técnico"
+                value="{{ request.GET.nombre_tecnico|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>N° Cuenta Contrato</label>
+            <input
+                type="text"
+                name="numero_cuenta_contrato"
+                placeholder="Cuenta contrato"
+                value="{{ request.GET.numero_cuenta_contrato|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>N° Orden</label>
+            <input
+                type="text"
+                name="numero_orden"
+                placeholder="Número orden"
+                value="{{ request.GET.numero_orden|default:'' }}">
+        </div>
+
+
+        <div class="filtro">
+            <label>Tipo Operación</label>
+
+            <select name="tipo_operacion">
+                <option value="">Todos</option>
+
+                <option value="ZVCL"
+                    {% if request.GET.tipo_operacion == "ZVCL" %}selected{% endif %}>
+                    ZVCL
+                </option>
+
+                <option value="DC00"
+                    {% if request.GET.tipo_operacion == "DC00" %}selected{% endif %}>
+                    DC00
+                </option>
+
+                <option value="RC00"
+                    {% if request.GET.tipo_operacion == "RC00" %}selected{% endif %}>
+                    RC00
+                </option>
+            </select>
+        </div>
+
+        <div class="filtro">
+            <label>Resultado Auditoría</label>
+
+            <select name="resultado_auditoria">
+                <option value="">Todos</option>
+
+                <option value="cumple"
+                    {% if request.GET.resultado_auditoria == "cumple" %}selected{% endif %}>
+                    Cumple
+                </option>
+
+                <option value="no_cumple"
+                    {% if request.GET.resultado_auditoria == "no_cumple" %}selected{% endif %}>
+                    No Cumple
+                </option>
+            </select>
+        </div>
+
+        <div class="filtro"> 
+            <label>Tipo Hallazgo</label> 
+            <select name="tipo_hallazgo"> 
+                <option value="">Todos</option> 
+                <option value="Alto" {% if request.GET.tipo_hallazgo == "Alto" %}selected{% endif %}> Alto </option> 
+                <option value="Medio" {% if request.GET.tipo_hallazgo == "Medio" %}selected{% endif %}> Medio </option> 
+                <option value="Bajo" {% if request.GET.tipo_hallazgo == "Bajo" %}selected{% endif %}> Bajo </option> 
+            </select> 
+        </div>
+
+
+        <div class="filtro">
+            <label>Hallazgo</label>
+            <input
+                type="text"
+                name="hallazgo"
+                placeholder="Hallazgo"
+                value="{{ request.GET.hallazgo|default:'' }}">
+        </div>
+
+        <div class="filtro">
+            <label>Fecha Operación Desde</label>
+            <input
+                type="date"
+                name="fecha_inicio"
+                value="{{ request.GET.fecha_inicio|default:'' }}">
+        </div>
+
+        <div class="filtro">
+            <label>Fecha Operación Hasta</label>
+            <input
+                type="date"
+                name="fecha_fin"
+                value="{{ request.GET.fecha_fin|default:'' }}">
+        </div>
+
+
+        <div class="botones">
+
+            <button type="submit">
+                Filtrar
+            </button>
+
+            <button
+                type="submit"
+                formaction="{% url 'generar_pdf' %}"
+                formmethod="GET">
+                Generar PDF
+            </button>
+
+            <a href="{% url 'consulta' %}">
+                Limpiar filtros
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<div class="contenedor-tabla"> 
+<table>
+    <thead>
+        <tr>
+            <th>Fecha</th> 
+            <th>Nombre Auditor</th>
+            <th>N°Cedula</th>
+            <th>Aplicativo</th>    
+            <th>Fecha Operacion</th>
+            <th>Nombre Tecnico</th>
+            <th>N°Cuenta Contrato</th>
+            <th>N° Orden</th>
+            <th>Tipo Operacion</th>
+            <th>Resul Auditoria</th>
+            <th>Observaciones</th>
+            <th>Tipo Hallazgo</th>
+            <th>Hallazgo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in Auditorias %}
+        <tr>
+            <td>{{a.fecha}}</td>
+            <td>{{a.nombre_auditor}}</td>
+            <td>{{a.numero_cedula}}</td>
+            <td>{{a.aplicativo}}</td>
+            <td>{{a.fecha_operacion}}</td>
+            <td>{{a.nombre_tecnico}}</td>
+            <td>{{a.numero_cuenta_contrato}}</td>
+            <td>{{a.numero_orden}}</td>
+            <td>{{a.tipo_operacion}}</td>
+            <td>{{a.resultado_auditoria}}</td>
+            <td>{{a.observacion}}</td>
+            <td>{{a.tipo_hallazgo}}</td>
+            <td>{{a.hallazgo}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

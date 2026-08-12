@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+AuditoriasSW
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard">
+
+    <div class="dashboard-header">
+        <h1>Sistema de Auditorías</h1>
+        <p>Bienvenido al panel principal</p>
+    </div>
+
+    <div class="menu">
+
+        <!-- Imagen superior -->
+        <a href="{% url 'carga' %}" class="menu-card principal">
+            <img src="{% static 'img/carta.png' %}" alt="Carga de auditorías">
+            <div class="card-text">
+                <h2>Cargar</h2>
+                <p>Registrar una nueva auditoría</p>
+            </div>
+        </a>
+
+        <!-- Dos imágenes inferiores -->
+        <div class="bottom-cards">
+
+            <a href="{% url 'estadistica' %}" class="menu-card">
+                <img src="{% static 'img/estadisticas.png' %}" alt="Estadísticas">
+                <div class="card-text">
+                    <h2>Estadísticas</h2>
+                    <p>Consultar resultados y estadísticas</p>
+                </div>
+            </a>
+
+            <a href="{% url 'consulta' %}" class="menu-card">
+                <img src="{% static 'img/buscar.png' %}" alt="Consulta">
+                <div class="card-text">
+                    <h2>Consultar</h2>
+                    <p>Buscar auditorías registradas</p>
+                </div>
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

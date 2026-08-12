@@ -1,0 +1,793 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/carga.css' %}">
+{% endblock %}
+
+{% block title %}
+    Carga masiva de auditorías
+{% endblock %}
+
+{% block content %}
+
+<div class="carga-page">
+
+    <div class="contenido-carga">
+
+        <!-- =====================================================
+             ENCABEZADO
+        ====================================================== -->
+
+        <div class="encabezado-pagina">
+
+            <div>
+                <h1>Carga masiva de auditorías</h1>
+
+                <p>
+                    Cargue, procese y revise múltiples auditorías desde un archivo Excel.
+                </p>
+            </div>
+
+        </div>
+        
+        
+
+
+        <!-- =====================================================
+             GRID PRINCIPAL - 4 SECCIONES
+        ====================================================== -->
+
+        <div class="grid-carga">
+
+
+            <!-- =================================================
+                 1. CARGA MASIVA
+            ================================================== -->
+
+            <section class="panel panel-carga">
+
+                <div class="panel-header">
+
+                    <div class="panel-icon">
+                        ↑
+                    </div>
+
+                    <div>
+                        <h2>
+                            Carga masiva
+                        </h2>
+
+                        <p>
+                            Seleccione el archivo Excel que desea procesar.
+                        </p>
+                    </div>
+
+                </div>
+            
+
+                <div class="panel-body panel-body-scroll">
+
+
+                    <!-- MENSAJES -->
+
+                    {% if messages %}
+
+                        {% for message in messages %}
+
+                            <div class="mensaje
+                                {% if message.tags == 'success' %}
+                                    mensaje-success
+                                {% elif message.tags == 'warning' %}
+                                    mensaje-warning
+                                {% elif message.tags == 'error' %}
+                                    mensaje-error
+                                {% else %}
+                                    mensaje-info
+                                {% endif %}
+                            ">
+
+                                {{ message }}
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+
+                    <!-- ERROR GENERAL -->
+
+                    {% if error %}
+
+                        <div class="mensaje mensaje-error">
+
+                            <strong>
+                                Error:
+                            </strong>
+
+                            {{ error }}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- FORMULARIO -->
+
+                    <form
+                        method="POST"
+                        enctype="multipart/form-data"
+                        action="{% url 'auditoria_crear' %}"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <div class="campo-archivo">
+
+                            <label for="{{ form.csv_file.id_for_label }}">
+                                {{ form.csv_file.label }}
+                            </label>
+
+
+                            <div class="archivo-input">
+
+                                <input
+                                    type="file"
+                                    name="{{ form.csv_file.html_name }}"
+                                    id="{{ form.csv_file.id_for_label }}"
+                                    accept=".xlsx"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <small class="ayuda-archivo">
+                                Formato permitido: .xlsx
+                            </small>
+
+                        </div>
+
+
+                        <div class="botones">
+
+                            <a
+                                href="{% url 'carga' %}"
+                                class="btn btn-cancelar"
+                            >
+                                Cancelar
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-subir"
+                            >
+                                <span>↑</span>
+                                Subir y procesar
+                            </button>
+
+                        </div>
+
+                    </form>
+
+
+                </div>
+
+            </section>
+        
+
+
+
+            <!-- =================================================
+                 2. RESULTADO DEL PROCESAMIENTO
+            ================================================== -->
+
+            <section class="panel panel-proceso">
+
+                <div class="panel-header">
+
+                    <div class="panel-icon icon-azul">
+                        ✓
+                    </div>
+
+                    <div>
+                        <h2>
+                            Resultado del procesamiento
+                        </h2>
+
+                        <p>
+                            Resumen de la carga realizada.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="panel-body panel-body-scroll">
+
+                    {% if report_generated %}
+
+
+                        <!-- CONTADORES -->
+
+                        <div class="contadores">
+
+
+                            <div class="contador contador-total">
+
+                                <span class="contador-icon">
+                                    #
+                                </span>
+
+                                <div>
+                                    <span class="contador-titulo">
+                                        Total
+                                    </span>
+
+                                    <strong class="contador-numero">
+                                        {{ total_rows }}
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="contador contador-exitos">
+
+                                <span class="contador-icon">
+                                    ✓
+                                </span>
+
+                                <div>
+                                    <span class="contador-titulo">
+                                        Creadas
+                                    </span>
+
+                                    <strong class="contador-numero">
+                                        {{ successful_count }}
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="contador contador-errores">
+
+                                <span class="contador-icon">
+                                    !
+                                </span>
+
+                                <div>
+                                    <span class="contador-titulo">
+                                        Errores
+                                    </span>
+
+                                    <strong class="contador-numero">
+                                        {{ error_count }}
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- RESUMEN -->
+
+                        <div class="resumen">
+
+                            <div class="resumen-titulo">
+                                Resumen de la carga
+                            </div>
+
+                            <p>
+
+                                Se procesaron
+
+                                <strong>
+                                    {{ total_rows }}
+                                </strong>
+
+                                registros.
+
+                            </p>
+
+                            <p>
+
+                                <span class="texto-verde">
+                                    {{ successful_count }} creados correctamente
+                                </span>
+
+                                y
+
+                                <span class="texto-rojo">
+                                    {{ error_count }} con errores
+                                </span>.
+
+                            </p>
+
+                        </div>
+
+
+                        <!-- BARRA DE PROGRESO VISUAL -->
+
+                        {% if total_rows > 0 %}
+
+                        <div class="progreso">
+
+                            <div class="progreso-label">
+
+                                <span>
+                                    Registros procesados
+                                </span>
+
+                                <strong>
+                                    {{ total_rows }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="progreso-barra">
+
+                                <div
+                                    class="progreso-exitos"
+                                    style="width:
+                                    {% widthratio successful_count total_rows 100 %}%"
+                                >
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+
+                    {% else %}
+
+                        <div class="estado-vacio">
+
+                            <div class="estado-icon">
+                                ↑
+                            </div>
+
+                            <h3>
+                                Sin procesamiento
+                            </h3>
+
+                            <p>
+                                Cargue un archivo Excel para comenzar.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 3. REGISTROS CON ERRORES
+            ================================================== -->
+
+            <section class="panel panel-errores">
+
+                <div class="panel-header">
+
+                    <div class="panel-icon icon-rojo">
+                        !
+                    </div>
+
+                    <div class="panel-header-text">
+
+                        <h2>
+                            Registros con errores
+                        </h2>
+
+                        <p>
+                            Revise los registros que no pudieron procesarse.
+                        </p>
+
+                    </div>
+
+
+                    {% if error_count %}
+
+                    <span class="badge-error">
+                        {{ error_count }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="panel-body panel-body-scroll">
+
+                    {% if report_generated and errors_records %}
+
+
+                        <div class="registros-container">
+
+                            {% for record in errors_records %}
+
+                            <details class="error-item">
+
+                                <summary class="error-header">
+
+                                    <div class="error-resumen">
+
+                                        <span class="fila-error">
+                                            Fila {{ record.row }}
+                                        </span>
+
+
+                                        {% for field, errors in record.errors.items %}
+
+                                            <span class="campo-error">
+                                                {{ field }}
+                                            </span>
+
+                                        {% endfor %}
+
+                                    </div>
+
+
+                                    <span class="ver-detalle">
+                                        Detalles
+                                        <span class="flecha">▾</span>
+                                    </span>
+
+                                </summary>
+
+
+                                <!-- DETALLES -->
+
+                                <div class="error-content">
+
+                                    {% for field, errors in record.errors.items %}
+
+                                        <div class="error-mensaje">
+
+                                            <div class="error-campo-titulo">
+                                                {{ field }}
+                                            </div>
+
+
+                                            {% for key, value in record.data.items %}
+
+                                                {% if key == field %}
+
+                                                    <div class="valor-error">
+
+                                                        <span>
+                                                            Valor:
+                                                        </span>
+
+                                                        <code>
+                                                            {{ value }}
+                                                        </code>
+
+                                                    </div>
+
+                                                {% endif %}
+
+                                            {% endfor %}
+
+
+                                            <p>
+                                                {{ errors }}
+                                            </p>
+
+                                        </div>
+
+                                    {% endfor %}
+
+
+                                    <!-- DATOS DEL REGISTRO -->
+
+                                    <div class="datos-grid">
+
+                                        {% for key, value in record.data.items %}
+
+                                            {% if value != "" and value != None %}
+
+                                                <div class="dato">
+
+                                                    <span class="dato-label">
+                                                        {{ key }}
+                                                    </span>
+
+                                                    <span class="dato-valor">
+                                                        {{ value }}
+                                                    </span>
+
+                                                </div>
+
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                </div>
+
+                            </details>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                    {% elif report_generated %}
+
+                        <div class="estado-vacio estado-exitoso">
+
+                            <div class="estado-icon">
+                                ✓
+                            </div>
+
+                            <h3>
+                                Sin errores
+                            </h3>
+
+                            <p>
+                                Todos los registros fueron procesados correctamente.
+                            </p>
+
+                        </div>
+
+
+                    {% else %}
+
+                        <div class="estado-vacio">
+
+                            <div class="estado-icon">
+                                !
+                            </div>
+
+                            <h3>
+                                Sin información
+                            </h3>
+
+                            <p>
+                                Los errores aparecerán aquí después de procesar el archivo.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if report_generated and error_count %}
+
+                    <div class="acciones-pdf">
+
+                        <form
+                            method="POST"
+                            action="{% url 'reporte_errores_pdf' %}"
+                        >
+                            {% csrf_token %}
+
+                            <textarea name="errores_json" hidden>{{ errores_json }}</textarea>
+
+                            <button
+                                type="submit"
+                                class="btn btn-pdf"
+                            >
+                                ↓ Descargar errores PDF
+                            </button>
+                        </form>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 4. REGISTROS EXITOSOS
+            ================================================== -->
+
+            <section class="panel panel-exitosos">
+
+                <div class="panel-header">
+
+                    <div class="panel-icon icon-verde">
+                        ✓
+                    </div>
+
+                    <div class="panel-header-text">
+
+                        <h2>
+                            Auditorías creadas
+                        </h2>
+
+                        <p>
+                            Registros procesados correctamente.
+                        </p>
+
+                    </div>
+
+
+                    {% if successful_count %}
+
+                    <span class="badge-success">
+                        {{ successful_count }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="panel-body panel-body-scroll">
+
+                    {% if report_generated and successful_records %}
+
+
+                        <div class="exitosos-container">
+
+                            <table class="tabla-exitosos">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Fila</th>
+                                        <th>Auditor</th>
+                                        <th>Técnico</th>
+                                        <th>Operación</th>
+                                        <th>Resultado</th>
+                                        <th>Estado</th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+                                    {% for record in successful_records %}
+
+                                    <tr>
+
+                                        <td>
+                                            <span class="numero-fila">
+                                                {{ record.row }}
+                                            </span>
+                                        </td>
+
+
+                                        <td>
+                                            {{ record.data.nombre_auditor }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ record.data.nombre_tecnico }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ record.data.tipo_operacion }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ record.data.resultado_auditoria }}
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="estado-creada">
+                                                ✓ Creada
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+                    {% elif report_generated %}
+
+                        <div class="estado-vacio estado-advertencia">
+
+                            <div class="estado-icon">
+                                !
+                            </div>
+
+                            <h3>
+                                No hay registros exitosos
+                            </h3>
+
+                            <p>
+                                Ninguna auditoría fue creada correctamente.
+                            </p>
+
+                        </div>
+
+
+                    {% else %}
+
+                        <div class="estado-vacio">
+
+                            <div class="estado-icon">
+                                ✓
+                            </div>
+
+                            <h3>
+                                Sin registros
+                            </h3>
+
+                            <p>
+                                Las auditorías creadas aparecerán aquí.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <!-- =====================================================
+             ADVERTENCIA SIN REGISTROS
+        ====================================================== -->
+
+        {% if report_generated and total_rows == 0 %}
+
+            <div class="advertencia-global">
+
+                <div class="advertencia-icon">
+                    !
+                </div>
+
+                <div>
+
+                    <strong>
+                        Archivo sin registros
+                    </strong>
+
+                    <p>
+                        El archivo seleccionado no contiene registros para procesar.
+                    </p>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+{% endblock %}

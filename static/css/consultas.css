@@ -1,0 +1,312 @@
+/* =====================================================
+   CONTENEDOR DE TABLA
+   ===================================================== */
+
+.contenedor-tabla {
+    width: 100%;
+    max-width: 985px;
+    overflow-x: auto;
+    overflow-y: auto;
+
+    max-height: 480px;
+
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   TABLA
+   ===================================================== */
+
+table {
+    width: 100%;
+    min-width: 900px;
+
+    border-collapse: collapse;
+
+    background-color: #fff;
+
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   ENCABEZADOS
+   ===================================================== */
+
+thead {
+    background-color: #1976d2;
+    color: white;
+}
+
+th {
+    padding: 15px 8px;
+
+    text-align: left;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    border-bottom: 2px solid #125ca1;
+}
+
+
+/* =====================================================
+   CELDAS
+   ===================================================== */
+
+td {
+    padding: 15px 8px;
+
+    color: #333;
+    font-size: 13px;
+    white-space: nowrap;
+
+    border-bottom: 1px solid #eee;
+
+    max-width: 150px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =====================================================
+   FILAS
+   ===================================================== */
+
+tbody tr {
+    background-color: #fff;
+    transition: background-color 0.15s ease;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tbody tr:hover {
+    background-color: #e3f2fd;
+}
+
+
+/* =====================================================
+   SCROLL
+   ===================================================== */
+
+.contenedor-tabla::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.contenedor-tabla::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.contenedor-tabla::-webkit-scrollbar-thumb {
+    background: #aaa;
+    border-radius: 10px;
+}
+
+.contenedor-tabla::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+
+/* =====================================================
+   TÍTULO
+   ===================================================== */
+
+h1 {
+    margin-bottom: 20px;
+    color: #222;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   FILTROS
+   ===================================================== */
+
+.filtros {
+    width: 110%;
+    max-width: 970px;
+
+    background-color: #fff;
+
+    padding: 18px;
+    margin-bottom: 20px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    box-sizing: border-box;
+}
+
+.filtros form {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+
+/* =====================================================
+   FILTROS INDIVIDUALES
+   ===================================================== */
+
+.filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filtro label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.filtro input {
+    width: 100%;
+    height: 35px;
+
+    padding: 7px 9px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    background-color: #fff;
+    color: #333;
+
+    font-size: 13px;
+
+    box-sizing: border-box;
+    outline: none;
+}
+
+.filtro input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.12);
+}
+
+.filtro input::placeholder {
+    color: #999;
+}
+
+
+/* =====================================================
+   BOTONES
+   ===================================================== */
+
+.botones {
+    grid-column: 1 / -1;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    margin-top: 5px;
+}
+
+.botones button,
+.botones a {
+    height: 38px;
+
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 6px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+}
+
+.botones button {
+    background-color: #007bff;
+    color: white;
+}
+
+.botones button:hover {
+    background-color: #0056b3;
+}
+
+.botones a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #6c757d;
+    color: white;
+
+    text-decoration: none;
+}
+
+.botones a:hover {
+    background-color: #545b62;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .filtros,
+    .contenedor-tabla {
+        width: 70%;
+    }
+
+    .filtros form {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+
+@media (max-width: 800px) {
+
+    .filtros,
+    .contenedor-tabla {
+        width: 90%;
+    }
+
+    .filtros form {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .filtros,
+    .contenedor-tabla {
+        width: 95%;
+    }
+
+    .filtros form {
+        grid-template-columns: 1fr;
+    }
+
+    .botones {
+        flex-direction: column;
+    }
+
+    .botones button,
+    .botones a {
+        width: 100%;
+    }
+}

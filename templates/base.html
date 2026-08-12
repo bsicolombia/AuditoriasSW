@@ -1,0 +1,53 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        Auditorías
+        {% endblock %}
+    </title>
+
+    <!-- CSS general -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}"> 
+    <!-- CSS específico de cada página --> 
+     {% block extra_css %} 
+     {% endblock %}
+
+    
+</head>
+
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+
+        <a href="{% url 'index' %}"><img src="{% static 'img/LogoBSI.png' %}" alt="Logo" class="logo"></a>
+
+        <h2>Auditorías</h2>
+
+        <nav>
+            <ul>
+                <li><a href="{% url 'index' %}">Inicio</a></li>
+                <li><a href="{% url 'carga' %}">Carga Excel</a></li>
+                <li><a href="{% url 'estadistica' %}">Estadísticas</a></li>       
+                <li><a href="{% url 'consulta' %}">Consultas</a></li>
+                
+            </ul>
+        </nav>
+    </aside>
+
+    <section class="contenido">
+        {% block content %}
+        {% endblock %}
+    </section>
+
+</div>
+
+
+</body>
+
+</html>

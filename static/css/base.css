@@ -1,0 +1,96 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 170px;
+    padding: 25px;
+    background: linear-gradient(180deg,#1f2937,#111827);
+    color: white;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+.logo {
+    width: 100px;
+    display: block;
+    margin: 0 auto 20px;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 30px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 15px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 15px;
+    color: white;
+    text-decoration: none;
+    font-size: 17px;
+    border-radius: 10px;
+    transition: background 0.3s ease,transform 0.3s ease,padding-left 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: #2b3547;
+    transform: translateX(5px);
+    padding-left: 20px;
+}
+
+.contenido {
+    flex: 1;
+    padding: 20px;
+}
+
+.contenido_carga {
+    width: 50%;
+    max-width: 900px;
+    min-height: 300px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border: 1px solid #222;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card:hover {
+    transform: translateY(-8px);
+}
+
+button {
+    background:#0d172c;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover {
+    background:#0c2569;
+    transform:scale(1.05);
+}

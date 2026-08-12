@@ -1,0 +1,984 @@
+/* =====================================================
+   PÁGINA
+===================================================== */
+
+.carga-page {
+    width: 100%;
+}
+
+.contenido-carga {
+    width: 100%;
+}
+
+
+/* =====================================================
+   ENCABEZADO
+===================================================== */
+
+.encabezado-pagina {
+    width: 100%;
+    box-sizing: border-box;
+
+    border: 2px solid #000;
+    border-radius: 15px;
+
+    padding: 20px;
+    margin-bottom: 20px;
+
+    background-color: #ffffff;
+}
+
+
+/* =====================================================
+   GRID PRINCIPAL - TODO VERTICAL
+===================================================== */
+
+.grid-carga {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+/* =====================================================
+   TODOS LOS PANELES
+===================================================== */
+
+.panel,
+.panelpanel-proceso {
+    width: 100%;
+    box-sizing: border-box;
+
+    border: 2px solid #000;
+    border-radius: 15px;
+
+    background-color: #ffffff;
+
+    overflow: hidden;
+
+    margin: 0;
+}
+
+
+/* =====================================================
+   CARGA MASIVA
+===================================================== */
+
+.panel-carga {
+    border-color: #000;
+}
+
+
+/* =====================================================
+   RESULTADO DEL PROCESAMIENTO
+===================================================== */
+
+.panel-proceso,
+.panelpanel-proceso {
+    border: 2px solid #1976d2;
+    border-radius: 15px;
+}
+
+.panel-proceso .panel-header,
+.panelpanel-proceso .panel-header {
+    background-color: #e3f2fd;
+}
+
+
+/* =====================================================
+   ERRORES
+===================================================== */
+
+.panel-errores {
+    border-color: #d32f2f;
+}
+
+.panel-errores .panel-header {
+    background-color: #ffebee;
+}
+
+
+/* =====================================================
+   EXITOSOS
+===================================================== */
+
+.panel-exitosos {
+    border-color: #2e7d32;
+}
+
+.panel-exitosos .panel-header {
+    background-color: #e8f5e9;
+}
+
+
+/* =====================================================
+   CABECERA DE LOS PANELES
+===================================================== */
+
+.panel-header {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    background-color: #f8f9fa;
+
+    border-bottom: 1px solid #dddddd;
+}
+
+
+/* =====================================================
+   TEXTO DE CABECERA
+===================================================== */
+
+.panel-header h2 {
+    margin: 0;
+
+    color: #222222;
+
+    font-size: 20px;
+}
+
+.panel-header p {
+    margin: 5px 0 0;
+
+    color: #666666;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   CUERPO DE LOS PANELES
+===================================================== */
+
+.panel-body {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    background-color: #ffffff;
+}
+
+
+/* =====================================================
+   ICONOS DE LOS PANELES
+===================================================== */
+
+.panel-icon {
+    width: 45px;
+    height: 45px;
+
+    min-width: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #eeeeee;
+
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.icon-azul {
+    background-color: #bbdefb;
+    color: #1976d2;
+}
+
+.icon-rojo {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+.icon-verde {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+
+/* =====================================================
+   CONTADORES
+===================================================== */
+
+.contadores {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+
+/* Cada contador ocupa una fila */
+
+.contador {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    border: 1px solid #ddd;
+
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+}
+
+
+/* =====================================================
+   CONTADOR TOTAL
+===================================================== */
+
+.contador-total {
+    background-color: #f5f5f5;
+
+    border-color: #999;
+}
+
+
+/* =====================================================
+   CONTADOR EXITOS
+===================================================== */
+
+.contador-exitos {
+    background-color: #e8f5e9;
+
+    border-color: #4caf50;
+}
+
+
+/* =====================================================
+   CONTADOR ERRORES
+===================================================== */
+
+.contador-errores {
+    background-color: #ffebee;
+
+    border-color: #f44336;
+}
+
+
+/* =====================================================
+   ICONOS DE CONTADORES
+===================================================== */
+
+.contador-icon {
+    width: 40px;
+    height: 40px;
+
+    min-width: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #ffffff;
+
+    font-weight: bold;
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   TEXTO DE CONTADORES
+===================================================== */
+
+.contador-titulo {
+    display: block;
+
+    color: #666666;
+
+    font-size: 14px;
+}
+
+.contador-numero {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 24px;
+
+    color: #222222;
+}
+
+
+/* =====================================================
+   RESUMEN
+===================================================== */
+
+.resumen {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 12px;
+
+    background-color: #f8f9fa;
+}
+
+.resumen-titulo {
+    font-weight: bold;
+
+    font-size: 18px;
+
+    margin-bottom: 10px;
+}
+
+.resumen p {
+    margin: 8px 0;
+}
+
+
+/* =====================================================
+   COLORES DE TEXTO
+===================================================== */
+
+.texto-verde {
+    color: #2e7d32;
+
+    font-weight: bold;
+}
+
+.texto-rojo {
+    color: #c62828;
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   BARRA DE PROGRESO
+===================================================== */
+
+.progreso {
+    width: 100%;
+
+    margin-top: 20px;
+}
+
+.progreso-label {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 8px;
+}
+
+.progreso-barra {
+    width: 100%;
+    height: 12px;
+
+    background-color: #eeeeee;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+.progreso-exitos {
+    height: 100%;
+
+    background-color: #4caf50;
+
+    border-radius: 10px;
+}
+
+
+/* =====================================================
+   ESTADOS VACÍOS
+===================================================== */
+
+.estado-vacio {
+    width: 100%;
+    box-sizing: border-box;
+
+    text-align: center;
+
+    padding: 40px 20px;
+
+    color: #666666;
+}
+
+.estado-icon {
+    font-size: 40px;
+
+    margin-bottom: 10px;
+}
+
+.estado-vacio h3 {
+    margin: 10px 0;
+
+    color: #333333;
+}
+
+.estado-vacio p {
+    margin: 0;
+
+    color: #777777;
+}
+
+
+/* =====================================================
+   MENSAJES
+===================================================== */
+
+.mensaje {
+    padding: 12px 15px;
+
+    margin-bottom: 15px;
+
+    border-radius: 8px;
+
+    border: 1px solid;
+}
+
+.mensaje-success {
+    color: #2e7d32;
+
+    background-color: #e8f5e9;
+
+    border-color: #4caf50;
+}
+
+.mensaje-warning {
+    color: #856404;
+
+    background-color: #fff3cd;
+
+    border-color: #ffc107;
+}
+
+.mensaje-error {
+    color: #c62828;
+
+    background-color: #ffebee;
+
+    border-color: #f44336;
+}
+
+.mensaje-info {
+    color: #1565c0;
+
+    background-color: #e3f2fd;
+
+    border-color: #2196f3;
+}
+
+
+/* =====================================================
+   FORMULARIO
+===================================================== */
+
+.campo-archivo {
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+.campo-archivo label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+
+    color: #333333;
+}
+
+.archivo-input {
+    width: 100%;
+}
+
+.archivo-input input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 10px;
+
+    border: 1px solid #cccccc;
+
+    border-radius: 8px;
+
+    background-color: #ffffff;
+}
+
+.ayuda-archivo {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #777777;
+}
+
+
+/* =====================================================
+   BOTONES
+===================================================== */
+
+.botones {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 10px 18px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    border: 1px solid;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.btn-cancelar {
+    color: #555555;
+
+    background-color: #f5f5f5;
+
+    border-color: #cccccc;
+}
+
+.btn-subir {
+    color: #ffffff;
+
+    background-color: #1976d2;
+
+    border-color: #1976d2;
+}
+
+
+/* =====================================================
+   REGISTROS CON ERROR
+===================================================== */
+
+.registros-container {
+    width: 100%;
+}
+
+.error-item {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin-bottom: 10px;
+
+    border: 1px solid #e0e0e0;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    background-color: #ffffff;
+}
+
+.error-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 15px;
+
+    cursor: pointer;
+
+    background-color: #fff5f5;
+}
+
+.error-resumen {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.fila-error {
+    font-weight: bold;
+
+    color: #c62828;
+}
+
+.campo-error {
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    background-color: #ffcdd2;
+
+    color: #b71c1c;
+
+    font-size: 12px;
+}
+
+.ver-detalle {
+    color: #c62828;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+.error-content {
+    padding: 15px;
+
+    border-top: 1px solid #eeeeee;
+}
+
+.error-mensaje {
+    padding: 12px;
+
+    margin-bottom: 10px;
+
+    border-left: 4px solid #f44336;
+
+    background-color: #ffebee;
+}
+
+.error-campo-titulo {
+    font-weight: bold;
+
+    color: #c62828;
+
+    margin-bottom: 5px;
+}
+
+.valor-error {
+    margin: 8px 0;
+}
+
+.valor-error code {
+    padding: 3px 6px;
+
+    border-radius: 4px;
+
+    background-color: #ffffff;
+
+    color: #333333;
+}
+
+
+/* =====================================================
+   DATOS DE ERROR
+===================================================== */
+
+.datos-grid {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 15px;
+}
+
+.dato {
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    background-color: #f8f9fa;
+
+    border: 1px solid #eeeeee;
+}
+
+.dato-label {
+    font-size: 12px;
+
+    font-weight: bold;
+
+    color: #666666;
+}
+
+.dato-valor {
+    margin-top: 3px;
+
+    color: #222222;
+
+    word-break: break-word;
+}
+
+
+/* =====================================================
+   BADGES
+===================================================== */
+
+.badge-error,
+.badge-success {
+    margin-left: auto;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-weight: bold;
+
+    font-size: 13px;
+}
+
+.badge-error {
+    background-color: #ffcdd2;
+
+    color: #c62828;
+}
+
+.badge-success {
+    background-color: #c8e6c9;
+
+    color: #2e7d32;
+}
+
+
+/* =====================================================
+   TABLA DE EXITOSOS
+===================================================== */
+
+.exitosos-container {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.tabla-exitosos {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 14px;
+}
+
+.tabla-exitosos th {
+    padding: 12px;
+
+    text-align: left;
+
+    background-color: #e8f5e9;
+
+    color: #2e7d32;
+
+    border-bottom: 2px solid #4caf50;
+}
+
+.tabla-exitosos td {
+    padding: 12px;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+.tabla-exitosos tr:hover {
+    background-color: #f8fff8;
+}
+
+.numero-fila {
+    display: inline-block;
+
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    background-color: #eeeeee;
+
+    font-weight: bold;
+}
+
+.estado-creada {
+    color: #2e7d32;
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   ADVERTENCIA GLOBAL
+===================================================== */
+
+.advertencia-global {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+    padding: 20px;
+
+    border: 2px solid #ffc107;
+
+    border-radius: 15px;
+
+    background-color: #fff8e1;
+}
+
+.advertencia-icon {
+    width: 40px;
+    height: 40px;
+
+    min-width: 40px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #ffc107;
+
+    color: #ffffff;
+
+    font-weight: bold;
+
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .encabezado-pagina,
+    .panel-body,
+    .panel-header {
+        padding: 15px;
+    }
+
+    .panel-header {
+        align-items: flex-start;
+    }
+
+    .contadores {
+        display: flex;
+
+        flex-direction: column;
+    }
+
+    .contador {
+        width: 100%;
+    }
+
+    .botones {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .tabla-exitosos {
+        min-width: 700px;
+    }
+}
+
+/* =====================================================
+   SCROLL SOLO EN ERRORES Y EXITOSOS
+   ===================================================== */
+
+/* Registros con errores */
+.panel-errores .panel-body {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Registros exitosos */
+.panel-exitosos .panel-body {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+
+/* Scroll vertical de errores */
+.panel-errores .panel-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.panel-errores .panel-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.panel-errores .panel-body::-webkit-scrollbar-thumb {
+    background: #bbbbbb;
+    border-radius: 10px;
+}
+
+.panel-errores .panel-body::-webkit-scrollbar-thumb:hover {
+    background: #999999;
+}
+
+
+/* Scroll de exitosos */
+.panel-exitosos .panel-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.panel-exitosos .panel-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.panel-exitosos .panel-body::-webkit-scrollbar-thumb {
+    background: #bbbbbb;
+    border-radius: 10px;
+}
+
+.panel-exitosos .panel-body::-webkit-scrollbar-thumb:hover {
+    background: #999999;
+}
+

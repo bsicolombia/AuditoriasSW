@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <style>
+
+        @page {
+            size: A4 landscape;
+            margin: 12px;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 7.5px;
+            color: #222222;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        /* =========================
+           TITULO
+        ========================= */
+
+        h1 {
+            text-align: center;
+            font-size: 17px;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+            padding: 0;
+        }
+
+
+        /* =========================
+           INFORMACION
+        ========================= */
+
+        .info {
+            font-size: 8px;
+            margin-bottom: 8px;
+            color: #555555;
+        }
+
+
+        /* =========================
+           TABLA
+        ========================= */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+
+        /* =========================
+           ENCABEZADO
+        ========================= */
+
+        thead {
+            display: table-header-group;
+        }
+
+        th {
+            background-color: #2563eb;
+            color: white;
+
+            border: 0.5px solid #1e40af;
+
+            padding: 5px 3px;
+
+            text-align: center;
+            vertical-align: middle;
+
+            font-size: 7px;
+            font-weight: bold;
+
+            line-height: 9px;
+        }
+
+
+        /* =========================
+           CELDAS
+        ========================= */
+
+        td {
+
+            border: 0.5px solid #b8b8b8;
+
+            padding: 4px 3px;
+
+            font-size: 7.5px;
+
+            line-height: 9px;
+
+            vertical-align: middle;
+
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+
+        }
+
+
+        /* =========================
+           FILAS
+        ========================= */
+
+        tr {
+            page-break-inside: avoid;
+        }
+
+
+        tbody tr:nth-child(even) {
+            background-color: #f3f6fa;
+        }
+
+
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+
+        /* =========================
+           CONTROL DE TEXTO
+        ========================= */
+
+        .texto {
+
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+
+            white-space: normal;
+
+            line-height: 9px;
+
+        }
+
+
+        /* =========================
+           ANCHOS
+        ========================= */
+
+        .fecha {
+            width: 5.5%;
+        }
+
+        .auditor {
+            width: 9%;
+        }
+
+        .cedula {
+            width: 6%;
+        }
+
+        .aplicativo {
+            width: 7%;
+        }
+
+        .fecha-operacion {
+            width: 6.5%;
+        }
+
+        .tecnico {
+            width: 9%;
+        }
+
+        .cuenta {
+            width: 8%;
+        }
+
+        .orden {
+            width: 6%;
+        }
+
+        .tipo-operacion {
+            width: 8%;
+        }
+
+        .resultado {
+            width: 7%;
+        }
+
+        .observacion {
+            width: 11%;
+        }
+
+        .tipo-hallazgo {
+            width: 7.5%;
+        }
+
+        .hallazgo {
+            width: 9.5%;
+        }
+
+
+        /* =========================
+           CENTRAR DATOS CORTOS
+        ========================= */
+
+        .centrado {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+
+        /* =========================
+           TEXTO LARGO
+        ========================= */
+
+        .largo {
+
+            text-align: left;
+
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+
+            line-height: 9px;
+
+        }
+
+
+        /* =========================
+           MENSAJE SIN RESULTADOS
+        ========================= */
+
+        .sin-resultados {
+
+            text-align: center;
+
+            font-size: 9px;
+
+            padding: 15px;
+
+            color: #666666;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <h1>
+        Reporte de Auditorías
+    </h1>
+
+
+    <div class="info">
+
+        <strong>Total de registros:</strong>
+        {{ Auditorias|length }}
+
+    </div>
+
+
+    <table>
+
+
+        <thead>
+
+            <tr>
+
+                <th class="fecha">
+                    Fecha
+                </th>
+
+                <th class="auditor">
+                    Auditor
+                </th>
+
+                <th class="cedula">
+                    Cédula
+                </th>
+
+                <th class="aplicativo">
+                    Aplicativo
+                </th>
+
+                <th class="fecha-operacion">
+                    Fecha<br>
+                    Operación
+                </th>
+
+                <th class="tecnico">
+                    Técnico
+                </th>
+
+                <th class="cuenta">
+                    Cuenta
+                </th>
+
+                <th class="orden">
+                    Orden
+                </th>
+
+                <th class="tipo-operacion">
+                    Tipo<br>
+                    Operación
+                </th>
+
+                <th class="resultado">
+                    Resultado
+                </th>
+
+                <th class="observacion">
+                    Observación
+                </th>
+
+                <th class="tipo-hallazgo">
+                    Tipo<br>
+                    Hallazgo
+                </th>
+
+                <th class="hallazgo">
+                    Hallazgo
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+            {% for a in Auditorias %}
+
+
+            <tr>
+
+                <td class="centrado">
+                    {{ a.fecha|date:"d/m/Y" }}
+                </td>
+
+
+                <td class="texto">
+                    {{ a.nombre_auditor }}
+                </td>
+
+
+                <td class="centrado">
+                    {{ a.numero_cedula }}
+                </td>
+
+
+                <td class="texto">
+                    {{ a.aplicativo }}
+                </td>
+
+
+                <td class="centrado">
+                    {{ a.fecha_operacion|date:"d/m/Y" }}
+                </td>
+
+
+                <td class="texto">
+                    {{ a.nombre_tecnico }}
+                </td>
+
+
+                <td class="centrado">
+                    {{ a.numero_cuenta_contrato }}
+                </td>
+
+
+                <td class="centrado">
+                    {{ a.numero_orden }}
+                </td>
+
+
+                <td class="texto">
+                    {{ a.tipo_operacion }}
+                </td>
+
+
+                <td class="texto">
+                    {{ a.resultado_auditoria }}
+                </td>
+
+
+                <td class="largo">
+                    {{ a.observacion }}
+                </td>
+
+
+                <td class="texto">
+                    {{ a.tipo_hallazgo }}
+                </td>
+
+
+                <td class="largo">
+                    {{ a.hallazgo }}
+                </td>
+
+            </tr>
+
+
+            {% empty %}
+
+
+            <tr>
+
+                <td colspan="13" class="sin-resultados">
+
+                    No se encontraron auditorías.
+
+                </td>
+
+            </tr>
+
+
+            {% endfor %}
+
+
+        </tbody>
+
+
+    </table>
+
+
+</body>
+
+</html>

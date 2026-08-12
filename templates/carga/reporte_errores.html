@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <style>
+
+        @page {
+            size: A4 landscape;
+            margin: 12px;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 8.5px;
+            color: #222222;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* =====================================================
+           TITULO
+        ====================================================== */
+
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+            padding: 0;
+        }
+
+        /* =====================================================
+           INFORMACION GENERAL
+        ====================================================== */
+
+        .info {
+            font-size: 9px;
+            margin-bottom: 8px;
+            color: #555555;
+        }
+
+        /* =====================================================
+           BLOQUE DE ERROR
+        ====================================================== */
+
+        .error-bloque {
+            margin-bottom: 12px;
+            page-break-inside: avoid;
+        }
+
+        .error-encabezado {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-bottom: 4px;
+        }
+
+        .error-encabezado th {
+            background-color: #dc2626;
+            color: white;
+            border: 0.5px solid #991b1b;
+            padding: 5px 4px;
+            text-align: center;
+            font-size: 8.5px;
+            font-weight: bold;
+        }
+
+        .error-encabezado td {
+            border: 0.5px solid #b8b8b8;
+            padding: 5px 4px;
+            font-size: 9px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .col-fila {
+            width: 8%;
+        }
+
+        .col-campo {
+            width: 20%;
+        }
+
+        .col-error {
+            width: 72%;
+        }
+
+        .fila-error {
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #991b1b;
+        }
+
+        .campo-error {
+            color: #991b1b;
+            font-weight: bold;
+        }
+
+        .mensaje-error {
+            color: #7f1d1d;
+        }
+
+        /* =====================================================
+           TABLA DE DATOS
+        ====================================================== */
+
+        .tabla-datos {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .tabla-datos thead {
+            display: table-header-group;
+        }
+
+        .tabla-datos th {
+            background-color: #374151;
+            color: white;
+
+            border: 0.5px solid #1f2937;
+
+            padding: 4px 3px;
+
+            text-align: center;
+            vertical-align: middle;
+
+            font-size: 7.5px;
+            font-weight: bold;
+
+            line-height: 9px;
+        }
+
+        .tabla-datos td {
+            border: 0.5px solid #b8b8b8;
+
+            padding: 4px 3px;
+
+            font-size: 8px;
+
+            line-height: 9.5px;
+
+            vertical-align: middle;
+
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+
+            white-space: normal;
+        }
+
+        .tabla-datos tr {
+            page-break-inside: avoid;
+        }
+
+        .tabla-datos tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .tabla-datos tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        /* =====================================================
+           ANCHOS DE COLUMNAS
+        ====================================================== */
+
+        .fecha {
+            width: 6%;
+        }
+
+        .auditor {
+            width: 9%;
+        }
+
+        .cedula {
+            width: 6%;
+        }
+
+        .aplicativo {
+            width: 7%;
+        }
+
+        .fecha-operacion {
+            width: 6%;
+        }
+
+        .tecnico {
+            width: 9%;
+        }
+
+        .cuenta {
+            width: 8%;
+        }
+
+        .orden {
+            width: 6%;
+        }
+
+        .tipo-operacion {
+            width: 8%;
+        }
+
+        .resultado {
+            width: 7%;
+        }
+
+        .observacion {
+            width: 10%;
+        }
+
+        .tipo-hallazgo {
+            width: 7%;
+        }
+
+        .hallazgo {
+            width: 11%;
+        }
+
+        /* =====================================================
+           TEXTO
+        ====================================================== */
+
+        .centrado {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .texto {
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        .largo {
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        /* =====================================================
+           RESALTADO DEL REGISTRO CON ERROR
+        ====================================================== */
+
+        .registro-error {
+            background-color: #fff7ed;
+        }
+
+        /* =====================================================
+           SEPARADOR
+        ====================================================== */
+
+        .separador {
+            height: 5px;
+        }
+
+        /* =====================================================
+           SIN RESULTADOS
+        ====================================================== */
+
+        .sin-resultados {
+            text-align: center;
+            font-size: 10px;
+            padding: 15px;
+            color: #666666;
+        }
+
+        /* =====================================================
+           RESUMEN FINAL
+        ====================================================== */
+
+        .resumen-final {
+            margin-top: 10px;
+            padding-top: 6px;
+
+            border-top: 1px solid #d1d5db;
+
+            font-size: 9px;
+            color: #555555;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         TITULO
+    ====================================================== -->
+
+    <h1>
+        Reporte de errores - Carga masiva de auditorías
+    </h1>
+
+
+    <!-- =====================================================
+         INFORMACION
+    ====================================================== -->
+
+    <div class="info">
+
+        <strong>
+            Total de registros con error:
+        </strong>
+
+        {{ errores|length }}
+
+    </div>
+
+
+    <!-- =====================================================
+         REGISTROS
+    ====================================================== -->
+
+    {% for record in errores %}
+
+
+        <div class="error-bloque">
+
+
+            <!-- =================================================
+                 INFORMACION DEL ERROR
+            ================================================== -->
+
+            
+
+                <table class="error-encabezado">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="col-fila">
+                                Fila Excel
+                            </th>
+
+                            <th class="col-campo">
+                                Campo
+                            </th>
+
+                            <th class="col-error">
+                                Error
+                            </th>
+
+                        </tr>
+
+                    </thead>
+                    {% for field, error_message in record.errors.items %}
+
+
+                    <tbody>
+
+                        <tr>
+
+                            <td class="fila-error">
+
+                                {{ record.row }}
+
+                            </td>
+
+
+                            <td class="campo-error">
+
+                                {{ field }}
+
+                            </td>
+
+
+                            <td class="mensaje-error">
+
+                                {{ error_message }}
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            {% endfor %}
+
+
+            <!-- =================================================
+                 DATOS DEL REGISTRO
+            ================================================== -->
+
+            <table class="tabla-datos">
+
+
+                <thead>
+
+                    <tr>
+
+                        <th class="fecha">
+                            Fecha
+                        </th>
+
+                        <th class="auditor">
+                            Auditor
+                        </th>
+
+                        <th class="cedula">
+                            Cédula
+                        </th>
+
+                        <th class="aplicativo">
+                            Aplicativo
+                        </th>
+
+                        <th class="fecha-operacion">
+                            Fecha<br>
+                            Operación
+                        </th>
+
+                        <th class="tecnico">
+                            Técnico
+                        </th>
+
+                        <th class="cuenta">
+                            Cuenta
+                        </th>
+
+                        <th class="orden">
+                            Orden
+                        </th>
+
+                        <th class="tipo-operacion">
+                            Tipo<br>
+                            Operación
+                        </th>
+
+                        <th class="resultado">
+                            Resultado
+                        </th>
+
+                        <th class="observacion">
+                            Observación
+                        </th>
+
+                        <th class="tipo-hallazgo">
+                            Tipo<br>
+                            Hallazgo
+                        </th>
+
+                        <th class="hallazgo">
+                            Hallazgo
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr class="registro-error">
+
+
+                        <!-- FECHA -->
+
+                        <td class="centrado">
+
+                            {{ record.data.fecha|date:"d/m/Y" }}
+
+                        </td>
+
+
+                        <!-- AUDITOR -->
+
+                        <td class="texto">
+
+                            {{ record.data.nombre_auditor }}
+
+                        </td>
+
+
+                        <!-- CEDULA -->
+
+                        <td class="centrado">
+
+                            {{ record.data.numero_cedula }}
+
+                        </td>
+
+
+                        <!-- APLICATIVO -->
+
+                        <td class="texto">
+
+                            {{ record.data.aplicativo }}
+
+                        </td>
+
+
+                        <!-- FECHA OPERACION -->
+
+                        <td class="centrado">
+
+                            {{ record.data.fecha_operacion|date:"d/m/Y" }}
+
+                        </td>
+
+
+                        <!-- TECNICO -->
+
+                        <td class="texto">
+
+                            {{ record.data.nombre_tecnico }}
+
+                        </td>
+
+
+                        <!-- CUENTA -->
+
+                        <td class="centrado">
+
+                            {{ record.data.numero_cuenta_contrato }}
+
+                        </td>
+
+
+                        <!-- ORDEN -->
+
+                        <td class="centrado">
+
+                            {{ record.data.numero_orden }}
+
+                        </td>
+
+
+                        <!-- TIPO OPERACION -->
+
+                        <td class="texto">
+
+                            {{ record.data.tipo_operacion }}
+
+                        </td>
+
+
+                        <!-- RESULTADO -->
+
+                        <td class="texto">
+
+                            {{ record.data.resultado_auditoria }}
+
+                        </td>
+
+
+                        <!-- OBSERVACION -->
+
+                        <td class="largo">
+
+                            {{ record.data.observacion }}
+
+                        </td>
+
+
+                        <!-- TIPO HALLAZGO -->
+
+                        <td class="texto">
+
+                            {{ record.data.tipo_hallazgo }}
+
+                        </td>
+
+
+                        <!-- HALLAZGO -->
+
+                        <td class="largo">
+
+                            {{ record.data.hallazgo }}
+
+                        </td>
+
+
+                    </tr>
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    {% empty %}
+
+
+        <table class="tabla-datos">
+
+            <tbody>
+
+                <tr>
+
+                    <td
+                        colspan="13"
+                        class="sin-resultados"
+                    >
+
+                        No se encontraron registros con errores.
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+
+    {% endfor %}
+
+
+    <!-- =====================================================
+         RESUMEN
+    ====================================================== -->
+
+    <div class="resumen-final">
+
+        <strong>
+            Resumen:
+        </strong>
+
+        Se encontraron
+
+        {{ errores|length }}
+
+        registros que no pudieron ser creados.
+
+    </div>
+
+
+</body>
+
+</html>

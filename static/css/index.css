@@ -1,16 +1,15 @@
 body {
     margin: 0;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
+    background: linear-gradient(135deg, #0f172a, #2c3c57);
     font-family: Arial, Helvetica, sans-serif;
     color: white;
     min-height: 100vh;
-}
-
+   }
 .dashboard {
     width: 90%;
     max-width: 1100px;
     margin: 0 auto;
-    padding: 50px 20px;
+    padding: 34px 20px;
 }
 
 .dashboard-header {
@@ -29,6 +28,49 @@ body {
     font-size: 18px;
     color: #cbd5e1;
     margin: 0;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background-color: #0b111f(112, 108, 108);
+    border-radius: 10px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stats h2 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+}
+
+.stats img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.stats:hover {
+    transform: translateY(-8px);
+    background: rgba(20, 68, 88, 0.15);
+    border-color: #38bdf8;
+    box-shadow:
+        0 15px 35px rgba(46, 46, 46, 0.35),
+        0 0 20px rgba(56, 189, 248, 0.15);
 }
 
 .menu {

@@ -27,7 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LANGUAGE_CODE = 'es-co'
 
+USE_I18N = True
+
+USE_TZ = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -64,10 +69,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'auditorias.context_processors.estadisticas',
             ],
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'config.wsgi.application'
 

@@ -163,7 +163,7 @@ Consultas
         </div>
 
         <div class="filtro">
-            <label>Fecha Operación Desde</label>
+            <label>Fecha Operacion Ejecucion Desde</label>
             <input
                 type="date"
                 name="fecha_inicio"
@@ -171,34 +171,72 @@ Consultas
         </div>
 
         <div class="filtro">
-            <label>Fecha Operación Hasta</label>
+            <label>Fecha Operacion Ejecucion Hasta</label>
             <input
                 type="date"
                 name="fecha_fin"
                 value="{{ request.GET.fecha_fin|default:'' }}">
         </div>
 
+        <div class="filtro">
+            <label>Fecha Auditoria Desde</label>
+            <input
+                type="date"
+                name="fecha_inicio_auditoria"
+                value="{{ request.GET.fecha_inicio_auditoria|default:'' }}">
+        </div>
 
-        <div class="botones">
+        <div class="filtro">
+            <label>Fecha Auditoria Hasta</label>
+            <input
+                type="date"
+                name="fecha_fin_auditoria"
+                value="{{ request.GET.fecha_fin_auditoria|default:'' }}">
+        </div>
 
-            <button type="submit">
-                Filtrar
-            </button>
 
-            <button
-                type="submit"
-                formaction="{% url 'generar_pdf' %}"
-                formmethod="GET">
-                Generar PDF
-            </button>
+    </form>
 
-            <a href="{% url 'consulta' %}">
-                Limpiar filtros
-            </a>
+        <div class="resumen-consulta">
+
+            <h2>Total de auditorías: {{ Cantidad }}</h2>
+
+            <div class="botones">
+
+                <!-- FILTRAR -->
+                <button
+                    type="submit"
+                    form="form-filtros">
+                    Filtrar
+                </button>
+
+                <!-- PDF -->
+                <button
+                    type="submit"
+                    form="form-filtros"
+                    formaction="{% url 'generar_pdf' %}"
+                    formmethod="GET">
+                    Generar PDF
+                </button>
+
+                <!-- EXCEL -->
+                <button
+                    type="submit"
+                    form="form-filtros"
+                    formaction="{% url 'exportar-excel' %}"
+                    formmethod="GET">
+                    Generar Excel
+                </button>
+
+                <!-- LIMPIAR -->
+                <a href="{% url 'consulta' %}">
+                    Limpiar filtros
+                </a>
+
+            </div>
 
         </div>
 
-    </form>
 
 </div>
 
@@ -225,11 +263,11 @@ Consultas
     <tbody>
         {% for a in Auditorias %}
         <tr>
-            <td>{{a.fecha}}</td>
+            <td>{{ a.fecha|date:"d/m/Y" }}</td>
             <td>{{a.nombre_auditor}}</td>
             <td>{{a.numero_cedula}}</td>
             <td>{{a.aplicativo}}</td>
-            <td>{{a.fecha_operacion}}</td>
+            <td>{{ a.fecha_operacion|date:"d/m/Y" }}</td>
             <td>{{a.nombre_tecnico}}</td>
             <td>{{a.numero_cuenta_contrato}}</td>
             <td>{{a.numero_orden}}</td>

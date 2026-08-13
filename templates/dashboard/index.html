@@ -18,19 +18,36 @@ AuditoriasSW
         <p>Bienvenido al panel principal</p>
     </div>
 
-    <div class="menu">
+    <div class="stats-container">
 
-        <!-- Imagen superior -->
-        <a href="{% url 'carga' %}" class="menu-card principal">
-            <img src="{% static 'img/carta.png' %}" alt="Carga de auditorías">
-            <div class="card-text">
-                <h2>Cargar</h2>
-                <p>Registrar una nueva auditoría</p>
-            </div>
-        </a>
+        <div class="stats">
+            <h2>Suspenciones: {{ Suspensiones }}</h2>
+            <img src="{% static 'img/flecha_abajo.png' %}" alt="Carga de auditorías">
+        </div>
+        <div class="stats">
+            <h2>Reconexiones: {{ Reconexiones }}</h2>
+            <img src="{% static 'img/flecha_arriba1.png' %}" alt="Carga de auditorías">
+        </div>
+        <div class="stats">
+            <h2>Zvcl: {{ Zvcl }}</h2>
+            <img src="{% static 'img/zvcl.png' %}" alt="Carga de auditorías">
+        </div>
+        <div class="stats">
+            <h2>Total: {{ Cantidad }}</h2>
+            <img src="{% static 'img/total.png' %}" alt="Carga de auditorías">
+        </div>
+    </div>
 
         <!-- Dos imágenes inferiores -->
         <div class="bottom-cards">
+
+            <a href="{% url 'carga' %}" class="menu-card principal">
+                <img src="{% static 'img/carta.png' %}" alt="Carga de auditorías">
+                <div class="card-text">
+                    <h2>Cargar</h2>
+                    <p>Registrar una nueva auditoría</p>
+                </div>
+            </a>
 
             <a href="{% url 'estadistica' %}" class="menu-card">
                 <img src="{% static 'img/estadisticas.png' %}" alt="Estadísticas">
@@ -49,8 +66,6 @@ AuditoriasSW
             </a>
 
         </div>
-
-    </div>
 
 </div>
 

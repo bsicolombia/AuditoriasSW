@@ -55,7 +55,7 @@ def filtrar_auditorias(request):
     # ==========================================
 
     filtros = {
-        # Fecha diligenciamiento - EXACTA
+
         "fecha": "fecha",
 
         "nombre_auditor": "nombre_auditor__icontains",
@@ -64,7 +64,6 @@ def filtrar_auditorias(request):
 
         "aplicativo": "aplicativo__icontains",
 
-        # Fecha operación - EXACTA
         "fecha_operacion": "fecha_operacion",
 
         "nombre_tecnico": "nombre_tecnico__icontains",
@@ -72,9 +71,7 @@ def filtrar_auditorias(request):
         "numero_cuenta_contrato": "numero_cuenta_contrato__icontains",
 
         "numero_orden": "numero_orden__icontains",
-
-        # Tipo operación - EXACTA
-        # DC00 NO encontrará DC000
+        
         "tipo_operacion": "tipo_operacion",
 
         "resultado_auditoria": "resultado_auditoria",
@@ -107,7 +104,7 @@ def filtrar_auditorias(request):
     if fecha_inicio:
 
         auditorias = auditorias.filter(
-            fecha_operacion__gte=fecha_inicio
+            fecha__gte=fecha_inicio
         )
 
     # ==========================================
@@ -119,21 +116,54 @@ def filtrar_auditorias(request):
     if fecha_fin:
 
         auditorias = auditorias.filter(
-            fecha_operacion__lte=fecha_fin
+            fecha__lte=fecha_fin
         )
 
+    # ==========================================
+    # FECHA AUDITORÍA DESDE
+    # Campo: fecha
+    # ==========================================
+
+    fecha_inicio_auditoria = request.GET.get(
+        "fecha_inicio_auditoria"
+    )
+
+    if fecha_inicio_auditoria:
+
+        auditorias = auditorias.filter(
+            fecha__gte=fecha_inicio_auditoria
+        )
+
+    # ==========================================
+    # FECHA AUDITORÍA HASTA
+    # Campo: fecha
+    # ==========================================
+
+    fecha_fin_auditoria = request.GET.get(
+        "fecha_fin_auditoria"
+    )
+
+    if fecha_fin_auditoria:
+
+        auditorias = auditorias.filter(
+            fecha__lte=fecha_fin_auditoria
+        )
+    
     return auditorias
 
 
 def consulta(request):
 
     auditorias = filtrar_auditorias(request)
+    cantidad = auditorias.count()
 
     return render(
         request,
         "auditorias/consulta.html",
+
         {
-            "Auditorias": auditorias
+            "Auditorias": auditorias,
+            "Cantidad": cantidad
         }
     )
 
@@ -145,7 +175,7 @@ def generate_pdf(request):
     cantidad = auditorias.count()
 
     # Evitar generar PDFs demasiado grandes
-    if cantidad > 2000:
+    if cantidad > 50000:
 
         return HttpResponse(
             f"""
@@ -212,8 +242,51 @@ def generate_pdf(request):
 
     return response
 
-
+def exportar_excel(request):
+    auditorias = filtrar_auditorias(request)
+    datos =[]
+    
+    for a in auditorias:
+        datos.append({
+            "Fecha": a.fecha,
+            "Nombre Auditor": a.nombre_auditor,
+            "Numero Cedula": a.numero_cedula,
+            "Aplicativo": a.aplicativo,
+            "Fecha Operacion": a.fecha_operacion,
+            "Nombre Tecnico": a.nombre_tecnico,
+            "Numero Cuenta Contrato": a.numero_cuenta_contrato,
+            "Numero Orden": a.numero_orden,
+            "Tipo Operacion": a.tipo_operacion,
+            "Resultado Auditoria": a.resultado_auditoria,
+            "Observacion": a.observacion,
+            "Tipo Hallazgo": a.tipo_hallazgo,
+            "Hallazgo": a.hallazgo
+        })
+    
+    df = pd.DataFrame(datos)
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    
+    response["Content-Disposition"] = (
+        'attachment; filename="auditorias.xlsx"'
+    )
+    
+    with pd.ExcelWriter(
+        response,
+        engine="openpyxl"
+    ) as writer:
+        
+        df.to_excel(
+            writer,
+            index=False,
+            sheet_name="Auditorias"
+        )
+        
+        return response
+    
 def estadistica(request):
+    
 
     return render(
         request,

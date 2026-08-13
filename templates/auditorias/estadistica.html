@@ -1,19 +1,803 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
 Estadisticas
 {% endblock %}
 
-
-
 {% block content %}
 
-<h1>
-Estadisticas de Auditorias
-</h1>
+<h1>Estadísticas de Auditorías</h1>
 
 
+<!-- ================================================= -->
+<!-- CONTENEDOR DE LAS DOS GRÁFICAS -->
+<!-- ================================================= -->
+
+<div
+    style="
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 25px;
+        margin-top: 25px;
+        align-items: start;
+    "
+>
+
+
+    <!-- ================================================= -->
+    <!-- GRÁFICA POR TIPO DE OPERACIÓN -->
+    <!-- ================================================= -->
+
+    <div class="grafica-card">
+
+        <!-- ENCABEZADO -->
+
+        <div
+            style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 20px;
+            "
+        >
+
+            <div>
+
+                <h2
+                    style="
+                        margin: 0;
+                        color: #1e293b;
+                        font-size: 20px;
+                    "
+                >
+                    Auditorías por operación
+                </h2>
+
+                <p
+                    style="
+                        margin: 5px 0 0;
+                        color: #64748b;
+                        font-size: 13px;
+                    "
+                >
+                    Comparación de registros
+                </p>
+
+            </div>
+
+
+            <!-- TOTAL -->
+
+            <div
+                style="
+                    background: #eff6ff;
+                    border: 1px solid #bfdbfe;
+                    border-radius: 10px;
+                    padding: 8px 14px;
+                    text-align: center;
+                    min-width: 90px;
+                "
+            >
+
+                <div
+                    style="
+                        font-size: 10px;
+                        color: #64748b;
+                        font-weight: 600;
+                    "
+                >
+                    TOTAL
+                </div>
+
+                <div
+                    style="
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #2563eb;
+                    "
+                >
+                    {{ Cantidad }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- GRÁFICA -->
+
+        <div style="height: 300px;">
+
+            <canvas id="graficaAuditorias"></canvas>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- GRÁFICA POR TÉCNICO -->
+    <!-- ================================================= -->
+
+    <div class="grafica-card">
+
+        <!-- ENCABEZADO -->
+
+        <div
+            style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 15px;
+                flex-wrap: wrap;
+            "
+        >
+
+            <div>
+
+                <h2
+                    style="
+                        margin: 0;
+                        color: #1e293b;
+                        font-size: 20px;
+                    "
+                >
+                    Auditorías por técnico
+                </h2>
+
+                <p
+                    style="
+                        margin: 5px 0 0;
+                        color: #64748b;
+                        font-size: 13px;
+                    "
+                >
+                    Cantidad realizada por técnico
+                </p>
+
+            </div>
+
+
+            <!-- TOTAL TÉCNICOS -->
+
+            <div
+                style="
+                    background: #f5f3ff;
+                    border: 1px solid #ddd6fe;
+                    border-radius: 10px;
+                    padding: 8px 14px;
+                    text-align: center;
+                    min-width: 80px;
+                "
+            >
+
+                <div
+                    style="
+                        font-size: 10px;
+                        color: #64748b;
+                        font-weight: 600;
+                    "
+                >
+                    TÉCNICOS
+                </div>
+
+                <div
+                    style="
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #7c3aed;
+                    "
+                >
+                    {{ Cantidad_Tecnicos }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FILTRO -->
+
+        <div style="margin-bottom: 15px;">
+
+            <select id="filtroTecnico">
+
+                <option value="todos">
+                    Todos los técnicos
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- GRÁFICA CON SCROLL -->
+
+        <div
+            style="
+                max-height: 350px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 8px;
+            "
+        >
+
+            <div id="contenedorGraficaTecnicos">
+
+                <canvas id="graficaTecnicos"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- LIBRERÍAS -->
+<!-- ================================================= -->
+
+<link
+    href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css"
+    rel="stylesheet"
+>
+
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<!-- ================================================= -->
+<!-- DATOS DE TÉCNICOS -->
+<!-- ================================================= -->
+
+{{ Estadisticas_Tecnico|json_script:"datos-tecnicos" }}
+
+
+<script>
+
+
+// =================================================
+// GRÁFICA POR TIPO DE OPERACIÓN
+// =================================================
+
+const ctx = document.getElementById(
+    'graficaAuditorias'
+);
+
+
+new Chart(ctx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: [
+            'Suspensiones',
+            'Reconexiones',
+            'ZVCL'
+        ],
+
+        datasets: [{
+
+            label: 'Auditorías',
+
+            data: [
+                {{ Suspensiones }},
+                {{ Reconexiones }},
+                {{ Zvcl }}
+            ],
+
+            backgroundColor: [
+                '#ef4444',
+                '#22c55e',
+                '#3b82f6'
+            ],
+
+            borderRadius: 7,
+
+            borderSkipped: false,
+
+            barThickness: 45
+
+        }]
+
+    },
+
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+
+        plugins: {
+
+            legend: {
+                display: false
+            },
+
+
+            tooltip: {
+
+                callbacks: {
+
+                    label: function(context) {
+
+                        return (
+                            ' Auditorías: ' +
+                            context.parsed.y
+                        );
+
+                    }
+
+                }
+
+            }
+
+        },
+
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    stepSize: 5,
+
+                    color: '#64748b',
+
+                    font: {
+                        size: 11
+                    }
+
+                },
+
+                grid: {
+
+                    color: '#e2e8f0'
+
+                }
+
+            },
+
+
+            x: {
+
+                ticks: {
+
+                    color: '#334155',
+
+                    font: {
+
+                        size: 12,
+
+                        weight: '600'
+
+                    }
+
+                },
+
+                grid: {
+
+                    display: false
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+
+
+// =================================================
+// DATOS DE TÉCNICOS
+// =================================================
+
+const datosTecnicos = JSON.parse(
+
+    document.getElementById(
+        'datos-tecnicos'
+    ).textContent
+
+);
+
+
+// =================================================
+// ORDENAR
+// =================================================
+
+datosTecnicos.sort(function(a, b) {
+
+    return b.total - a.total;
+
+});
+
+
+// =================================================
+// SELECT
+// =================================================
+
+const filtroTecnico = document.getElementById(
+    'filtroTecnico'
+);
+
+
+// =================================================
+// CARGAR TÉCNICOS
+// =================================================
+
+datosTecnicos.forEach(function(tecnico) {
+
+    const option =
+        document.createElement('option');
+
+
+    option.value =
+        tecnico.nombre_tecnico;
+
+
+    option.textContent =
+        tecnico.nombre_tecnico +
+        ' (' +
+        tecnico.total +
+        ')';
+
+
+    filtroTecnico.appendChild(option);
+
+});
+
+
+// =================================================
+// TOM SELECT
+// =================================================
+
+const buscadorTecnico = new TomSelect(
+    '#filtroTecnico',
+    {
+
+        placeholder: 'Buscar técnico...',
+
+        allowEmptyOption: false,
+
+        maxOptions: 100,
+
+        searchField: ['text'],
+
+        sortField: {
+
+            field: 'text',
+
+            direction: 'asc'
+
+        }
+
+    }
+);
+
+
+// =================================================
+// VARIABLE GRÁFICA
+// =================================================
+
+let graficaTecnicos = null;
+
+
+// =================================================
+// ACTUALIZAR GRÁFICA
+// =================================================
+
+function actualizarGraficaTecnicos() {
+
+
+    const tecnicoSeleccionado =
+        buscadorTecnico.getValue();
+
+
+    // =============================================
+    // FILTRAR
+    // =============================================
+
+    let datosFiltrados;
+
+
+    if (
+        !tecnicoSeleccionado ||
+        tecnicoSeleccionado === 'todos'
+    ) {
+
+        datosFiltrados =
+            datosTecnicos;
+
+    } else {
+
+        datosFiltrados =
+            datosTecnicos.filter(
+                function(tecnico) {
+
+                    return (
+                        tecnico.nombre_tecnico ===
+                        tecnicoSeleccionado
+                    );
+
+                }
+            );
+
+    }
+
+
+    // =============================================
+    // ARRAYS
+    // =============================================
+
+    const nombres = [];
+
+    const cantidades = [];
+
+
+    datosFiltrados.forEach(function(tecnico) {
+
+        nombres.push(
+            tecnico.nombre_tecnico
+        );
+
+        cantidades.push(
+            tecnico.total
+        );
+
+    });
+
+
+    // =============================================
+    // ALTURA
+    // =============================================
+
+    const contenedor =
+        document.getElementById(
+            'contenedorGraficaTecnicos'
+        );
+
+
+    const alturaPorTecnico = 38;
+
+    const alturaMinima = 350;
+
+    const alturaMaxima = 2500;
+
+
+    const alturaCalculada = Math.max(
+
+        alturaMinima,
+
+        Math.min(
+
+            nombres.length *
+            alturaPorTecnico,
+
+            alturaMaxima
+
+        )
+
+    );
+
+
+    contenedor.style.height =
+        alturaCalculada + 'px';
+
+
+    // =============================================
+    // DESTRUIR GRÁFICA
+    // =============================================
+
+    if (graficaTecnicos) {
+
+        graficaTecnicos.destroy();
+
+    }
+
+
+    // =============================================
+    // CREAR GRÁFICA
+    // =============================================
+
+    const ctxTecnicos =
+        document.getElementById(
+            'graficaTecnicos'
+        );
+
+
+    graficaTecnicos = new Chart(
+
+        ctxTecnicos,
+
+        {
+
+            type: 'bar',
+
+
+            data: {
+
+                labels: nombres,
+
+                datasets: [{
+
+                    label: 'Auditorías',
+
+                    data: cantidades,
+
+                    backgroundColor:
+                        '#8b5cf6',
+
+                    borderRadius: 6,
+
+                    borderSkipped: false,
+
+                    barThickness: 22
+
+                }]
+
+            },
+
+
+            options: {
+
+                indexAxis: 'y',
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(
+                                context
+                            ) {
+
+                                return (
+                                    ' Auditorías: ' +
+                                    context.parsed.x
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    x: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            stepSize: 5,
+
+                            color:
+                                '#64748b',
+
+                            font: {
+                                size: 10
+                            }
+
+                        },
+
+                        grid: {
+
+                            color:
+                                '#e2e8f0'
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        ticks: {
+
+                            color:
+                                '#334155',
+
+                            font: {
+
+                                size: 11
+
+                            }
+
+                        },
+
+                        grid: {
+
+                            display: false
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+// =================================================
+// EVENTO FILTRO
+// =================================================
+
+buscadorTecnico.on(
+    'change',
+    actualizarGraficaTecnicos
+);
+
+
+// =================================================
+// CARGAR
+// =================================================
+
+actualizarGraficaTecnicos();
+
+
+//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+
+
+
+
+
+</script>
+
+
+<!-- ================================================= -->
+<!-- RESPONSIVE -->
+<!-- ================================================= -->
+
+<style>
+
+@media (max-width: 900px) {
+
+    div[style*="grid-template-columns"] {
+
+        grid-template-columns: 1fr !important;
+
+    }
+
+}
+
+</style>
 
 
 {% endblock %}

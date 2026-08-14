@@ -115,8 +115,6 @@ Estadisticas
 
     </div>
 
-
-
     <!-- ================================================= -->
     <!-- GRÁFICA POR TÉCNICO -->
     <!-- ================================================= -->
@@ -235,6 +233,449 @@ Estadisticas
 
     </div>
 
+    <!-- ================================================= -->
+    <!-- GRÁFICA DE AUDITORÍAS POR DÍA -->
+    <!-- ================================================= -->
+
+    <div class="grafica-card">
+
+        <div
+            style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 15px;
+                flex-wrap: wrap;
+            "
+        >
+
+            <div>
+
+                <h2
+                    style="
+                        margin: 0;
+                        color: #1e293b;
+                        font-size: 20px;
+                    "
+                >
+                    Auditorías por día
+                </h2>
+
+                <p
+                    style="
+                        margin: 5px 0 0;
+                        color: #64748b;
+                        font-size: 13px;
+                    "
+                >
+                    Cantidad de auditorías realizadas por día
+                </p>
+
+            </div>
+
+            <div
+                style="
+                    background: #f5f3ff;
+                    border: 1px solid #ddd6fe;
+                    border-radius: 10px;
+                    padding: 8px 14px;
+                    text-align: center;
+                    min-width: 80px;
+                "
+            >
+
+                <div
+                    style="
+                        font-size: 10px;
+                        color: #64748b;
+                        font-weight: 600;
+                    "
+                >
+                    AUDITORÍAS
+                </div>
+
+                <div
+                    id="totalAuditoriasFiltrado"
+                    style="
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #7c3aed;
+                    "
+                >
+                    {{ Cantidad }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FILTRO -->
+
+        <div style="
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        ">
+
+            <!-- AÑO -->
+            <select id="filtroAnio">
+                <option value="todos">
+                    Todos los años
+                </option>
+            </select>
+
+            <!-- MES -->
+            <select id="filtroMes">
+                <option value="todos">
+                    Todos los meses
+                </option>
+            </select>
+
+            <!-- DÍA -->
+            <select id="filtroAuditoriaDia">
+                <option value="todos">
+                    Todos los días
+                </option>
+            </select>
+
+        </div>
+
+        <!-- CONTENEDOR DE LA GRÁFICA -->
+
+        <div
+            style="
+                height: 350px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 8px;
+            "
+        >
+
+            <div
+                id="ContenedorGraficaAuditoriaDia"
+                style="
+                    position: relative;
+                    width: 100%;
+                    min-height: 350px;
+                "
+            >
+
+                <canvas id="graficaAuditoria_dia"></canvas>
+
+            </div>
+
+        </div>
+    
+    </div>
+
+    <!-- ================================================= -->
+    <!-- GRÁFICA DE AUDITORÍAS QUE NO CUMPLEN -->
+    <!-- ================================================= -->
+
+    <div class="grafica-card">
+
+        <!-- ENCABEZADO -->
+
+        <div
+            style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 15px;
+                flex-wrap: wrap;
+            "
+        >
+
+            <div>
+
+                <h2
+                    style="
+                        margin: 0;
+                        color: #1e293b;
+                        font-size: 20px;
+                    "
+                >
+                    Auditorías que no cumplen
+                </h2>
+
+                <p
+                    style="
+                        margin: 5px 0 0;
+                        color: #64748b;
+                        font-size: 13px;
+                    "
+                >
+                    Cantidad de auditorías que no cumplen por día
+                </p>
+
+            </div>
+
+
+            <!-- TOTAL -->
+
+            <div
+                style="
+                    background: #fef2f2;
+                    border: 1px solid #fecaca;
+                    border-radius: 10px;
+                    padding: 8px 14px;
+                    text-align: center;
+                    min-width: 90px;
+                "
+            >
+
+                <div
+                    style="
+                        font-size: 10px;
+                        color: #64748b;
+                        font-weight: 600;
+                    "
+                >
+                    TOTAL NO CUMPLEN
+                </div>
+
+                <div
+                    id="totalNoCumplen"
+                    style="
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #dc2626;
+                    "
+                >
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FILTROS AÑO Y MES -->
+        <!-- ================================================= -->
+
+        <div
+            style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 15px;
+            "
+        >
+
+            <!-- AÑO -->
+
+            <select id="filtroAnioNoCumplen">
+
+                <option value="todos">
+                    Todos los años
+                </option>
+
+            </select>
+
+
+            <!-- MES -->
+
+            <select id="filtroMesNoCumplen">
+
+                <option value="todos">
+                    Todos los meses
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- GRÁFICA -->
+        <!-- ================================================= -->
+
+        <div
+            style="
+                height: 350px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 8px;
+            "
+        >
+
+            <div
+                id="contenedorGraficaNoCumplen"
+                style="
+                    position: relative;
+                    width: 100%;
+                    min-height: 350px;
+                "
+            >
+
+                <canvas id="graficaNoCumplen"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================================= -->
+    <!-- HALLAZGOS POR TÉCNICO -->
+    <!-- ================================================= -->
+
+    <div class="grafica-card">
+
+        <div
+            style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 15px;
+                flex-wrap: wrap;
+            "
+        >
+
+            <div>
+
+                <h2
+                    style="
+                        margin: 0;
+                        color: #1e293b;
+                        font-size: 20px;
+                    "
+                >
+                    Hallazgos por técnico
+                </h2>
+
+                <p
+                    style="
+                        margin: 5px 0 0;
+                        color: #64748b;
+                        font-size: 13px;
+                    "
+                >
+                    Cantidad de hallazgos encontrados por técnico
+                </p>
+
+            </div>
+
+
+            <!-- TOTAL -->
+
+            <div
+                style="
+                    background: #fef2f2;
+                    border: 1px solid #fecaca;
+                    border-radius: 10px;
+                    padding: 8px 14px;
+                    text-align: center;
+                    min-width: 110px;
+                "
+            >
+
+                <div
+                    style="
+                        font-size: 10px;
+                        color: #64748b;
+                        font-weight: 600;
+                    "
+                >
+                    TOTAL HALLAZGOS
+                </div>
+
+                <div
+                    id="totalHallazgosTecnico"
+                    style="
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #dc2626;
+                    "
+                >
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FILTROS -->
+
+        <div
+            style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 15px;
+            "
+        >
+
+            <select id="filtroAnioHallazgos">
+
+                <option value="todos">
+                    Todos los años
+                </option>
+
+            </select>
+
+
+            <select id="filtroMesHallazgos">
+
+                <option value="todos">
+                    Todos los meses
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- PERÍODO -->
+
+        <div
+            id="periodoHallazgosTecnico"
+            style="
+                margin-bottom: 15px;
+                color: #64748b;
+                font-size: 13px;
+                font-weight: 600;
+            "
+        >
+            Período: Todos los períodos
+        </div>
+
+
+        <!-- GRÁFICA -->
+
+        <div
+            style="
+                height: 350px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 8px;
+            "
+        >
+
+            <div
+                id="contenedorGraficaHallazgosTecnico"
+                style="
+                    position: relative;
+                    width: 100%;
+                    min-height: 350px;
+                "
+            >
+
+                <canvas id="graficaHallazgosTecnico"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 
@@ -250,146 +691,272 @@ Estadisticas
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 
 <!-- ================================================= -->
-<!-- DATOS DE TÉCNICOS -->
+<!-- DATOS DJANGO -->
 <!-- ================================================= -->
 
 {{ Estadisticas_Tecnico|json_script:"datos-tecnicos" }}
+{{ Auditoria_Dia|json_script:"datos-Auditoria_Dia" }}
+{{ Datos_No_Cumplen|json_script:"datos-No-Cumplen" }}
+{{ Estadisticas_Hallazgos_Tecnico|json_script:"datos-Hallazgos-Tecnico" }}
 
 
 <script>
 
+// ============================================================
+// CONFIGURACIÓN GENERAL
+// ============================================================
 
-// =================================================
-// GRÁFICA POR TIPO DE OPERACIÓN
-// =================================================
-
-const ctx = document.getElementById(
-    'graficaAuditorias'
-);
+Chart.register(ChartDataLabels);
 
 
-new Chart(ctx, {
+// ============================================================
+// FUNCIONES GENERALES
+// ============================================================
 
-    type: 'bar',
+function numero(valor) {
 
-    data: {
+    return Number(valor || 0);
 
-        labels: [
-            'Suspensiones',
-            'Reconexiones',
-            'ZVCL'
+}
+
+
+function formatearNumero(valor) {
+
+    return numero(valor).toLocaleString('es-CO');
+
+}
+
+
+function formatearFecha(fecha) {
+
+    if (!fecha) {
+        return '';
+    }
+
+    const partes = fecha.split('-');
+
+    if (partes.length !== 3) {
+        return fecha;
+    }
+
+    return (
+        partes[2] +
+        '/' +
+        partes[1] +
+        '/' +
+        partes[0]
+    );
+
+}
+
+
+function obtenerAnio(fecha) {
+
+    return fecha.split('-')[0];
+
+}
+
+
+function obtenerMes(fecha) {
+
+    return fecha.split('-')[1];
+
+}
+
+
+const nombresMeses = {
+
+    '01': 'Enero',
+    '02': 'Febrero',
+    '03': 'Marzo',
+    '04': 'Abril',
+    '05': 'Mayo',
+    '06': 'Junio',
+    '07': 'Julio',
+    '08': 'Agosto',
+    '09': 'Septiembre',
+    '10': 'Octubre',
+    '11': 'Noviembre',
+    '12': 'Diciembre'
+
+};
+
+
+// ============================================================
+// 1. GRÁFICA POR TIPO DE OPERACIÓN
+// ============================================================
+
+const ctxOperaciones =
+    document.getElementById('graficaAuditorias');
+
+
+if (ctxOperaciones) {
+
+    new Chart(ctxOperaciones, {
+
+        type: 'bar',
+
+        plugins: [
+            ChartDataLabels
         ],
 
-        datasets: [{
+        data: {
 
-            label: 'Auditorías',
-
-            data: [
-                {{ Suspensiones }},
-                {{ Reconexiones }},
-                {{ Zvcl }}
+            labels: [
+                'Suspensiones',
+                'Reconexiones',
+                'ZVCL'
             ],
 
-            backgroundColor: [
-                '#ef4444',
-                '#22c55e',
-                '#3b82f6'
-            ],
+            datasets: [{
 
-            borderRadius: 7,
+                label: 'Auditorías',
 
-            borderSkipped: false,
+                data: [
+                    numero({{ Suspensiones|default:0 }}),
+                    numero({{ Reconexiones|default:0 }}),
+                    numero({{ Zvcl|default:0 }})
+                ],
 
-            barThickness: 45
+                backgroundColor: [
+                    '#ef4444',
+                    '#22c55e',
+                    '#3b82f6'
+                ],
 
-        }]
+                borderRadius: 7,
 
-    },
+                borderSkipped: false,
 
+                barThickness: 45,
 
-    options: {
+                maxBarThickness: 45
 
-        responsive: true,
-
-        maintainAspectRatio: false,
-
-
-        plugins: {
-
-            legend: {
-                display: false
-            },
-
-
-            tooltip: {
-
-                callbacks: {
-
-                    label: function(context) {
-
-                        return (
-                            ' Auditorías: ' +
-                            context.parsed.y
-                        );
-
-                    }
-
-                }
-
-            }
+            }]
 
         },
 
+        options: {
 
-        scales: {
+            responsive: true,
 
-            y: {
+            maintainAspectRatio: false,
 
-                beginAtZero: true,
+            layout: {
 
-                ticks: {
+                padding: {
+                    top: 25,
+                    right: 15,
+                    left: 10,
+                    bottom: 5
+                }
 
-                    stepSize: 5,
+            },
 
-                    color: '#64748b',
+            plugins: {
+
+                legend: {
+                    display: false
+                },
+
+                datalabels: {
+
+                    anchor: 'end',
+
+                    align: 'top',
+
+                    offset: 5,
+
+                    color: '#1e293b',
+
+                    clip: false,
 
                     font: {
-                        size: 11
+
+                        size: 14,
+
+                        weight: '700'
+
+                    },
+
+                    formatter: function(value) {
+
+                        return formatearNumero(value);
+
                     }
 
                 },
 
-                grid: {
+                tooltip: {
 
-                    color: '#e2e8f0'
+                    callbacks: {
+
+                        label: function(context) {
+
+                            return (
+                                ' Auditorías: ' +
+                                formatearNumero(context.parsed.y)
+                            );
+
+                        }
+
+                    }
 
                 }
 
             },
 
+            scales: {
 
-            x: {
+                y: {
 
-                ticks: {
+                    beginAtZero: true,
 
-                    color: '#334155',
+                    grace: '15%',
 
-                    font: {
+                    ticks: {
 
-                        size: 12,
+                        color: '#64748b',
 
-                        weight: '600'
+                        font: {
+                            size: 11
+                        }
+
+                    },
+
+                    grid: {
+
+                        color: '#e2e8f0'
 
                     }
 
                 },
 
-                grid: {
+                x: {
 
-                    display: false
+                    ticks: {
+
+                        color: '#334155',
+
+                        font: {
+
+                            size: 12,
+
+                            weight: '600'
+
+                        }
+
+                    },
+
+                    grid: {
+
+                        display: false
+
+                    }
 
                 }
 
@@ -397,15 +964,14 @@ new Chart(ctx, {
 
         }
 
-    }
+    });
 
-});
+}
 
 
-
-// =================================================
-// DATOS DE TÉCNICOS
-// =================================================
+// ============================================================
+// 2. DATOS DE TÉCNICOS
+// ============================================================
 
 const datosTecnicos = JSON.parse(
 
@@ -416,133 +982,118 @@ const datosTecnicos = JSON.parse(
 );
 
 
-// =================================================
-// ORDENAR
-// =================================================
+// ============================================================
+// ORDENAR TÉCNICOS
+// ============================================================
 
 datosTecnicos.sort(function(a, b) {
 
-    return b.total - a.total;
+    return numero(b.total) - numero(a.total);
 
 });
 
 
-// =================================================
-// SELECT
-// =================================================
+// ============================================================
+// SELECT TÉCNICO
+// ============================================================
 
-const filtroTecnico = document.getElementById(
-    'filtroTecnico'
-);
+const filtroTecnico =
+    document.getElementById(
+        'filtroTecnico'
+    );
 
 
-// =================================================
+// ============================================================
 // CARGAR TÉCNICOS
-// =================================================
+// ============================================================
 
 datosTecnicos.forEach(function(tecnico) {
 
-    const option =
-        document.createElement('option');
+    filtroTecnico.add(
 
+        new Option(
 
-    option.value =
-        tecnico.nombre_tecnico;
+            tecnico.nombre_tecnico +
+            ' (' +
+            formatearNumero(tecnico.total) +
+            ')',
 
+            tecnico.nombre_tecnico
 
-    option.textContent =
-        tecnico.nombre_tecnico +
-        ' (' +
-        tecnico.total +
-        ')';
+        )
 
-
-    filtroTecnico.appendChild(option);
+    );
 
 });
 
 
-// =================================================
-// TOM SELECT
-// =================================================
+// ============================================================
+// TOM SELECT TÉCNICO
+// ============================================================
 
-const buscadorTecnico = new TomSelect(
-    '#filtroTecnico',
-    {
+const buscadorTecnico =
+    new TomSelect(
 
-        placeholder: 'Buscar técnico...',
+        '#filtroTecnico',
 
-        allowEmptyOption: false,
+        {
 
-        maxOptions: 100,
+            placeholder:
+                'Buscar técnico...',
 
-        searchField: ['text'],
+            searchField:
+                ['text'],
 
-        sortField: {
+            sortField: {
 
-            field: 'text',
+                field: 'text',
 
-            direction: 'asc'
+                direction: 'asc'
+
+            }
 
         }
 
-    }
-);
+    );
 
 
-// =================================================
-// VARIABLE GRÁFICA
-// =================================================
+// ============================================================
+// GRÁFICA TÉCNICOS
+// ============================================================
 
 let graficaTecnicos = null;
 
 
-// =================================================
-// ACTUALIZAR GRÁFICA
-// =================================================
-
 function actualizarGraficaTecnicos() {
-
 
     const tecnicoSeleccionado =
         buscadorTecnico.getValue();
 
 
-    // =============================================
-    // FILTRAR
-    // =============================================
-
-    let datosFiltrados;
+    let datosFiltrados = [
+        ...datosTecnicos
+    ];
 
 
     if (
-        !tecnicoSeleccionado ||
-        tecnicoSeleccionado === 'todos'
+
+        tecnicoSeleccionado &&
+        tecnicoSeleccionado !== 'todos'
+
     ) {
 
         datosFiltrados =
-            datosTecnicos;
+            datosFiltrados.filter(function(tecnico) {
 
-    } else {
+                return (
+                    tecnico.nombre_tecnico ===
+                    tecnicoSeleccionado
+                );
 
-        datosFiltrados =
-            datosTecnicos.filter(
-                function(tecnico) {
-
-                    return (
-                        tecnico.nombre_tecnico ===
-                        tecnicoSeleccionado
-                    );
-
-                }
-            );
+            });
 
     }
 
-
-    // =============================================
-    // ARRAYS
-    // =============================================
 
     const nombres = [];
 
@@ -556,15 +1107,11 @@ function actualizarGraficaTecnicos() {
         );
 
         cantidades.push(
-            tecnico.total
+            numero(tecnico.total)
         );
 
     });
 
-
-    // =============================================
-    // ALTURA
-    // =============================================
 
     const contenedor =
         document.getElementById(
@@ -576,32 +1123,18 @@ function actualizarGraficaTecnicos() {
 
     const alturaMinima = 350;
 
-    const alturaMaxima = 2500;
-
-
-    const alturaCalculada = Math.max(
-
-        alturaMinima,
-
-        Math.min(
-
-            nombres.length *
-            alturaPorTecnico,
-
-            alturaMaxima
-
-        )
-
-    );
-
 
     contenedor.style.height =
-        alturaCalculada + 'px';
 
+        Math.max(
 
-    // =============================================
-    // DESTRUIR GRÁFICA
-    // =============================================
+            alturaMinima,
+
+            nombres.length *
+            alturaPorTecnico
+
+        ) + 'px';
+
 
     if (graficaTecnicos) {
 
@@ -610,11 +1143,7 @@ function actualizarGraficaTecnicos() {
     }
 
 
-    // =============================================
-    // CREAR GRÁFICA
-    // =============================================
-
-    const ctxTecnicos =
+    const canvas =
         document.getElementById(
             'graficaTecnicos'
         );
@@ -622,12 +1151,15 @@ function actualizarGraficaTecnicos() {
 
     graficaTecnicos = new Chart(
 
-        ctxTecnicos,
+        canvas,
 
         {
 
             type: 'bar',
 
+            plugins: [
+                ChartDataLabels
+            ],
 
             data: {
 
@@ -646,12 +1178,13 @@ function actualizarGraficaTecnicos() {
 
                     borderSkipped: false,
 
-                    barThickness: 22
+                    barThickness: 22,
+
+                    maxBarThickness: 22
 
                 }]
 
             },
-
 
             options: {
 
@@ -661,25 +1194,65 @@ function actualizarGraficaTecnicos() {
 
                 maintainAspectRatio: false,
 
+                animation: false,
+
+                layout: {
+
+                    padding: {
+
+                        right: 45
+
+                    }
+
+                },
 
                 plugins: {
 
                     legend: {
+
                         display: false
+
                     },
 
+                    datalabels: {
+
+                        anchor: 'end',
+
+                        align: 'end',
+
+                        offset: 5,
+
+                        color: '#334155',
+
+                        clip: false,
+
+                        font: {
+
+                            size: 11,
+
+                            weight: '600'
+
+                        },
+
+                        formatter: function(value) {
+
+                            return formatearNumero(value);
+
+                        }
+
+                    },
 
                     tooltip: {
 
                         callbacks: {
 
-                            label: function(
-                                context
-                            ) {
+                            label: function(context) {
 
                                 return (
                                     ' Auditorías: ' +
-                                    context.parsed.x
+                                    formatearNumero(
+                                        context.parsed.x
+                                    )
                                 );
 
                             }
@@ -690,7 +1263,6 @@ function actualizarGraficaTecnicos() {
 
                 },
 
-
                 scales: {
 
                     x: {
@@ -699,10 +1271,7 @@ function actualizarGraficaTecnicos() {
 
                         ticks: {
 
-                            stepSize: 5,
-
-                            color:
-                                '#64748b',
+                            color: '#64748b',
 
                             font: {
                                 size: 10
@@ -712,20 +1281,17 @@ function actualizarGraficaTecnicos() {
 
                         grid: {
 
-                            color:
-                                '#e2e8f0'
+                            color: '#e2e8f0'
 
                         }
 
                     },
 
-
                     y: {
 
                         ticks: {
 
-                            color:
-                                '#334155',
+                            color: '#334155',
 
                             font: {
 
@@ -754,32 +1320,2177 @@ function actualizarGraficaTecnicos() {
 }
 
 
-// =================================================
-// EVENTO FILTRO
-// =================================================
-
 buscadorTecnico.on(
+
     'change',
+
     actualizarGraficaTecnicos
+
 );
 
-
-// =================================================
-// CARGAR
-// =================================================
 
 actualizarGraficaTecnicos();
 
 
-//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+// ============================================================
+// 3. AUDITORÍAS POR DÍA
+// ============================================================
+
+const datosPorDia = JSON.parse(
+
+    document.getElementById(
+        'datos-Auditoria_Dia'
+    ).textContent
+
+);
 
 
+datosPorDia.sort(function(a, b) {
 
+    return (
+        a.fecha_operacion.localeCompare(
+            b.fecha_operacion
+        )
+    );
+
+});
+
+
+// ============================================================
+// SELECTORES
+// ============================================================
+
+const filtroAnio =
+    document.getElementById(
+        'filtroAnio'
+    );
+
+
+const filtroMes =
+    document.getElementById(
+        'filtroMes'
+    );
+
+
+const filtroAuditoriaDia =
+    document.getElementById(
+        'filtroAuditoriaDia'
+    );
+
+
+// ============================================================
+// TOM SELECT AÑO
+// ============================================================
+
+const buscadorAnio =
+    new TomSelect(
+
+        '#filtroAnio',
+
+        {
+
+            placeholder:
+                'Buscar año...',
+
+            searchField:
+                ['text'],
+
+            sortField: {
+
+                field: 'text',
+
+                direction: 'desc'
+
+            }
+
+        }
+
+    );
+
+
+// ============================================================
+// TOM SELECT MES
+// ============================================================
+
+const buscadorMes =
+    new TomSelect(
+
+        '#filtroMes',
+
+        {
+
+            placeholder:
+                'Buscar mes...',
+
+            searchField:
+                ['text'],
+
+            sortField: {
+
+                field: 'text',
+
+                direction: 'asc'
+
+            }
+
+        }
+
+    );
+
+
+// ============================================================
+// TOM SELECT DÍA
+// ============================================================
+
+const buscadorDia =
+    new TomSelect(
+
+        '#filtroAuditoriaDia',
+
+        {
+
+            placeholder:
+                'Buscar día...',
+
+            searchField:
+                ['text'],
+
+            sortField: {
+
+                field: 'text',
+
+                direction: 'asc'
+
+            }
+
+        }
+
+    );
+
+
+// ============================================================
+// CARGAR AÑOS
+// ============================================================
+
+const anios = [
+
+    ...new Set(
+
+        datosPorDia.map(function(auditoria) {
+
+            return obtenerAnio(
+                auditoria.fecha_operacion
+            );
+
+        })
+
+    )
+
+];
+
+
+anios.sort(function(a, b) {
+
+    return b.localeCompare(a);
+
+});
+
+
+anios.forEach(function(anio) {
+
+    buscadorAnio.addOption({
+
+        value: anio,
+
+        text: anio
+
+    });
+
+});
+
+
+buscadorAnio.refreshOptions(false);
+
+
+// ============================================================
+// CARGAR MESES
+// ============================================================
+
+for (let numero = 1; numero <= 12; numero++) {
+
+    const mes =
+        String(numero).padStart(2, '0');
+
+
+    buscadorMes.addOption({
+
+        value: mes,
+
+        text: nombresMeses[mes]
+
+    });
+
+}
+
+
+buscadorMes.refreshOptions(false);
+
+
+// ============================================================
+// CARGAR DÍAS SEGÚN AÑO Y MES
+// ============================================================
+
+function cargarDias() {
+
+    const anioSeleccionado =
+        buscadorAnio.getValue();
+
+
+    const mesSeleccionado =
+        buscadorMes.getValue();
+
+
+    buscadorDia.clear();
+
+    buscadorDia.clearOptions();
+
+
+    buscadorDia.addOption({
+
+        value: 'todos',
+
+        text: 'Todos los días'
+
+    });
+
+
+    let diasDisponibles =
+        [...datosPorDia];
+
+
+    if (
+
+        anioSeleccionado &&
+        anioSeleccionado !== 'todos'
+
+    ) {
+
+        diasDisponibles =
+            diasDisponibles.filter(function(auditoria) {
+
+                return (
+
+                    obtenerAnio(
+                        auditoria.fecha_operacion
+                    ) ===
+                    anioSeleccionado
+
+                );
+
+            });
+
+    }
+
+
+    if (
+
+        mesSeleccionado &&
+        mesSeleccionado !== 'todos'
+
+    ) {
+
+        diasDisponibles =
+            diasDisponibles.filter(function(auditoria) {
+
+                return (
+
+                    obtenerMes(
+                        auditoria.fecha_operacion
+                    ) ===
+                    mesSeleccionado
+
+                );
+
+            });
+
+    }
+
+
+    diasDisponibles.sort(function(a, b) {
+
+        return (
+            a.fecha_operacion.localeCompare(
+                b.fecha_operacion
+            )
+        );
+
+    });
+
+
+    diasDisponibles.forEach(function(auditoria) {
+
+        buscadorDia.addOption({
+
+            value:
+                auditoria.fecha_operacion,
+
+            text:
+
+                formatearFecha(
+                    auditoria.fecha_operacion
+                ) +
+
+                ' (' +
+
+                formatearNumero(
+                    auditoria.total
+                ) +
+
+                ')'
+
+        });
+
+    });
+
+
+    buscadorDia.refreshOptions(false);
+
+}
+
+
+cargarDias();
+
+
+// ============================================================
+// GRÁFICA AUDITORÍAS POR DÍA
+// ============================================================
+
+let graficaAuditoriaDia = null;
+
+
+function actualizarGraficaAuditoriaDia() {
+
+    const anioSeleccionado =
+        buscadorAnio.getValue();
+
+
+    const mesSeleccionado =
+        buscadorMes.getValue();
+
+
+    const diaSeleccionado =
+        buscadorDia.getValue();
+
+
+    let datosFiltrados =
+        [...datosPorDia];
+
+
+    // --------------------------------------------------------
+    // FILTRO AÑO
+    // --------------------------------------------------------
+
+    if (
+
+        anioSeleccionado &&
+        anioSeleccionado !== 'todos'
+
+    ) {
+
+        datosFiltrados =
+            datosFiltrados.filter(function(auditoria) {
+
+                return (
+
+                    obtenerAnio(
+                        auditoria.fecha_operacion
+                    ) ===
+                    anioSeleccionado
+
+                );
+
+            });
+
+    }
+
+
+    // --------------------------------------------------------
+    // FILTRO MES
+    // --------------------------------------------------------
+
+    if (
+
+        mesSeleccionado &&
+        mesSeleccionado !== 'todos'
+
+    ) {
+
+        datosFiltrados =
+            datosFiltrados.filter(function(auditoria) {
+
+                return (
+
+                    obtenerMes(
+                        auditoria.fecha_operacion
+                    ) ===
+                    mesSeleccionado
+
+                );
+
+            });
+
+    }
+
+
+    // --------------------------------------------------------
+    // FILTRO DÍA
+    // --------------------------------------------------------
+
+    if (
+
+        diaSeleccionado &&
+        diaSeleccionado !== 'todos'
+
+    ) {
+
+        datosFiltrados =
+            datosFiltrados.filter(function(auditoria) {
+
+                return (
+
+                    auditoria.fecha_operacion ===
+                    diaSeleccionado
+
+                );
+
+            });
+
+    }
+
+
+    // --------------------------------------------------------
+    // TOTAL
+    // --------------------------------------------------------
+
+    const totalFiltrado =
+        datosFiltrados.reduce(function(total, auditoria) {
+
+            return (
+                total +
+                numero(auditoria.total)
+            );
+
+        }, 0);
+
+
+    const totalElemento =
+        document.getElementById(
+            'totalAuditoriasFiltrado'
+        );
+
+
+    totalElemento.textContent =
+        formatearNumero(totalFiltrado);
+
+
+    // --------------------------------------------------------
+    // DATOS DEL GRÁFICO
+    // --------------------------------------------------------
+
+    let fechas = [];
+
+    let cantidades = [];
+
+
+    // --------------------------------------------------------
+    // SI SE SELECCIONA AÑO SIN MES
+    // MOSTRAR LOS 12 MESES
+    // --------------------------------------------------------
+
+    if (
+
+        anioSeleccionado &&
+        anioSeleccionado !== 'todos' &&
+        (
+            !mesSeleccionado ||
+            mesSeleccionado === 'todos'
+        )
+
+    ) {
+
+        const nombres = [
+
+            'Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Septiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre'
+
+        ];
+
+
+        const totales =
+            Array(12).fill(0);
+
+
+        datosFiltrados.forEach(function(auditoria) {
+
+            const mes =
+                Number(
+                    obtenerMes(
+                        auditoria.fecha_operacion
+                    )
+                );
+
+
+            if (mes >= 1 && mes <= 12) {
+
+                totales[mes - 1] +=
+                    numero(auditoria.total);
+
+            }
+
+        });
+
+
+        fechas = nombres;
+
+        cantidades = totales;
+
+    }
+
+
+    // --------------------------------------------------------
+    // SI NO ES AÑO COMPLETO
+    // MOSTRAR POR DÍA
+    // --------------------------------------------------------
+
+    else {
+
+        datosFiltrados.sort(function(a, b) {
+
+            return (
+                a.fecha_operacion.localeCompare(
+                    b.fecha_operacion
+                )
+            );
+
+        });
+
+
+        datosFiltrados.forEach(function(auditoria) {
+
+            fechas.push(
+                formatearFecha(
+                    auditoria.fecha_operacion
+                )
+            );
+
+            cantidades.push(
+                numero(auditoria.total)
+            );
+
+        });
+
+    }
+
+
+    // --------------------------------------------------------
+    // CONTENEDOR
+    // --------------------------------------------------------
+
+    const contenedor =
+        document.getElementById(
+            'ContenedorGraficaAuditoriaDia'
+        );
+
+
+    const alturaPorRegistro = 42;
+
+    const alturaMinima = 350;
+
+
+    contenedor.style.height =
+
+        Math.max(
+
+            alturaMinima,
+
+            fechas.length *
+            alturaPorRegistro
+
+        ) + 'px';
+
+
+    // --------------------------------------------------------
+    // DESTRUIR GRÁFICA ANTERIOR
+    // --------------------------------------------------------
+
+    if (graficaAuditoriaDia) {
+
+        graficaAuditoriaDia.destroy();
+
+    }
+
+
+    // --------------------------------------------------------
+    // CREAR GRÁFICA
+    // --------------------------------------------------------
+
+    const canvas =
+        document.getElementById(
+            'graficaAuditoria_dia'
+        );
+
+
+    graficaAuditoriaDia = new Chart(
+
+        canvas,
+
+        {
+
+            type: 'bar',
+
+            plugins: [
+                ChartDataLabels
+            ],
+
+            data: {
+
+                labels: fechas,
+
+                datasets: [{
+
+                    label: 'Auditorías',
+
+                    data: cantidades,
+
+                    backgroundColor:
+                        '#8b5cf6',
+
+                    borderRadius: 5,
+
+                    borderSkipped: false,
+
+                    barThickness: 24,
+
+                    maxBarThickness: 24
+
+                }]
+
+            },
+
+            options: {
+
+                indexAxis: 'y',
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                animation: false,
+
+                layout: {
+
+                    padding: {
+
+                        right: 45
+
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    },
+
+                    datalabels: {
+
+                        anchor: 'end',
+
+                        align: 'end',
+
+                        offset: 5,
+
+                        color: '#334155',
+
+                        clip: false,
+
+                        font: {
+
+                            size: 11,
+
+                            weight: '600'
+
+                        },
+
+                        formatter: function(value) {
+
+                            return formatearNumero(value);
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return (
+                                    ' Auditorías: ' +
+                                    formatearNumero(
+                                        context.parsed.x
+                                    )
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            color: '#64748b',
+
+                            font: {
+                                size: 10
+                            }
+
+                        },
+
+                        grid: {
+
+                            color: '#e2e8f0'
+
+                        }
+
+                    },
+
+                    y: {
+
+                        offset: true,
+
+                        ticks: {
+
+                            color: '#334155',
+
+                            font: {
+
+                                size: 11,
+
+                                weight: '600'
+
+                            },
+
+                            padding: 8
+
+                        },
+
+                        grid: {
+
+                            display: false
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+// ============================================================
+// EVENTOS DE FILTROS
+// ============================================================
+
+buscadorAnio.on(
+
+    'change',
+
+    function() {
+
+        buscadorDia.setValue(
+            'todos',
+            true
+        );
+
+        cargarDias();
+
+        actualizarGraficaAuditoriaDia();
+
+    }
+
+);
+
+
+buscadorMes.on(
+
+    'change',
+
+    function() {
+
+        buscadorDia.setValue(
+            'todos',
+            true
+        );
+
+        cargarDias();
+
+        actualizarGraficaAuditoriaDia();
+
+    }
+
+);
+
+
+buscadorDia.on(
+
+    'change',
+
+    function() {
+
+        actualizarGraficaAuditoriaDia();
+
+    }
+
+);
+
+
+// ============================================================
+// CARGAR GRÁFICA INICIAL
+// ============================================================
+
+actualizarGraficaAuditoriaDia();
+
+
+// ============================================================
+// 4. AUDITORÍAS QUE NO CUMPLEN
+// ============================================================
+
+const datosNoCumplen = JSON.parse(
+
+    document.getElementById(
+        'datos-No-Cumplen'
+    ).textContent
+
+);
+
+
+datosNoCumplen.sort(function(a, b) {
+
+    return (
+        a.fecha_operacion.localeCompare(
+            b.fecha_operacion
+        )
+    );
+
+});
+
+
+// ============================================================
+// SELECTORES
+// ============================================================
+
+const filtroAnioNoCumplen =
+    document.getElementById(
+        'filtroAnioNoCumplen'
+    );
+
+
+const filtroMesNoCumplen =
+    document.getElementById(
+        'filtroMesNoCumplen'
+    );
+
+
+// ============================================================
+// CARGAR AÑOS
+// ============================================================
+
+const aniosNoCumplen = [
+
+    ...new Set(
+
+        datosNoCumplen.map(function(auditoria) {
+
+            return obtenerAnio(
+                auditoria.fecha_operacion
+            );
+
+        })
+
+    )
+
+];
+
+
+aniosNoCumplen.sort(function(a, b) {
+
+    return b.localeCompare(a);
+
+});
+
+
+aniosNoCumplen.forEach(function(anio) {
+
+    filtroAnioNoCumplen.add(
+
+        new Option(
+            anio,
+            anio
+        )
+
+    );
+
+});
+
+
+// ============================================================
+// CARGAR MESES
+// ============================================================
+
+for (let numeroMes = 1; numeroMes <= 12; numeroMes++) {
+
+    const mes =
+        String(numeroMes).padStart(2, '0');
+
+
+    filtroMesNoCumplen.add(
+
+        new Option(
+
+            nombresMeses[mes],
+
+            mes
+
+        )
+
+    );
+
+}
+
+
+// ============================================================
+// GRÁFICA
+// ============================================================
+
+let graficaNoCumplen = null;
+
+
+function actualizarGraficaNoCumplen() {
+
+    const anioSeleccionado =
+        filtroAnioNoCumplen.value;
+
+
+    const mesSeleccionado =
+        filtroMesNoCumplen.value;
+
+
+    let datosFiltrados =
+        [...datosNoCumplen];
+
+
+    // --------------------------------------------------------
+    // AÑO
+    // --------------------------------------------------------
+
+    if (
+
+        anioSeleccionado &&
+        anioSeleccionado !== 'todos'
+
+    ) {
+
+        datosFiltrados =
+            datosFiltrados.filter(function(auditoria) {
+
+                return (
+
+                    obtenerAnio(
+                        auditoria.fecha_operacion
+                    ) ===
+                    anioSeleccionado
+
+                );
+
+            });
+
+    }
+
+
+    // --------------------------------------------------------
+    // MES
+    // --------------------------------------------------------
+
+    if (
+
+        mesSeleccionado &&
+        mesSeleccionado !== 'todos'
+
+    ) {
+
+        datosFiltrados =
+            datosFiltrados.filter(function(auditoria) {
+
+                return (
+
+                    obtenerMes(
+                        auditoria.fecha_operacion
+                    ) ===
+                    mesSeleccionado
+
+                );
+
+            });
+
+    }
+
+
+    // --------------------------------------------------------
+    // ORDENAR
+    // --------------------------------------------------------
+
+    datosFiltrados.sort(function(a, b) {
+
+        return (
+            a.fecha_operacion.localeCompare(
+                b.fecha_operacion
+            )
+        );
+
+    });
+
+
+    // --------------------------------------------------------
+    // TOTAL
+    // --------------------------------------------------------
+
+    const total =
+        datosFiltrados.reduce(function(total, auditoria) {
+
+            return (
+                total +
+                numero(auditoria.total)
+            );
+
+        }, 0);
+
+
+    document.getElementById(
+        'totalNoCumplen'
+    ).textContent =
+        formatearNumero(total);
+
+
+    // --------------------------------------------------------
+    // DATOS CHART
+    // --------------------------------------------------------
+
+    const fechas = [];
+
+    const cantidades = [];
+
+
+    datosFiltrados.forEach(function(auditoria) {
+
+        fechas.push(
+
+            formatearFecha(
+                auditoria.fecha_operacion
+            )
+
+        );
+
+
+        cantidades.push(
+            numero(auditoria.total)
+        );
+
+    });
+
+
+    // --------------------------------------------------------
+    // ALTURA
+    // --------------------------------------------------------
+
+    const contenedor =
+        document.getElementById(
+            'contenedorGraficaNoCumplen'
+        );
+
+
+    const alturaPorDia = 42;
+
+    const alturaMinima = 350;
+
+
+    contenedor.style.height =
+
+        Math.max(
+
+            alturaMinima,
+
+            fechas.length *
+            alturaPorDia
+
+        ) + 'px';
+
+
+    // --------------------------------------------------------
+    // DESTRUIR
+    // --------------------------------------------------------
+
+    if (graficaNoCumplen) {
+
+        graficaNoCumplen.destroy();
+
+    }
+
+
+    // --------------------------------------------------------
+    // CREAR
+    // --------------------------------------------------------
+
+    const canvas =
+        document.getElementById(
+            'graficaNoCumplen'
+        );
+
+
+    graficaNoCumplen = new Chart(
+
+        canvas,
+
+        {
+
+            type: 'bar',
+
+            plugins: [
+                ChartDataLabels
+            ],
+
+            data: {
+
+                labels: fechas,
+
+                datasets: [{
+
+                    label: 'No cumplen',
+
+                    data: cantidades,
+
+                    backgroundColor:
+                        '#ef4444',
+
+                    borderRadius: 6,
+
+                    borderSkipped: false,
+
+                    barThickness: 24,
+
+                    maxBarThickness: 24
+
+                }]
+
+            },
+
+            options: {
+
+                indexAxis: 'y',
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                animation: false,
+
+                layout: {
+
+                    padding: {
+
+                        right: 50
+
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    },
+
+                    datalabels: {
+
+                        anchor: 'end',
+
+                        align: 'end',
+
+                        offset: 5,
+
+                        color: '#dc2626',
+
+                        clip: false,
+
+                        font: {
+
+                            size: 12,
+
+                            weight: '700'
+
+                        },
+
+                        formatter: function(value) {
+
+                            return formatearNumero(value);
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return (
+
+                                    ' No cumplen: ' +
+
+                                    formatearNumero(
+                                        context.parsed.x
+                                    )
+
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            color: '#64748b',
+
+                            font: {
+                                size: 10
+                            }
+
+                        },
+
+                        grid: {
+
+                            color: '#e2e8f0'
+
+                        }
+
+                    },
+
+                    y: {
+
+                        offset: true,
+
+                        ticks: {
+
+                            color: '#334155',
+
+                            font: {
+
+                                size: 11,
+
+                                weight: '600'
+
+                            },
+
+                            padding: 8
+
+                        },
+
+                        grid: {
+
+                            display: false
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+// ============================================================
+// EVENTOS
+// ============================================================
+
+filtroAnioNoCumplen.addEventListener(
+
+    'change',
+
+    actualizarGraficaNoCumplen
+
+);
+
+
+filtroMesNoCumplen.addEventListener(
+
+    'change',
+
+    actualizarGraficaNoCumplen
+
+);
+
+
+// ============================================================
+// CARGAR INICIAL
+// ============================================================
+
+actualizarGraficaNoCumplen();
+
+
+// ============================================================
+// 5. HALLAZGOS POR TÉCNICO
+// ============================================================
+
+const datosHallazgosTecnico = JSON.parse(
+
+    document.getElementById(
+        'datos-Hallazgos-Tecnico'
+    ).textContent
+
+);
+
+
+// ============================================================
+// FUNCIONES
+// ============================================================
+
+function obtenerAnioHallazgo(fecha) {
+
+    if (!fecha) {
+        return '';
+    }
+
+    return String(fecha).split('-')[0];
+
+}
+
+
+function obtenerMesHallazgo(fecha) {
+
+    if (!fecha) {
+        return '';
+    }
+
+    return String(fecha).split('-')[1];
+
+}
+
+
+function numeroHallazgo(valor) {
+
+    return Number(valor || 0);
+
+}
+
+
+// ============================================================
+// MESES
+// ============================================================
+
+const nombresMesesHallazgos = {
+
+    '01': 'Enero',
+    '02': 'Febrero',
+    '03': 'Marzo',
+    '04': 'Abril',
+    '05': 'Mayo',
+    '06': 'Junio',
+    '07': 'Julio',
+    '08': 'Agosto',
+    '09': 'Septiembre',
+    '10': 'Octubre',
+    '11': 'Noviembre',
+    '12': 'Diciembre'
+
+};
+
+
+// ============================================================
+// SELECTORES
+// ============================================================
+
+const filtroAnioHallazgosTecnico =
+    document.getElementById(
+        'filtroAnioHallazgos'
+    );
+
+
+const filtroMesHallazgosTecnico =
+    document.getElementById(
+        'filtroMesHallazgos'
+    );
+
+
+// ============================================================
+// CARGAR AÑOS
+// ============================================================
+
+const aniosHallazgos =
+    new Set();
+
+
+datosHallazgosTecnico.forEach(
+    function(hallazgo) {
+
+        if (!hallazgo.fecha_operacion) {
+            return;
+        }
+
+        const anio =
+            obtenerAnioHallazgo(
+                hallazgo.fecha_operacion
+            );
+
+        if (anio) {
+
+            aniosHallazgos.add(anio);
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// ORDENAR AÑOS
+// ============================================================
+
+const listaAniosHallazgos =
+    Array.from(aniosHallazgos);
+
+
+listaAniosHallazgos.sort(
+    function(a, b) {
+
+        return b.localeCompare(a);
+
+    }
+);
+
+
+// ============================================================
+// INSERTAR AÑOS
+// ============================================================
+
+listaAniosHallazgos.forEach(
+    function(anio) {
+
+        filtroAnioHallazgosTecnico.add(
+            new Option(
+                anio,
+                anio
+            )
+        );
+
+    }
+);
+
+
+// ============================================================
+// CARGAR MESES
+// ============================================================
+
+for (
+    let numeroMes = 1;
+    numeroMes <= 12;
+    numeroMes++
+) {
+
+    const mes =
+        String(numeroMes).padStart(
+            2,
+            '0'
+        );
+
+
+    filtroMesHallazgosTecnico.add(
+        new Option(
+            nombresMesesHallazgos[mes],
+            mes
+        )
+    );
+
+}
+
+
+// ============================================================
+// VARIABLE GRÁFICA
+// ============================================================
+
+let graficaHallazgosTecnico = null;
+
+
+// ============================================================
+// ACTUALIZAR GRÁFICA
+// ============================================================
+
+function actualizarGraficaHallazgosTecnico() {
+
+    const anioSeleccionado =
+        filtroAnioHallazgosTecnico.value;
+
+
+    const mesSeleccionado =
+        filtroMesHallazgosTecnico.value;
+
+
+    // ========================================================
+    // COPIAR DATOS
+    // ========================================================
+
+    let datosFiltrados = [
+        ...datosHallazgosTecnico
+    ];
+
+
+    // ========================================================
+    // FILTRO AÑO
+    // ========================================================
+
+    if (
+        anioSeleccionado &&
+        anioSeleccionado !== 'todos'
+    ) {
+
+        datosFiltrados =
+            datosFiltrados.filter(
+                function(hallazgo) {
+
+                    return (
+
+                        hallazgo.fecha_operacion &&
+
+                        obtenerAnioHallazgo(
+                            hallazgo.fecha_operacion
+                        ) ===
+                        anioSeleccionado
+
+                    );
+
+                }
+            );
+
+    }
+
+
+    // ========================================================
+    // FILTRO MES
+    // ========================================================
+
+    if (
+        mesSeleccionado &&
+        mesSeleccionado !== 'todos'
+    ) {
+
+        datosFiltrados =
+            datosFiltrados.filter(
+                function(hallazgo) {
+
+                    return (
+
+                        hallazgo.fecha_operacion &&
+
+                        obtenerMesHallazgo(
+                            hallazgo.fecha_operacion
+                        ) ===
+                        mesSeleccionado
+
+                    );
+
+                }
+            );
+
+    }
+
+
+    // ========================================================
+    // AGRUPAR POR TÉCNICO
+    // ========================================================
+
+    const hallazgosPorTecnico = {};
+
+
+    datosFiltrados.forEach(
+        function(hallazgo) {
+
+            const tecnico =
+                hallazgo.nombre_tecnico;
+
+
+            if (!tecnico) {
+                return;
+            }
+
+
+            if (
+                !hallazgosPorTecnico[tecnico]
+            ) {
+
+                hallazgosPorTecnico[tecnico] =
+                    0;
+
+            }
+
+
+            hallazgosPorTecnico[tecnico] +=
+                numeroHallazgo(
+                    hallazgo.total
+                );
+
+        }
+    );
+
+
+    // ========================================================
+    // CONVERTIR A ARRAY
+    // ========================================================
+
+    const datosAgrupados =
+        Object.entries(
+            hallazgosPorTecnico
+        ).map(
+            function([tecnico, total]) {
+
+                return {
+
+                    nombre_tecnico:
+                        tecnico,
+
+                    total:
+                        total
+
+                };
+
+            }
+        );
+
+
+    // ========================================================
+    // ORDENAR MAYOR A MENOR
+    // ========================================================
+
+    datosAgrupados.sort(
+        function(a, b) {
+
+            return (
+                b.total -
+                a.total
+            );
+
+        }
+    );
+
+
+    // ========================================================
+    // LABELS Y DATOS
+    // ========================================================
+
+    const nombres = [];
+
+    const cantidades = [];
+
+
+    datosAgrupados.forEach(
+        function(tecnico) {
+
+            nombres.push(
+                tecnico.nombre_tecnico
+            );
+
+
+            cantidades.push(
+                numeroHallazgo(
+                    tecnico.total
+                )
+            );
+
+        }
+    );
+
+
+    // ========================================================
+    // TOTAL
+    // ========================================================
+
+    const total =
+        cantidades.reduce(
+            function(acumulado, valor) {
+
+                return (
+                    acumulado +
+                    valor
+                );
+
+            },
+            0
+        );
+
+
+    document.getElementById(
+        'totalHallazgosTecnico'
+    ).textContent =
+        total.toLocaleString('es-CO');
+
+
+    // ========================================================
+    // TEXTO PERÍODO
+    // ========================================================
+
+    let textoPeriodo =
+        'Período: ';
+
+
+    if (
+        anioSeleccionado === 'todos' &&
+        mesSeleccionado === 'todos'
+    ) {
+
+        textoPeriodo +=
+            'Todos los períodos';
+
+    }
+
+    else if (
+        anioSeleccionado !== 'todos' &&
+        mesSeleccionado === 'todos'
+    ) {
+
+        textoPeriodo +=
+            anioSeleccionado;
+
+    }
+
+    else if (
+        anioSeleccionado === 'todos' &&
+        mesSeleccionado !== 'todos'
+    ) {
+
+        textoPeriodo +=
+            nombresMesesHallazgos[
+                mesSeleccionado
+            ];
+
+    }
+
+    else {
+
+        textoPeriodo +=
+            nombresMesesHallazgos[
+                mesSeleccionado
+            ] +
+            ' ' +
+            anioSeleccionado;
+
+    }
+
+
+    document.getElementById(
+        'periodoHallazgosTecnico'
+    ).textContent =
+        textoPeriodo;
+
+
+    // ========================================================
+    // CONTENEDOR
+    // ========================================================
+
+    const contenedor =
+        document.getElementById(
+            'contenedorGraficaHallazgosTecnico'
+        );
+
+
+    const alturaPorTecnico = 38;
+
+    const alturaMinima = 350;
+
+
+    contenedor.style.height =
+
+        Math.max(
+            alturaMinima,
+            nombres.length *
+            alturaPorTecnico
+        ) + 'px';
+
+
+    // ========================================================
+    // DESTRUIR GRÁFICA ANTERIOR
+    // ========================================================
+
+    if (graficaHallazgosTecnico) {
+
+        graficaHallazgosTecnico.destroy();
+
+    }
+
+
+    // ========================================================
+    // CANVAS
+    // ========================================================
+
+    const canvas =
+        document.getElementById(
+            'graficaHallazgosTecnico'
+        );
+
+
+    // ========================================================
+    // CREAR GRÁFICA
+    // ========================================================
+
+    graficaHallazgosTecnico =
+        new Chart(
+            canvas,
+            {
+
+                type: 'bar',
+
+                plugins: [
+                    ChartDataLabels
+                ],
+
+                data: {
+
+                    labels: nombres,
+
+                    datasets: [{
+
+                        label:
+                            'Hallazgos',
+
+                        data:
+                            cantidades,
+
+                        backgroundColor:
+                            '#ef4444',
+
+                        borderRadius:
+                            6,
+
+                        borderSkipped:
+                            false,
+
+                        barThickness:
+                            22,
+
+                        maxBarThickness:
+                            22
+
+                    }]
+
+                },
+
+                options: {
+
+                    indexAxis:
+                        'y',
+
+                    responsive:
+                        true,
+
+                    maintainAspectRatio:
+                        false,
+
+                    animation:
+                        false,
+
+                    layout: {
+
+                        padding: {
+
+                            right: 50
+
+                        }
+
+                    },
+
+                    plugins: {
+
+                        legend: {
+
+                            display:
+                                false
+
+                        },
+
+                        datalabels: {
+
+                            anchor:
+                                'end',
+
+                            align:
+                                'end',
+
+                            offset:
+                                5,
+
+                            color:
+                                '#dc2626',
+
+                            clip:
+                                false,
+
+                            font: {
+
+                                size:
+                                    11,
+
+                                weight:
+                                    '700'
+
+                            },
+
+                            formatter:
+                                function(value) {
+
+                                    return Number(
+                                        value
+                                    ).toLocaleString(
+                                        'es-CO'
+                                    );
+
+                                }
+
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label:
+                                    function(context) {
+
+                                        return (
+
+                                            ' Hallazgos: ' +
+
+                                            Number(
+                                                context.parsed.x
+                                            ).toLocaleString(
+                                                'es-CO'
+                                            )
+
+                                        );
+
+                                    }
+
+                            }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: {
+
+                            beginAtZero:
+                                true,
+
+                            ticks: {
+
+                                color:
+                                    '#64748b',
+
+                                font: {
+
+                                    size:
+                                        10
+
+                                }
+
+                            },
+
+                            grid: {
+
+                                color:
+                                    '#e2e8f0'
+
+                            }
+
+                        },
+
+                        y: {
+
+                            ticks: {
+
+                                color:
+                                    '#334155',
+
+                                font: {
+
+                                    size:
+                                        11
+
+                                }
+
+                            },
+
+                            grid: {
+
+                                display:
+                                    false
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+// ============================================================
+// EVENTO AÑO
+// ============================================================
+
+filtroAnioHallazgosTecnico.addEventListener(
+    'change',
+    actualizarGraficaHallazgosTecnico
+);
+
+
+// ============================================================
+// EVENTO MES
+// ============================================================
+
+filtroMesHallazgosTecnico.addEventListener(
+    'change',
+    actualizarGraficaHallazgosTecnico
+);
+
+
+// ============================================================
+// CARGAR INICIAL
+// ============================================================
+
+actualizarGraficaHallazgosTecnico();
 
 
 
 </script>
 
+
+<!-- ================================================= -->
+<!-- RESPONSIVE -->
+<!-- ================================================= -->
+
+<style>
+
+.grafica-card {
+
+    min-width: 0;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    border: 1px solid #e2e8f0;
+
+}
+
+
+.grafica-card canvas {
+
+    max-width: 100%;
+
+}
+
+
+.grafica-card select {
+
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+
+@media (max-width: 900px) {
+
+    div[style*="grid-template-columns"] {
+
+        grid-template-columns: 1fr !important;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .grafica-card {
+
+        padding: 15px;
+
+    }
+
+}
+
+</style>
 
 <!-- ================================================= -->
 <!-- RESPONSIVE -->

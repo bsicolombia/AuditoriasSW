@@ -4,7 +4,7 @@ from django.template.loader import get_template
 import pandas as pd
 from xhtml2pdf import pisa
 from .models import Auditoria
-
+from django.db.models import Count
 
 def cargar_excel(request):
 
@@ -292,3 +292,203 @@ def estadistica(request):
         request,
         "auditorias/estadistica.html"
     )
+
+def exportar_estadisticas_excel(request):
+
+    # ==========================================
+    # ESTADÍSTICAS GENERALES
+    # ==========================================
+
+    cantidad = Auditoria.objects.count()
+
+    suspensiones = Auditoria.objects.filter(
+        tipo_operacion="DC00"
+    ).count()
+
+    reconexiones = Auditoria.objects.filter(
+        tipo_operacion="RC00"
+    ).count()
+
+    zvcl = Auditoria.objects.filter(
+        tipo_operacion="ZVCL"
+    ).count()
+
+
+    # ==========================================
+    # ESTADÍSTICAS POR TÉCNICO
+    # ==========================================
+
+    estadisticas_tecnico = list(
+        Auditoria.objects
+        .values("nombre_tecnico")
+        .annotate(total=Count("id"))
+        .order_by("-total")
+    )
+
+
+    datos_tecnicos = []
+
+    for tecnico in estadisticas_tecnico:
+
+        datos_tecnicos.append({
+
+            "Nombre Técnico":
+                tecnico["nombre_tecnico"],
+
+            "Cantidad de Auditorías":
+                tecnico["total"]
+
+        })
+
+
+    df_tecnicos = pd.DataFrame(
+        datos_tecnicos
+    )
+
+
+    # ==========================================
+    # ESTADÍSTICAS POR DÍA
+    # ==========================================
+
+    estadisticas_dia = list(
+        Auditoria.objects
+        .values("fecha_operacion")
+        .annotate(total=Count("id"))
+        .order_by("fecha_operacion")
+    )
+
+
+    datos_dias = []
+
+    for dia in estadisticas_dia:
+
+        datos_dias.append({
+
+            "Fecha":
+                dia["fecha_operacion"],
+
+            "Cantidad de Auditorías":
+                dia["total"]
+
+        })
+
+
+    df_dias = pd.DataFrame(
+        datos_dias
+    )
+
+
+    # ==========================================
+    # RESUMEN
+    # ==========================================
+
+    datos_resumen = [
+
+        {
+            "Estadística":
+                "Total de Auditorías",
+
+            "Cantidad":
+                cantidad
+        },
+
+        {
+            "Estadística":
+                "Suspensiones",
+
+            "Cantidad":
+                suspensiones
+        },
+
+        {
+            "Estadística":
+                "Reconexiones",
+
+            "Cantidad":
+                reconexiones
+        },
+
+        {
+            "Estadística":
+                "ZVCL",
+
+            "Cantidad":
+                zvcl
+        },
+
+        {
+            "Estadística":
+                "Total de Técnicos",
+
+            "Cantidad":
+                len(estadisticas_tecnico)
+        }
+
+    ]
+
+
+    df_resumen = pd.DataFrame(
+        datos_resumen
+    )
+
+
+    # ==========================================
+    # CREAR EXCEL
+    # ==========================================
+
+    response = HttpResponse(
+
+        content_type=
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    )
+
+
+    response["Content-Disposition"] = (
+        'attachment; filename="estadisticas_auditorias.xlsx"'
+    )
+
+
+    # ==========================================
+    # ESCRIBIR LAS 3 HOJAS
+    # ==========================================
+
+    with pd.ExcelWriter(
+        response,
+        engine="openpyxl"
+    ) as writer:
+
+        df_resumen.to_excel(
+
+            writer,
+
+            index=False,
+
+            sheet_name="Resumen"
+
+        )
+
+
+        df_tecnicos.to_excel(
+
+            writer,
+
+            index=False,
+
+            sheet_name="Por Tecnico"
+
+        )
+
+
+        df_dias.to_excel(
+
+            writer,
+
+            index=False,
+
+            sheet_name="Por Dia"
+
+        )
+
+
+    return response

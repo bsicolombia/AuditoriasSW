@@ -1,0 +1,133 @@
+<!-- ================================================= -->
+<!-- GRÁFICA DE AUDITORÍAS QUE NO CUMPLEN -->
+<!-- ================================================= -->
+
+<div class="grafica-card">
+
+    <div
+        style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        "
+    >
+
+        <div>
+
+            <h2
+                style="
+                    margin: 0;
+                    color: #1e293b;
+                    font-size: 20px;
+                "
+            >
+                Auditorías que no cumplen
+            </h2>
+
+            <p
+                style="
+                    margin: 5px 0 0;
+                    color: #64748b;
+                    font-size: 13px;
+                "
+            >
+                Cantidad de auditorías que no cumplen por día
+            </p>
+
+        </div>
+
+
+        <div
+            style="
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                border-radius: 10px;
+                padding: 8px 14px;
+                text-align: center;
+                min-width: 90px;
+            "
+        >
+
+            <div
+                style="
+                    font-size: 10px;
+                    color: #64748b;
+                    font-weight: 600;
+                "
+            >
+                TOTAL NO CUMPLEN
+            </div>
+
+            <div
+                id="totalNoCumplen"
+                style="
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #dc2626;
+                "
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        "
+    >
+
+        <select id="filtroAnioNoCumplen">
+
+            <option value="todos">
+                Todos los años
+            </option>
+
+        </select>
+
+
+        <select id="filtroMesNoCumplen">
+
+            <option value="todos">
+                Todos los meses
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div
+        style="
+            height: 350px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 8px;
+        "
+    >
+
+        <div
+            id="contenedorGraficaNoCumplen"
+            style="
+                position: relative;
+                width: 100%;
+                min-height: 350px;
+            "
+        >
+
+            <canvas id="graficaNoCumplen"></canvas>
+
+        </div>
+
+    </div>
+
+</div>

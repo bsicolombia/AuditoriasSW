@@ -21,60 +21,19 @@ class Auditoria(models.Model):
     ]
 
     fecha = models.DateField()
-
-    nombre_auditor = models.CharField(
-        max_length=100
-    )
-
-    numero_cedula = models.CharField(
-        max_length=10
-    )
-
-    aplicativo = models.CharField(
-        max_length=100
-    )
-
+    nombre_auditor = models.CharField(max_length=100)
+    numero_cedula = models.CharField(max_length=10)
+    aplicativo = models.CharField(max_length=100)
     fecha_operacion = models.DateField()
-
-    nombre_tecnico = models.CharField(
-        max_length=200
-    )
-
-    numero_cuenta_contrato = models.CharField(
-        max_length=9
-    )
-
-    numero_orden = models.CharField(
-        max_length=11
-    )
-
-    tipo_operacion = models.CharField(
-        max_length=10,
-        choices=TIPO_OPERACION
-    )
-
-    resultado_auditoria = models.CharField(
-        max_length=20,
-        choices=RESULTADO
-    )
-
-    observacion = models.TextField(
-        blank=True
-    )
-
-    tipo_hallazgo = models.CharField(
-        max_length=20,
-        choices=TIPO_HALLAZGO,
-        blank=True
-    )
-
-    hallazgo = models.TextField(
-        blank=True
-    )
-
-    fecha_carga = models.DateTimeField(
-        auto_now_add=True
-    )
+    nombre_tecnico = models.CharField(max_length=200)
+    numero_cuenta_contrato = models.CharField(max_length=9)
+    numero_orden = models.CharField(max_length=11)
+    tipo_operacion = models.CharField(max_length=10,choices=TIPO_OPERACION)
+    resultado_auditoria = models.CharField(max_length=20,choices=RESULTADO)
+    observacion = models.TextField(blank=True)
+    tipo_hallazgo = models.CharField(max_length=20,choices=TIPO_HALLAZGO,blank=True)
+    hallazgo = models.TextField(blank=True)
+    fecha_carga = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return (

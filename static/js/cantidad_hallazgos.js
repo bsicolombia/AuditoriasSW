@@ -694,20 +694,125 @@ if (!elementoDatosHallazgos) {
     }
 
 
-    // ========================================================
+    // ============================================================
+    // EXPORTAR EXCEL CON LOS MISMOS FILTROS
+    // CANTIDAD DE HALLAZGOS
+    // ============================================================
+
+    const botonExportarHallazgos =
+        document.getElementById(
+            'btnExportarEstadisticas'
+        );
+
+
+    function actualizarUrlExportacionHallazgos() {
+
+        if (!botonExportarHallazgos) {
+            return;
+        }
+
+
+        const anio =
+            filtroAnioHallazgosCantidad.value;
+
+
+        const mes =
+            filtroMesHallazgosCantidad.value;
+
+
+        const url =
+            new URL(
+                botonExportarHallazgos.href,
+                window.location.origin
+            );
+
+
+        // --------------------------------------------------------
+        // LIMPIAR PARÁMETROS ANTERIORES
+        // --------------------------------------------------------
+
+        url.searchParams.delete(
+            'anio_hallazgos'
+        );
+
+        url.searchParams.delete(
+            'mes_hallazgos'
+        );
+
+
+        // --------------------------------------------------------
+        // AÑO
+        // --------------------------------------------------------
+
+        if (
+            anio &&
+            anio !== 'todos'
+        ) {
+
+            url.searchParams.set(
+                'anio_hallazgos',
+                anio
+            );
+
+        }
+
+
+        // --------------------------------------------------------
+        // MES
+        // --------------------------------------------------------
+
+        if (
+            mes &&
+            mes !== 'todos'
+        ) {
+
+            url.searchParams.set(
+                'mes_hallazgos',
+                mes
+            );
+
+        }
+
+
+        botonExportarHallazgos.href =
+            url.toString();
+
+    }
+
+
+    // ============================================================
     // EVENTOS
-    // ========================================================
+    // ============================================================
 
     filtroAnioHallazgosCantidad.addEventListener(
         'change',
-        actualizarGraficaHallazgosCantidad
+        function() {
+
+            actualizarGraficaHallazgosCantidad();
+
+            actualizarUrlExportacionHallazgos();
+
+        }
     );
 
 
     filtroMesHallazgosCantidad.addEventListener(
         'change',
-        actualizarGraficaHallazgosCantidad
+        function() {
+
+            actualizarGraficaHallazgosCantidad();
+
+            actualizarUrlExportacionHallazgos();
+
+        }
     );
+
+
+    // ============================================================
+    // INICIAL
+    // ============================================================
+
+    actualizarUrlExportacionHallazgos();
 
 
     // ========================================================

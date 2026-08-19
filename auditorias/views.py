@@ -519,74 +519,536 @@ def exportar_estadisticas_excel(request):
 
         )
 
-    return respons
+    return response
+
+from django.http import HttpResponse
+from django.db.models import Count
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.table import Table, TableStyleInfo
 
 def exportar_estadisticas(request):
 
+    # ==========================================================
+    # QUERYSET GENERAL
+    # ==========================================================
+
     auditorias = Auditoria.objects.all()
 
+
+    # ==========================================================
+    # FILTROS PARA AUDITORÍAS POR DIGITADOR
+    # ==========================================================
+
+    anio_digitador = request.GET.get(
+        "anio_digitador"
+    )
+
+    mes_digitador = request.GET.get(
+        "mes_digitador"
+    )
+
+
+    auditorias_digitador = auditorias
+
+
+    if anio_digitador:
+
+        auditorias_digitador = (
+            auditorias_digitador
+            .filter(
+                fecha_operacion__year=anio_digitador
+            )
+        )
+
+
+    if mes_digitador:
+
+        auditorias_digitador = (
+            auditorias_digitador
+            .filter(
+                fecha_operacion__month=mes_digitador
+            )
+        )
+
+
+    # ==========================================================
+    # FILTROS PARA CANTIDAD DE HALLAZGOS
+    # ==========================================================
+
+    anio_hallazgos = request.GET.get(
+        "anio_hallazgos"
+    )
+
+    mes_hallazgos = request.GET.get(
+        "mes_hallazgos"
+    )
+
+
+    auditorias_hallazgos = auditorias
+
+
+    if anio_hallazgos:
+
+        auditorias_hallazgos = (
+            auditorias_hallazgos
+            .filter(
+                fecha_operacion__year=anio_hallazgos
+            )
+        )
+
+
+    if mes_hallazgos:
+
+        auditorias_hallazgos = (
+            auditorias_hallazgos
+            .filter(
+                fecha_operacion__month=mes_hallazgos
+            )
+        )
+
+
+    # ==========================================================
+    # CREAR LIBRO
+    # ==========================================================
+
     wb = Workbook()
+
+    ws = wb.active
+
+    ws.title = "Estadísticas"
+
 
     # ==========================================================
     # COLORES
     # ==========================================================
 
-    COLOR_HEADER = "1E293B"
-    COLOR_TOTAL = "D1FAE5"
-    COLOR_SUBHEADER = "E2E8F0"
+    COLOR_TITULO = "1F2937"
+
+    COLOR_HEADER = "D9EAF7"
+
+    COLOR_TOTAL = "D9EAD3"
+
+    COLOR_BORDE = "7F8C8D"
+
+    COLOR_TEXTO = "000000"
 
 
     # ==========================================================
-    # FUNCIONES AUXILIARES
+    # BORDE
     # ==========================================================
 
-    def aplicar_encabezado(ws):
+    borde = Border(
 
-        for celda in ws[1]:
+        left=Side(
+            style="thin",
+            color=COLOR_BORDE
+        ),
+
+        right=Side(
+            style="thin",
+            color=COLOR_BORDE
+        ),
+
+        top=Side(
+            style="thin",
+            color=COLOR_BORDE
+        ),
+
+        bottom=Side(
+            style="thin",
+            color=COLOR_BORDE
+        )
+
+    )
+
+
+    # ==========================================================
+    # FUNCIÓN CREAR TÍTULO
+    # ==========================================================
+
+    def crear_titulo(
+        ws,
+        fila,
+        columna_inicio,
+        columna_fin,
+        titulo,
+        color=COLOR_TITULO
+    ):
+
+        ws.merge_cells(
+
+            start_row=fila,
+
+            start_column=columna_inicio,
+
+            end_row=fila,
+
+            end_column=columna_fin
+
+        )
+
+
+        celda = ws.cell(
+
+            fila,
+
+            columna_inicio
+
+        )
+
+
+        celda.value = titulo
+
+
+        celda.font = Font(
+
+            bold=True,
+
+            color="FFFFFF",
+
+            size=11
+
+        )
+
+
+        celda.fill = PatternFill(
+
+            "solid",
+
+            fgColor=color
+
+        )
+
+
+        celda.alignment = Alignment(
+
+            horizontal="center",
+
+            vertical="center"
+
+        )
+
+
+        celda.border = borde
+
+
+        for columna in range(
+
+            columna_inicio,
+
+            columna_fin + 1
+
+        ):
+
+            ws.cell(
+
+                fila,
+
+                columna
+
+            ).fill = PatternFill(
+
+                "solid",
+
+                fgColor=color
+
+            )
+
+            ws.cell(
+
+                fila,
+
+                columna
+
+            ).border = borde
+
+
+        ws.row_dimensions[fila].height = 22
+
+
+    # ==========================================================
+    # FUNCIÓN CREAR ENCABEZADOS
+    # ==========================================================
+
+    def crear_encabezados(
+        ws,
+        fila,
+        columna,
+        encabezados
+    ):
+
+        for i, encabezado in enumerate(
+            encabezados
+        ):
+
+            celda = ws.cell(
+
+                fila,
+
+                columna + i
+
+            )
+
+
+            celda.value = encabezado
+
 
             celda.font = Font(
+
                 bold=True,
-                color="FFFFFF"
+
+                color=COLOR_TEXTO
+
             )
 
+
             celda.fill = PatternFill(
+
                 "solid",
+
                 fgColor=COLOR_HEADER
+
             )
+
 
             celda.alignment = Alignment(
+
                 horizontal="center",
+
                 vertical="center"
+
             )
 
 
-    def aplicar_total(ws):
+            celda.border = borde
 
-        fila = ws.max_row
 
-        for celda in ws[fila]:
+    # ==========================================================
+    # FUNCIÓN ESCRIBIR DATOS
+    # ==========================================================
+
+    def escribir_datos(
+        ws,
+        fila_inicio,
+        columna_inicio,
+        datos
+    ):
+
+        fila = fila_inicio
+
+
+        for dato in datos:
+
+            for i, valor in enumerate(dato):
+
+                celda = ws.cell(
+
+                    fila,
+
+                    columna_inicio + i
+
+                )
+
+
+                celda.value = valor
+
+
+                celda.border = borde
+
+
+                celda.alignment = Alignment(
+
+                    vertical="center"
+
+                )
+
+
+                if hasattr(
+                    valor,
+                    "strftime"
+                ):
+
+                    celda.number_format = (
+                        "dd/mm/yyyy"
+                    )
+
+
+            fila += 1
+
+
+        if not datos:
+
+            return fila_inicio - 1
+
+
+        return fila - 1
+
+
+    # ==========================================================
+    # FUNCIÓN CREAR TOTAL
+    # ==========================================================
+
+    def crear_total(
+        ws,
+        fila,
+        columna_inicio,
+        valores
+    ):
+
+        for i, valor in enumerate(valores):
+
+            celda = ws.cell(
+
+                fila,
+
+                columna_inicio + i
+
+            )
+
+
+            celda.value = valor
+
 
             celda.font = Font(
+
                 bold=True
+
             )
+
 
             celda.fill = PatternFill(
+
                 "solid",
+
                 fgColor=COLOR_TOTAL
+
             )
 
 
-    def ajustar_columnas(ws):
+            celda.border = borde
 
-        for columna in ws.columns:
+
+            celda.alignment = Alignment(
+
+                horizontal="center",
+
+                vertical="center"
+
+            )
+
+
+    # ==========================================================
+    # FUNCIÓN CREAR TABLA
+    # ==========================================================
+
+    def crear_tabla(
+        ws,
+        nombre,
+        fila_inicio,
+        columna_inicio,
+        fila_fin,
+        columna_fin
+    ):
+
+        # ------------------------------------------------------
+        # NO CREAR TABLA SI NO HAY DATOS
+        # ------------------------------------------------------
+
+        if fila_fin < fila_inicio + 1:
+
+            return
+
+
+        # ------------------------------------------------------
+        # REFERENCIA
+        # ------------------------------------------------------
+
+        referencia = (
+
+            f"{get_column_letter(columna_inicio)}"
+
+            f"{fila_inicio}:"
+
+            f"{get_column_letter(columna_fin)}"
+
+            f"{fila_fin}"
+
+        )
+
+
+        # ------------------------------------------------------
+        # CREAR TABLA
+        # ------------------------------------------------------
+
+        tabla = Table(
+
+            displayName=nombre,
+
+            ref=referencia
+
+        )
+
+
+        # ------------------------------------------------------
+        # ESTILO
+        # ------------------------------------------------------
+
+        estilo = TableStyleInfo(
+
+            name="TableStyleMedium2",
+
+            showFirstColumn=False,
+
+            showLastColumn=False,
+
+            showRowStripes=True,
+
+            showColumnStripes=False
+
+        )
+
+
+        tabla.tableStyleInfo = estilo
+
+
+        # ------------------------------------------------------
+        # AGREGAR
+        # ------------------------------------------------------
+
+        ws.add_table(
+            tabla
+        )
+
+
+    # ==========================================================
+    # FUNCIÓN AJUSTAR ANCHO
+    # ==========================================================
+
+    def ajustar_ancho(
+        columna_inicio,
+        columna_fin,
+        ancho_maximo=35
+    ):
+
+        for columna in range(
+
+            columna_inicio,
+
+            columna_fin + 1
+
+        ):
+
+            letra = get_column_letter(
+                columna
+            )
+
 
             maximo = 0
 
-            letra = get_column_letter(
-                columna[0].column
-            )
 
-            for celda in columna:
+            for celda in ws[letra]:
 
                 if celda.value is not None:
 
@@ -594,342 +1056,782 @@ def exportar_estadisticas(request):
                         str(celda.value)
                     )
 
-                    if longitud > maximo:
-                        maximo = longitud
+
+                    maximo = max(
+
+                        maximo,
+
+                        longitud
+
+                    )
+
 
             ws.column_dimensions[
                 letra
             ].width = min(
-                maximo + 3,
-                40
+
+                maximo + 2,
+
+                ancho_maximo
+
             )
 
 
     # ==========================================================
-    # 1. RESUMEN
+    # CONFIGURACIÓN GENERAL
     # ==========================================================
 
-    ws = wb.active
+    ws.sheet_view.showGridLines = True
 
-    ws.title = "Resumen"
-
-    ws.append([
-        "Estadística",
-        "Cantidad"
-    ])
-
-    aplicar_encabezado(ws)
-
-
-    ws.append([
-        "Total de auditorías",
-        auditorias.count()
-    ])
-
-    ws.append([
-        "Suspensiones",
-        auditorias.filter(
-            tipo_operacion="DC00"
-        ).count()
-    ])
-
-    ws.append([
-        "Reconexiones",
-        auditorias.filter(
-            tipo_operacion="RC00"
-        ).count()
-    ])
-
-    ws.append([
-        "ZVCL",
-        auditorias.filter(
-            tipo_operacion="ZVCL"
-        ).count()
-    ])
-
-    ws.append([
-        "Cantidad técnicos",
-        auditorias.values(
-            "nombre_tecnico"
-        ).distinct().count()
-    ])
-
-    ajustar_columnas(ws)
+    ws.freeze_panes = "A3"
 
 
     # ==========================================================
-    # 2. OPERACIONES
+    # 1. AUDITORÍAS TOTALES REALIZADAS
     # ==========================================================
-
-    ws = wb.create_sheet(
-        "Operaciones"
-    )
-
-    ws.append([
-        "Tipo operación",
-        "Cantidad"
-    ])
-
-    aplicar_encabezado(ws)
-
-
-    operaciones = [
-        ("Suspensiones", "DC00"),
-        ("Reconexiones", "RC00"),
-        ("ZVCL", "ZVCL"),
-    ]
-
-
-    total_operaciones = 0
-
-
-    for nombre, codigo in operaciones:
-
-        cantidad = auditorias.filter(
-            tipo_operacion=codigo
-        ).count()
-
-        ws.append([
-            nombre,
-            cantidad
-        ])
-
-        total_operaciones += cantidad
-
-
-    ws.append([
-        "Total general",
-        total_operaciones
-    ])
-
-    aplicar_total(ws)
-
-    ajustar_columnas(ws)
-
-
-    # ==========================================================
-    # 3. AUDITORÍAS POR DÍA
-    # ==========================================================
-
-    ws = wb.create_sheet(
-        "Auditorias por dia"
-    )
-
-    ws.append([
-        "Fecha",
-        "Cantidad"
-    ])
-
-    aplicar_encabezado(ws)
-
 
     datos = (
+
         auditorias
-        .values("fecha_operacion")
+
+        .values(
+            "fecha_operacion"
+        )
+
         .annotate(
             total=Count("id")
         )
+
         .order_by(
             "fecha_operacion"
         )
+
     )
 
 
-    total = 0
+    datos = list(datos)
+
+
+    columna = 1
+
+
+    crear_titulo(
+
+        ws,
+
+        1,
+
+        columna,
+
+        columna + 1,
+
+        "AUDITORÍAS TOTALES REALIZADAS"
+
+    )
+
+
+    crear_encabezados(
+
+        ws,
+
+        2,
+
+        columna,
+
+        [
+
+            "Fecha",
+
+            "Total"
+
+        ]
+
+    )
+
+
+    filas = []
+
+    total_auditorias = 0
 
 
     for dato in datos:
 
-        ws.append([
+        filas.append([
+
             dato["fecha_operacion"],
+
             dato["total"]
+
         ])
 
-        total += dato["total"]
+
+        total_auditorias += dato["total"]
 
 
-    ws.append([
-        "Total general",
-        total
-    ])
+    ultima_fila_totales = escribir_datos(
 
-    aplicar_total(ws)
+        ws,
 
-    ajustar_columnas(ws)
+        3,
 
+        columna,
 
-    # ==========================================================
-    # 4. NO CUMPLEN
-    # ==========================================================
+        filas
 
-    ws = wb.create_sheet(
-        "No cumplen"
     )
 
-    ws.append([
-        "Fecha",
-        "Cantidad"
-    ])
 
-    aplicar_encabezado(ws)
+    crear_total(
 
+        ws,
+
+        ultima_fila_totales + 1,
+
+        columna,
+
+        [
+
+            "Total general",
+
+            total_auditorias
+
+        ]
+
+    )
+
+
+    crear_tabla(
+
+        ws,
+
+        "TablaAuditoriasTotales",
+
+        2,
+
+        columna,
+
+        ultima_fila_totales,
+
+        columna + 1
+
+    )
+
+
+    ajustar_ancho(
+
+        columna,
+
+        columna + 1
+
+    )
+
+
+    # ==========================================================
+    # 2. AUDITORÍAS QUE NO CUMPLEN
+    # ==========================================================
 
     datos = (
+
         auditorias
+
         .filter(
+
             resultado_auditoria="no_cumple"
+
         )
-        .values("fecha_operacion")
-        .annotate(
-            total=Count("id")
-        )
-        .order_by(
+
+        .values(
+
             "fecha_operacion"
+
         )
-    )
 
-
-    total = 0
-
-
-    for dato in datos:
-
-        ws.append([
-            dato["fecha_operacion"],
-            dato["total"]
-        ])
-
-        total += dato["total"]
-
-
-    ws.append([
-        "Total general",
-        total
-    ])
-
-    aplicar_total(ws)
-
-    ajustar_columnas(ws)
-
-
-    # ==========================================================
-    # 5. TÉCNICOS
-    # ==========================================================
-
-    ws = wb.create_sheet(
-        "Tecnicos"
-    )
-
-    ws.append([
-        "Nombre técnico",
-        "Cantidad"
-    ])
-
-    aplicar_encabezado(ws)
-
-
-    datos = (
-        auditorias
-        .values("nombre_tecnico")
         .annotate(
+
             total=Count("id")
+
         )
+
         .order_by(
-            "-total"
+
+            "fecha_operacion"
+
         )
+
     )
 
 
-    total = 0
+    datos = list(datos)
+
+
+    columna = 4
+
+
+    crear_titulo(
+
+        ws,
+
+        1,
+
+        columna,
+
+        columna + 1,
+
+        "AUDITORÍAS QUE NO CUMPLEN"
+
+    )
+
+
+    crear_encabezados(
+
+        ws,
+
+        2,
+
+        columna,
+
+        [
+
+            "Fecha",
+
+            "Total"
+
+        ]
+
+    )
+
+
+    filas = []
+
+    total_no_cumplen = 0
 
 
     for dato in datos:
 
-        ws.append([
-            dato["nombre_tecnico"],
+        filas.append([
+
+            dato["fecha_operacion"],
+
             dato["total"]
+
         ])
 
-        total += dato["total"]
+
+        total_no_cumplen += dato["total"]
 
 
-    ws.append([
-        "Total general",
-        total
-    ])
+    ultima_fila_no_cumplen = escribir_datos(
 
-    aplicar_total(ws)
+        ws,
 
-    ajustar_columnas(ws)
+        3,
 
+        columna,
 
-    # ==========================================================
-    # 6. HALLAZGOS POR TÉCNICO
-    # ==========================================================
+        filas
 
-    ws = wb.create_sheet(
-        "Hallazgos tecnico"
     )
 
-    ws.append([
-        "Nombre técnico",
-        "Fecha",
-        "Cantidad"
-    ])
 
-    aplicar_encabezado(ws)
+    crear_total(
+
+        ws,
+
+        ultima_fila_no_cumplen + 1,
+
+        columna,
+
+        [
+
+            "Total general",
+
+            total_no_cumplen
+
+        ]
+
+    )
 
 
-    datos = (
-        auditorias
+    crear_tabla(
+
+        ws,
+
+        "TablaNoCumplen",
+
+        2,
+
+        columna,
+
+        ultima_fila_no_cumplen,
+
+        columna + 1
+
+    )
+
+
+    ajustar_ancho(
+
+        columna,
+
+        columna + 1
+
+    )
+
+
+    # ==========================================================
+    # 3. AUDITORÍAS PARA DESCONTAR A LOS TÉCNICOS
+    # ==========================================================
+
+    # ----------------------------------------------------------
+    # FILTROS PROPIOS DE ESTA SECCIÓN
+    # ----------------------------------------------------------
+
+    anio_hallazgos = request.GET.get(
+        "anio_hallazgos"
+    )
+
+    mes_hallazgos = request.GET.get(
+        "mes_hallazgos"
+    )
+
+
+    # ----------------------------------------------------------
+    # BASE DE DATOS
+    # ----------------------------------------------------------
+
+    auditorias_descontar = Auditoria.objects.all()
+
+
+    # ----------------------------------------------------------
+    # FILTRO POR AÑO
+    # ----------------------------------------------------------
+
+    if (
+        anio_hallazgos
+        and anio_hallazgos != "todos"
+    ):
+
+        auditorias_descontar = (
+            auditorias_descontar
+            .filter(
+                fecha_operacion__year=anio_hallazgos
+            )
+        )
+
+
+    # ----------------------------------------------------------
+    # FILTRO POR MES
+    # ----------------------------------------------------------
+
+    if (
+        mes_hallazgos
+        and mes_hallazgos != "todos"
+    ):
+
+        auditorias_descontar = (
+            auditorias_descontar
+            .filter(
+                fecha_operacion__month=mes_hallazgos
+            )
+        )
+
+
+    # ----------------------------------------------------------
+    # SOLO AUDITORÍAS QUE NO CUMPLEN
+    # ----------------------------------------------------------
+
+    auditorias_descontar = (
+        auditorias_descontar
         .filter(
             resultado_auditoria="no_cumple"
+        )
+    )
+
+
+    # ----------------------------------------------------------
+    # OBTENER AUDITORÍAS POR TÉCNICO
+    # ----------------------------------------------------------
+
+    datos = list(
+
+        auditorias_descontar
+        .exclude(
+            nombre_tecnico__isnull=True
+        )
+        .exclude(
+            nombre_tecnico__exact=""
         )
         .values(
-            "nombre_tecnico",
-            "fecha_operacion"
+            "nombre_tecnico"
         )
         .annotate(
             total=Count("id")
         )
         .order_by(
-            "fecha_operacion",
-            "-total"
+            "-total",
+            "nombre_tecnico"
         )
+
     )
+
+
+    # ----------------------------------------------------------
+    # COLUMNA
+    # ----------------------------------------------------------
+
+    columna = 7
+
+
+    # ----------------------------------------------------------
+    # TÍTULO
+    # ----------------------------------------------------------
+
+    crear_titulo(
+
+        ws,
+
+        1,
+
+        columna,
+
+        columna + 1,
+
+        "AUDITORIAS PARA DESCONTAR A LOS TECNICOS"
+
+    )
+
+
+    # ----------------------------------------------------------
+    # INFORMACIÓN DEL MES
+    # ----------------------------------------------------------
+
+    celda = ws.cell(
+        2,
+        columna
+    )
+
+    celda.value = "MES"
+
+    celda.font = Font(
+        bold=True
+    )
+
+    celda.fill = PatternFill(
+        "solid",
+        fgColor=COLOR_HEADER
+    )
+
+    celda.border = borde
+
+
+    celda = ws.cell(
+        2,
+        columna + 1
+    )
+
+
+    meses = {
+
+        "1": "ENERO",
+        "2": "FEBRERO",
+        "3": "MARZO",
+        "4": "ABRIL",
+        "5": "MAYO",
+        "6": "JUNIO",
+        "7": "JULIO",
+        "8": "AGOSTO",
+        "9": "SEPTIEMBRE",
+        "10": "OCTUBRE",
+        "11": "NOVIEMBRE",
+        "12": "DICIEMBRE"
+
+    }
+
+
+    if (
+        mes_hallazgos
+        and mes_hallazgos != "todos"
+    ):
+
+        celda.value = meses.get(
+            str(mes_hallazgos),
+            str(mes_hallazgos)
+        )
+
+    else:
+
+        celda.value = "(Todos)"
+
+
+    celda.border = borde
+
+
+    # ----------------------------------------------------------
+    # FECHA
+    # ----------------------------------------------------------
+
+    celda = ws.cell(
+        3,
+        columna
+    )
+
+    celda.value = "FECHA"
+
+    celda.font = Font(
+        bold=True
+    )
+
+    celda.fill = PatternFill(
+        "solid",
+        fgColor=COLOR_HEADER
+    )
+
+    celda.border = borde
+
+
+    celda = ws.cell(
+        3,
+        columna + 1
+    )
+
+    celda.value = "(Todas)"
+
+    celda.border = borde
+
+
+    # ----------------------------------------------------------
+    # RESULTADO AUDITORÍA
+    # ----------------------------------------------------------
+
+    celda = ws.cell(
+        4,
+        columna
+    )
+
+    celda.value = "Resultado Auditoria"
+
+    celda.font = Font(
+        bold=True
+    )
+
+    celda.fill = PatternFill(
+        "solid",
+        fgColor=COLOR_HEADER
+    )
+
+    celda.border = borde
+
+
+    celda = ws.cell(
+        4,
+        columna + 1
+    )
+
+    celda.value = "No cumple"
+
+    celda.border = borde
+
+
+    # ----------------------------------------------------------
+    # ENCABEZADOS
+    # ----------------------------------------------------------
+
+    fila_encabezado = 6
+
+
+    crear_encabezados(
+
+        ws,
+
+        fila_encabezado,
+
+        columna,
+
+        [
+            "Etiquetas de fila",
+            "Cuenta de Resultado Auditoria"
+        ]
+
+    )
+
+
+    # ----------------------------------------------------------
+    # ESCRIBIR DATOS
+    # ----------------------------------------------------------
+
+    fila_actual = 7
+
+
+    total_general_descontar = 0
 
 
     for dato in datos:
 
-        ws.append([
-            dato["nombre_tecnico"],
-            dato["fecha_operacion"],
-            dato["total"]
-        ])
+        tecnico = dato[
+            "nombre_tecnico"
+        ]
+
+        total = dato[
+            "total"
+        ]
 
 
-    ajustar_columnas(ws)
+        total_general_descontar += total
 
 
-    # ==========================================================
-    # 7. ERRORES POR TÉCNICO
-    # ==========================================================
+        # ------------------------------------------------------
+        # NOMBRE DEL TÉCNICO
+        # ------------------------------------------------------
 
-    ws = wb.create_sheet(
-        "Errores tecnico"
+        celda = ws.cell(
+
+            fila_actual,
+
+            columna
+
+        )
+
+        celda.value = tecnico
+
+        celda.border = borde
+
+        celda.font = Font(
+
+            bold=False
+
+        )
+
+        celda.alignment = Alignment(
+
+            vertical="center"
+
+        )
+
+
+        # ------------------------------------------------------
+        # CANTIDAD
+        # ------------------------------------------------------
+
+        celda = ws.cell(
+
+            fila_actual,
+
+            columna + 1
+
+        )
+
+        celda.value = total
+
+        celda.border = borde
+
+        celda.alignment = Alignment(
+
+            horizontal="center",
+
+            vertical="center"
+
+        )
+
+
+        fila_actual += 1
+
+
+    # ----------------------------------------------------------
+    # TOTAL GENERAL
+    # ----------------------------------------------------------
+
+    crear_total(
+
+        ws,
+
+        fila_actual,
+
+        columna,
+
+        [
+
+            "Total general",
+
+            total_general_descontar
+
+        ]
+
     )
 
-    ws.append([
-        "Nombre técnico",
-        "Hallazgo",
-        "Fecha"
-    ])
 
-    aplicar_encabezado(ws)
+    # ----------------------------------------------------------
+    # GUARDAR ÚLTIMA FILA
+    # ----------------------------------------------------------
+
+    ultima_fila_tecnicos = fila_actual
 
 
-    datos = (
-        auditorias
+    # ----------------------------------------------------------
+    # IMPORTANTE
+    #
+    # NO USAR crear_tabla() EN ESTA SECCIÓN
+    #
+    # La tabla queda como celdas normales.
+    # Esto evita:
+    #
+    # Característica quitada: Autofiltro
+    # Característica quitada: Tabla
+    #
+    # ----------------------------------------------------------
+
+
+    # ----------------------------------------------------------
+    # ANCHO
+    # ----------------------------------------------------------
+
+    ajustar_ancho(
+
+        columna,
+
+        columna + 1,
+
+        45
+
+    )
+
+
+    # ==========================================================
+    # 4. ERRORES COMETIDOS POR LOS TÉCNICOS
+    # ==========================================================
+
+    # ----------------------------------------------------------
+    # APLICAR LOS MISMOS FILTROS DE AÑO Y MES
+    # ----------------------------------------------------------
+
+    auditorias_errores = auditorias
+
+
+    if anio_digitador:
+
+        auditorias_errores = (
+            auditorias_errores
+            .filter(
+                fecha_operacion__year=anio_digitador
+            )
+        )
+
+
+    if mes_digitador:
+
+        auditorias_errores = (
+            auditorias_errores
+            .filter(
+                fecha_operacion__month=mes_digitador
+            )
+        )
+
+
+    # ----------------------------------------------------------
+    # SOLO AUDITORÍAS QUE NO CUMPLEN
+    # ----------------------------------------------------------
+
+    auditorias_errores = (
+        auditorias_errores
         .filter(
             resultado_auditoria="no_cumple"
         )
@@ -945,140 +1847,801 @@ def exportar_estadisticas(request):
         .exclude(
             hallazgo__exact=""
         )
+    )
+
+
+    # ----------------------------------------------------------
+    # OBTENER TÉCNICO + HALLAZGO
+    # ----------------------------------------------------------
+
+    datos_errores = list(
+
+        auditorias_errores
         .values(
             "nombre_tecnico",
-            "hallazgo",
-            "fecha_operacion"
+            "hallazgo"
         )
-        .order_by(
-            "fecha_operacion"
+        .annotate(
+            total=Count("id")
         )
     )
 
 
-    for dato in datos:
+    # ----------------------------------------------------------
+    # AGRUPAR POR TÉCNICO
+    # ----------------------------------------------------------
 
-        ws.append([
-            dato["nombre_tecnico"],
-            dato["hallazgo"],
-            dato["fecha_operacion"]
-        ])
+    errores_por_tecnico = {}
 
 
-    ajustar_columnas(ws)
+    for dato in datos_errores:
+
+        tecnico = dato["nombre_tecnico"]
+        hallazgo = dato["hallazgo"]
+        total = dato["total"]
+
+        if tecnico not in errores_por_tecnico:
+
+            errores_por_tecnico[tecnico] = []
+
+        errores_por_tecnico[tecnico].append({
+
+            "hallazgo": hallazgo,
+
+            "total": total
+
+        })
 
 
-    # ==========================================================
-    # 8. CANTIDAD DE HALLAZGOS
-    # ==========================================================
+    # ----------------------------------------------------------
+    # CALCULAR TOTAL DE CADA TÉCNICO
+    # ----------------------------------------------------------
 
-    ws = wb.create_sheet(
-        "Cantidad hallazgos"
+    totales_tecnicos = {}
+
+
+    for tecnico, hallazgos in errores_por_tecnico.items():
+
+        totales_tecnicos[tecnico] = sum(
+
+            item["total"]
+
+            for item in hallazgos
+
+        )
+
+
+    # ----------------------------------------------------------
+    # ORDENAR TÉCNICOS DE MAYOR A MENOR
+    # ----------------------------------------------------------
+
+    tecnicos_ordenados = sorted(
+
+        errores_por_tecnico.keys(),
+
+        key=lambda tecnico:
+            totales_tecnicos[tecnico],
+
+        reverse=True
+
     )
 
-    ws.append([
-        "Hallazgo",
-        "Fecha",
-        "Cantidad"
-    ])
 
-    aplicar_encabezado(ws)
+    # ----------------------------------------------------------
+    # UBICACIÓN
+    # ----------------------------------------------------------
 
+    columna = 10
+
+
+    # ----------------------------------------------------------
+    # TÍTULO
+    # ----------------------------------------------------------
+
+    crear_titulo(
+
+        ws,
+
+        1,
+
+        columna,
+
+        columna + 1,
+
+        "ERRORES COMETIDOS POR LOS TÉCNICOS"
+
+    )
+
+
+    # ----------------------------------------------------------
+    # INFORMACIÓN DE FILTROS
+    # ----------------------------------------------------------
+
+    # MES
+
+    celda = ws.cell(
+        2,
+        columna
+    )
+
+    celda.value = "MES"
+
+    celda.font = Font(
+        bold=True
+    )
+
+    celda.fill = PatternFill(
+        "solid",
+        fgColor=COLOR_HEADER
+    )
+
+    celda.border = borde
+
+
+    celda = ws.cell(
+        2,
+        columna + 1
+    )
+
+
+    meses = {
+
+        "1": "ENERO",
+        "2": "FEBRERO",
+        "3": "MARZO",
+        "4": "ABRIL",
+        "5": "MAYO",
+        "6": "JUNIO",
+        "7": "JULIO",
+        "8": "AGOSTO",
+        "9": "SEPTIEMBRE",
+        "10": "OCTUBRE",
+        "11": "NOVIEMBRE",
+        "12": "DICIEMBRE"
+
+    }
+
+
+    if mes_digitador:
+
+        celda.value = meses.get(
+            str(mes_digitador),
+            str(mes_digitador)
+        )
+
+    else:
+
+        celda.value = "(Todos)"
+
+
+    celda.border = borde
+
+
+    # ----------------------------------------------------------
+    # FECHA / AÑO
+    # ----------------------------------------------------------
+
+    celda = ws.cell(
+        3,
+        columna
+    )
+
+    celda.value = "FECHA"
+
+    celda.font = Font(
+        bold=True
+    )
+
+    celda.fill = PatternFill(
+        "solid",
+        fgColor=COLOR_HEADER
+    )
+
+    celda.border = borde
+
+
+    celda = ws.cell(
+        3,
+        columna + 1
+    )
+
+
+    if anio_digitador:
+
+        celda.value = str(anio_digitador)
+
+    else:
+
+        celda.value = "(Todas)"
+
+
+    celda.border = borde
+
+
+    # ----------------------------------------------------------
+    # RESULTADO
+    # ----------------------------------------------------------
+
+    celda = ws.cell(
+        4,
+        columna
+    )
+
+    celda.value = "Resultado Auditoria"
+
+    celda.font = Font(
+        bold=True
+    )
+
+    celda.fill = PatternFill(
+        "solid",
+        fgColor=COLOR_HEADER
+    )
+
+    celda.border = borde
+
+
+    celda = ws.cell(
+        4,
+        columna + 1
+    )
+
+    celda.value = "No cumple"
+
+    celda.border = borde
+
+
+    # ----------------------------------------------------------
+    # ENCABEZADOS
+    # ----------------------------------------------------------
+
+    fila_encabezado_errores = 6
+
+
+    crear_encabezados(
+
+        ws,
+
+        fila_encabezado_errores,
+
+        columna,
+
+        [
+            "Etiquetas de fila",
+            "Cuenta de Resultado Auditoria"
+        ]
+
+    )
+
+
+    # ----------------------------------------------------------
+    # ESCRIBIR INFORMACIÓN
+    # ----------------------------------------------------------
+
+    fila_actual = 7
+
+
+    total_general_errores = 0
+
+
+    for tecnico in tecnicos_ordenados:
+
+        # ======================================================
+        # TOTAL DEL TÉCNICO
+        # ======================================================
+
+        total_tecnico = totales_tecnicos[
+            tecnico
+        ]
+
+
+        total_general_errores += total_tecnico
+
+
+        # ------------------------------------------------------
+        # FILA DEL TÉCNICO
+        # ------------------------------------------------------
+
+        celda_tecnico = ws.cell(
+
+            fila_actual,
+
+            columna
+
+        )
+
+        celda_tecnico.value = tecnico
+
+        celda_tecnico.font = Font(
+
+            bold=True,
+
+            color="000000"
+
+        )
+
+        celda_tecnico.fill = PatternFill(
+
+            "solid",
+
+            fgColor="D9EAF7"
+
+        )
+
+        celda_tecnico.border = borde
+
+        celda_tecnico.alignment = Alignment(
+
+            vertical="center"
+
+        )
+
+
+        celda_total = ws.cell(
+
+            fila_actual,
+
+            columna + 1
+
+        )
+
+        celda_total.value = total_tecnico
+
+        celda_total.font = Font(
+
+            bold=True,
+
+            color="000000"
+
+        )
+
+        celda_total.fill = PatternFill(
+
+            "solid",
+
+            fgColor="D9EAF7"
+
+        )
+
+        celda_total.border = borde
+
+        celda_total.alignment = Alignment(
+
+            horizontal="center",
+
+            vertical="center"
+
+        )
+
+
+        fila_actual += 1
+
+
+        # ======================================================
+        # ORDENAR HALLAZGOS DEL TÉCNICO
+        # ======================================================
+
+        hallazgos_ordenados = sorted(
+
+            errores_por_tecnico[tecnico],
+
+            key=lambda item:
+                item["total"],
+
+            reverse=True
+
+        )
+
+
+        # ======================================================
+        # ESCRIBIR HALLAZGOS
+        # ======================================================
+
+        for item in hallazgos_ordenados:
+
+            celda_hallazgo = ws.cell(
+
+                fila_actual,
+
+                columna
+
+            )
+
+            celda_hallazgo.value = (
+                item["hallazgo"]
+            )
+
+            celda_hallazgo.border = borde
+
+            celda_hallazgo.alignment = Alignment(
+
+                vertical="center",
+
+                indent=1
+
+            )
+
+
+            celda_cantidad = ws.cell(
+
+                fila_actual,
+
+                columna + 1
+
+            )
+
+            celda_cantidad.value = (
+                item["total"]
+            )
+
+            celda_cantidad.border = borde
+
+            celda_cantidad.alignment = Alignment(
+
+                horizontal="center",
+
+                vertical="center"
+
+            )
+
+
+            fila_actual += 1
+
+
+    # ----------------------------------------------------------
+    # TOTAL GENERAL
+    # ----------------------------------------------------------
+
+    crear_total(
+
+        ws,
+
+        fila_actual,
+
+        columna,
+
+        [
+
+            "Total general",
+
+            total_general_errores
+
+        ]
+
+    )
+
+
+    # ----------------------------------------------------------
+    # GUARDAR ÚLTIMA FILA
+    # ----------------------------------------------------------
+
+    ultima_fila_errores = fila_actual
+
+
+    # ----------------------------------------------------------
+    # IMPORTANTE:
+    # NO CREAR Table() AQUÍ
+    # ----------------------------------------------------------
+    #
+    # Esta sección NO utiliza:
+    #
+    # crear_tabla(...)
+    #
+    # porque Excel estaba reparando/eliminando las tablas.
+    #
+    # La información queda como celdas normales con formato.
+    # ----------------------------------------------------------
+
+
+    # ----------------------------------------------------------
+    # ANCHO DE COLUMNAS
+    # ----------------------------------------------------------
+
+    ajustar_ancho(
+
+        columna,
+
+        columna + 1,
+
+        50
+
+    )
+
+
+    # ==========================================================
+    # 5. CANTIDAD DE HALLAZGOS ENCONTRADOS
+    # ==========================================================
 
     datos = (
-        auditorias
+
+        auditorias_hallazgos
+
         .filter(
+
             resultado_auditoria="no_cumple"
+
         )
+
+        .exclude(
+
+            hallazgo__isnull=True
+
+        )
+
+        .exclude(
+
+            hallazgo__exact=""
+
+        )
+
         .values(
-            "hallazgo",
-            "fecha_operacion"
+
+            "hallazgo"
+
         )
+
         .annotate(
+
             total=Count("id")
+
         )
+
         .order_by(
-            "fecha_operacion"
+
+            "-total"
+
         )
+
     )
+
+
+    datos = list(datos)
+
+
+    columna = 14
+
+
+    crear_titulo(
+
+        ws,
+
+        1,
+
+        columna,
+
+        columna + 1,
+
+        "CANTIDAD DE HALLAZGOS ENCONTRADOS"
+
+    )
+
+
+    crear_encabezados(
+
+        ws,
+
+        2,
+
+        columna,
+
+        [
+
+            "Hallazgo",
+
+            "Total"
+
+        ]
+
+    )
+
+
+    filas = []
+
+    total_hallazgos = 0
 
 
     for dato in datos:
 
-        ws.append([
+        filas.append([
+
             dato["hallazgo"],
-            dato["fecha_operacion"],
+
             dato["total"]
+
         ])
 
 
-    ajustar_columnas(ws)
+        total_hallazgos += dato["total"]
 
 
-    # ==========================================================
-    # 9. AUDITORÍAS POR DIGITADOR
-    # ==========================================================
+    ultima_fila_hallazgos = escribir_datos(
 
-    ws = wb.create_sheet(
-        "Auditorias digitador"
+        ws,
+
+        3,
+
+        columna,
+
+        filas
+
     )
 
+
+    # ----------------------------------------------------------
+    # TOTAL FUERA DE LA TABLA
+    # ----------------------------------------------------------
+
+    crear_total(
+
+        ws,
+
+        ultima_fila_hallazgos + 1,
+
+        columna,
+
+        [
+
+            "Total general",
+
+            total_hallazgos
+
+        ]
+
+    )
+
+
+    # ----------------------------------------------------------
+    # TABLA SOLO CON ENCABEZADO + DATOS
+    # ----------------------------------------------------------
+
+    crear_tabla(
+
+        ws,
+
+        "TablaCantidadHallazgos",
+
+        2,
+
+        columna,
+
+        ultima_fila_hallazgos,
+
+        columna + 1
+
+    )
+
+
+    ajustar_ancho(
+
+        columna,
+
+        columna + 1,
+
+        45
+
+    )
+
+
+    # ==========================================================
+    # 6. AUDITORÍAS POR DIGITADOR
+    # ==========================================================
 
     datos = list(
-        auditorias
+
+        auditorias_digitador
+
         .exclude(
+
             nombre_auditor__isnull=True
+
         )
+
         .exclude(
+
             nombre_auditor__exact=""
+
         )
+
         .values(
+
             "fecha_operacion",
+
             "nombre_auditor"
+
         )
+
         .annotate(
+
             total=Count("id")
+
         )
+
         .order_by(
+
             "fecha_operacion",
+
             "nombre_auditor"
+
         )
+
     )
 
 
-    # ----------------------------------------------------------
-    # DIGITADORES
-    # ----------------------------------------------------------
-
     digitadores = sorted(
+
         set(
+
             dato["nombre_auditor"]
+
             for dato in datos
+
         )
+
+    )
+
+
+    columna = 17
+
+
+    ultima_columna = (
+
+        columna +
+
+        len(digitadores) +
+
+        1
+
+    )
+
+
+    crear_titulo(
+
+        ws,
+
+        1,
+
+        columna,
+
+        ultima_columna,
+
+        "AUDITORÍAS POR DIGITADOR"
+
     )
 
 
     encabezado = [
+
         "Fecha"
+
     ]
 
+
     encabezado.extend(
+
         digitadores
+
     )
+
 
     encabezado.append(
+
         "Total general"
+
     )
 
 
-    ws.append(encabezado)
+    crear_encabezados(
 
-    aplicar_encabezado(ws)
+        ws,
 
+        2,
 
-    # ----------------------------------------------------------
-    # CREAR MAPA
-    # ----------------------------------------------------------
+        columna,
+
+        encabezado
+
+    )
+
 
     mapa = {}
 
@@ -1108,44 +2671,56 @@ def exportar_estadisticas(request):
         ] = cantidad
 
 
-    # ----------------------------------------------------------
-    # TOTALES
-    # ----------------------------------------------------------
-
     totales = {
+
         digitador: 0
+
         for digitador in digitadores
+
     }
 
 
-    total_general = 0
+    total_general_digitadores = 0
 
 
-    # ----------------------------------------------------------
-    # FILAS
-    # ----------------------------------------------------------
+    fila_actual = 3
 
-    for fecha in sorted(mapa.keys()):
+
+    for fecha in sorted(
+        mapa.keys()
+    ):
 
         fila = [
+
             fecha
+
         ]
+
 
         total_dia = 0
 
 
         for digitador in digitadores:
 
-            cantidad = mapa[
-                fecha
-            ].get(
-                digitador,
-                0
+            cantidad = (
+
+                mapa[fecha]
+
+                .get(
+
+                    digitador,
+
+                    0
+
+                )
+
             )
 
 
             fila.append(
+
                 cantidad
+
             )
 
 
@@ -1158,68 +2733,616 @@ def exportar_estadisticas(request):
 
 
         fila.append(
+
             total_dia
+
         )
 
 
-        total_general += total_dia
+        total_general_digitadores += (
+
+            total_dia
+
+        )
 
 
-        ws.append(fila)
+        for i, valor in enumerate(
+            fila
+        ):
+
+            celda = ws.cell(
+
+                fila_actual,
+
+                columna + i
+
+            )
+
+
+            celda.value = valor
+
+
+            celda.border = borde
+
+
+            celda.alignment = Alignment(
+
+                vertical="center"
+
+            )
+
+
+            if hasattr(
+
+                valor,
+
+                "strftime"
+
+            ):
+
+                celda.number_format = (
+                    "dd/mm/yyyy"
+                )
+
+
+        fila_actual += 1
 
 
     # ----------------------------------------------------------
-    # TOTAL GENERAL
+    # TOTAL DIGITADORES
     # ----------------------------------------------------------
 
     fila_total = [
+
         "Total general"
+
     ]
 
 
     for digitador in digitadores:
 
         fila_total.append(
+
             totales[digitador]
+
         )
 
 
     fila_total.append(
-        total_general
+
+        total_general_digitadores
+
     )
 
 
-    ws.append(
+    crear_total(
+
+        ws,
+
+        fila_actual,
+
+        columna,
+
         fila_total
+
     )
 
 
-    aplicar_total(ws)
+    # ----------------------------------------------------------
+    # TABLA DIGITADORES
+    # ----------------------------------------------------------
 
-    ajustar_columnas(ws)
+    crear_tabla(
+
+        ws,
+
+        "TablaAuditoriasDigitador",
+
+        2,
+
+        columna,
+
+        fila_actual - 1,
+
+        ultima_columna
+
+    )
+
+
+    ajustar_ancho(
+
+        columna,
+
+        ultima_columna,
+
+        30
+
+    )
 
 
     # ==========================================================
-    # DESCARGAR
+    # 7. OPERACIONES
+    # ==========================================================
+
+    fila_operaciones = max(
+
+        3,
+
+        max(
+
+            ultima_fila_totales,
+
+            ultima_fila_no_cumplen,
+
+            ultima_fila_tecnicos,
+
+            ultima_fila_errores,
+
+            ultima_fila_hallazgos
+
+        ) + 4
+
+    )
+
+
+    columna = 1
+
+
+    crear_titulo(
+
+        ws,
+
+        fila_operaciones,
+
+        columna,
+
+        columna + 1,
+
+        "OPERACIONES"
+
+    )
+
+
+    crear_encabezados(
+
+        ws,
+
+        fila_operaciones + 1,
+
+        columna,
+
+        [
+
+            "Tipo operación",
+
+            "Cantidad"
+
+        ]
+
+    )
+
+
+    operaciones = [
+
+        (
+            "Suspensiones",
+            "DC00"
+        ),
+
+        (
+            "Reconexiones",
+            "RC00"
+        ),
+
+        (
+            "ZVCL",
+            "ZVCL"
+        )
+
+    ]
+
+
+    filas = []
+
+    total_operaciones = 0
+
+
+    for nombre, codigo in operaciones:
+
+        cantidad = auditorias.filter(
+
+            tipo_operacion=codigo
+
+        ).count()
+
+
+        filas.append([
+
+            nombre,
+
+            cantidad
+
+        ])
+
+
+        total_operaciones += cantidad
+
+
+    ultima_fila_operaciones = (
+
+        escribir_datos(
+
+            ws,
+
+            fila_operaciones + 2,
+
+            columna,
+
+            filas
+
+        )
+
+    )
+
+
+    crear_total(
+
+        ws,
+
+        ultima_fila_operaciones + 1,
+
+        columna,
+
+        [
+
+            "Total general",
+
+            total_operaciones
+
+        ]
+
+    )
+
+
+    crear_tabla(
+
+        ws,
+
+        "TablaOperaciones",
+
+        fila_operaciones + 1,
+
+        columna,
+
+        ultima_fila_operaciones,
+
+        columna + 1
+
+    )
+
+
+    ajustar_ancho(
+
+        columna,
+
+        columna + 1
+
+    )
+
+
+    # ==========================================================
+    # 8. RESUMEN GENERAL
+    # ==========================================================
+
+    columna = 4
+
+
+    crear_titulo(
+
+        ws,
+
+        fila_operaciones,
+
+        columna,
+
+        columna + 1,
+
+        "RESUMEN GENERAL"
+
+    )
+
+
+    crear_encabezados(
+
+        ws,
+
+        fila_operaciones + 1,
+
+        columna,
+
+        [
+
+            "Estadística",
+
+            "Cantidad"
+
+        ]
+
+    )
+
+
+    resumen = [
+
+        (
+
+            "Total auditorías",
+
+            auditorias.count()
+
+        ),
+
+        (
+
+            "No cumplen",
+
+            total_no_cumplen
+
+        ),
+
+        (
+
+            "Suspensiones",
+
+            auditorias.filter(
+
+                tipo_operacion="DC00"
+
+            ).count()
+
+        ),
+
+        (
+
+            "Reconexiones",
+
+            auditorias.filter(
+
+                tipo_operacion="RC00"
+
+            ).count()
+
+        ),
+
+        (
+
+            "ZVCL",
+
+            auditorias.filter(
+
+                tipo_operacion="ZVCL"
+
+            ).count()
+
+        ),
+
+        (
+
+            "Técnicos",
+
+            auditorias
+
+            .values(
+
+                "nombre_tecnico"
+
+            )
+
+            .distinct()
+
+            .count()
+
+        ),
+
+        (
+
+            "Digitadores",
+
+            auditorias
+
+            .exclude(
+
+                nombre_auditor__isnull=True
+
+            )
+
+            .exclude(
+
+                nombre_auditor__exact=""
+
+            )
+
+            .values(
+
+                "nombre_auditor"
+
+            )
+
+            .distinct()
+
+            .count()
+
+        )
+
+    ]
+
+
+    filas = []
+
+
+    for nombre, cantidad in resumen:
+
+        filas.append([
+
+            nombre,
+
+            cantidad
+
+        ])
+
+
+    ultima_fila_resumen = escribir_datos(
+
+        ws,
+
+        fila_operaciones + 2,
+
+        columna,
+
+        filas
+
+    )
+
+
+    crear_total(
+
+        ws,
+
+        ultima_fila_resumen + 1,
+
+        columna,
+
+        [
+
+            "Total",
+
+            auditorias.count()
+
+        ]
+
+    )
+
+
+    crear_tabla(
+
+        ws,
+
+        "TablaResumen",
+
+        fila_operaciones + 1,
+
+        columna,
+
+        ultima_fila_resumen,
+
+        columna + 1
+
+    )
+
+
+    ajustar_ancho(
+
+        columna,
+
+        columna + 1
+
+    )
+
+
+    # ==========================================================
+    # FORMATO FINAL
+    # ==========================================================
+
+    for fila in range(
+
+        1,
+
+        ws.max_row + 1
+
+    ):
+
+        if ws.row_dimensions[
+            fila
+        ].height is None:
+
+            ws.row_dimensions[
+                fila
+            ].height = 18
+
+
+    # ==========================================================
+    # ALINEACIÓN DE NÚMEROS
+    # ==========================================================
+
+    for fila in ws.iter_rows():
+
+        for celda in fila:
+
+            if isinstance(
+
+                celda.value,
+
+                (int, float)
+
+            ):
+
+                celda.alignment = Alignment(
+
+                    horizontal="center",
+
+                    vertical="center"
+
+                )
+
+
+    # ==========================================================
+    # CONFIGURACIÓN DE IMPRESIÓN
+    # ==========================================================
+
+    ws.page_setup.orientation = (
+        "landscape"
+    )
+
+
+    ws.page_setup.fitToWidth = 1
+
+    ws.page_setup.fitToHeight = 0
+
+
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+
+
+    ws.print_title_rows = "1:2"
+
+
+    # ==========================================================
+    # DESCARGAR EXCEL
     # ==========================================================
 
     response = HttpResponse(
+
         content_type=(
+
             "application/vnd.openxmlformats-officedocument."
+
             "spreadsheetml.sheet"
+
         )
+
     )
 
 
-    response[
-        "Content-Disposition"
-    ] = (
+    response["Content-Disposition"] = (
+
         'attachment; '
+
         'filename="Estadisticas_Auditorias.xlsx"'
+
     )
 
 
-    wb.save(response)
+    wb.save(
+        response
+    )
 
 
     return response

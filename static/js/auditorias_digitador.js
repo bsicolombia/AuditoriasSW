@@ -746,11 +746,92 @@ if (!elementoDatosDigitador) {
     // EVENTOS
     // ========================================================
 
+    // ========================================================
+// EXPORTAR EXCEL CON LOS MISMOS FILTROS
+// ========================================================
+
+    const botonExportar =
+        document.getElementById(
+            'btnExportarEstadisticas'
+        );
+
+
+    function actualizarUrlExportacion() {
+
+        if (!botonExportar) {
+            return;
+        }
+
+
+        const anio =
+            buscadorAnio.getValue();
+
+
+        const mes =
+            buscadorMes.getValue();
+
+
+        const url =
+            new URL(
+                botonExportar.href,
+                window.location.origin
+            );
+
+
+        // Limpiar parámetros anteriores
+
+        url.searchParams.delete(
+            'anio_digitador'
+        );
+
+        url.searchParams.delete(
+            'mes_digitador'
+        );
+
+
+        // Año
+
+        if (
+            anio &&
+            anio !== 'todos'
+        ) {
+
+            url.searchParams.set(
+                'anio_digitador',
+                anio
+            );
+
+        }
+
+
+        // Mes
+
+        if (
+            mes &&
+            mes !== 'todos'
+        ) {
+
+            url.searchParams.set(
+                'mes_digitador',
+                mes
+            );
+
+        }
+
+
+        botonExportar.href =
+            url.toString();
+
+    }
+
+
     buscadorAnio.on(
         'change',
         function() {
 
             construirTabla();
+
+            actualizarUrlExportacion();
 
         }
     );
@@ -762,8 +843,15 @@ if (!elementoDatosDigitador) {
 
             construirTabla();
 
+            actualizarUrlExportacion();
+
         }
     );
+
+
+    actualizarUrlExportacion();
+
+    
 
 
     // ========================================================

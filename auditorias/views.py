@@ -8,6 +8,12 @@ from django.db.models import Count
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl import Workbook
+from django.http import HttpResponse
+from django.db.models import Count
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.table import Table, TableStyleInfo
 
 def cargar_excel(request):
 
@@ -520,13 +526,6 @@ def exportar_estadisticas_excel(request):
         )
 
     return response
-
-from django.http import HttpResponse
-from django.db.models import Count
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils import get_column_letter
-from openpyxl.worksheet.table import Table, TableStyleInfo
 
 def exportar_estadisticas(request):
 

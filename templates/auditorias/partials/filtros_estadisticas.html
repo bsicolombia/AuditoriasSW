@@ -1,0 +1,218 @@
+<div class="filtros-card">
+
+    <form method="get" id="formFiltrosEstadisticas">
+
+        <div class="filtros-grid">
+
+            <div>
+                <label>Año</label>
+
+                <select name="anio">
+                    <option value="">Todos</option>
+
+                    {% for anio in anios_estadisticas %}
+                        <option
+                            value="{{ anio }}"
+                            {% if filtros_estadisticas.anio == anio|stringformat:"s" %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ anio }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+
+            <div>
+                <label>Mes</label>
+
+                <select name="mes">
+
+                    <option value="">Todos</option>
+
+                    <option value="1" {% if filtros_estadisticas.mes == "1" %}selected{% endif %}>
+                        Enero
+                    </option>
+
+                    <option value="2" {% if filtros_estadisticas.mes == "2" %}selected{% endif %}>
+                        Febrero
+                    </option>
+
+                    <option value="3" {% if filtros_estadisticas.mes == "3" %}selected{% endif %}>
+                        Marzo
+                    </option>
+
+                    <option value="4" {% if filtros_estadisticas.mes == "4" %}selected{% endif %}>
+                        Abril
+                    </option>
+
+                    <option value="5" {% if filtros_estadisticas.mes == "5" %}selected{% endif %}>
+                        Mayo
+                    </option>
+
+                    <option value="6" {% if filtros_estadisticas.mes == "6" %}selected{% endif %}>
+                        Junio
+                    </option>
+
+                    <option value="7" {% if filtros_estadisticas.mes == "7" %}selected{% endif %}>
+                        Julio
+                    </option>
+
+                    <option value="8" {% if filtros_estadisticas.mes == "8" %}selected{% endif %}>
+                        Agosto
+                    </option>
+
+                    <option value="9" {% if filtros_estadisticas.mes == "9" %}selected{% endif %}>
+                        Septiembre
+                    </option>
+
+                    <option value="10" {% if filtros_estadisticas.mes == "10" %}selected{% endif %}>
+                        Octubre
+                    </option>
+
+                    <option value="11" {% if filtros_estadisticas.mes == "11" %}selected{% endif %}>
+                        Noviembre
+                    </option>
+
+                    <option value="12" {% if filtros_estadisticas.mes == "12" %}selected{% endif %}>
+                        Diciembre
+                    </option>
+
+                </select>
+            </div>
+
+
+            <div>
+                <label>Día</label>
+
+                <select name="dia">
+
+                    <option value="">Todos</option>
+
+                    {% for dia in "123456789"|make_list %}
+                        <option value="{{ forloop.counter }}">
+                            {{ forloop.counter }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+
+            <div>
+                <label>Operación</label>
+
+                <select name="tipo_operacion">
+
+                    <option value="">Todas</option>
+
+                    <option
+                        value="DC00"
+                        {% if filtros_estadisticas.tipo_operacion == "DC00" %}
+                            selected
+                        {% endif %}
+                    >
+                        DC00
+                    </option>
+
+                    <option
+                        value="RC00"
+                        {% if filtros_estadisticas.tipo_operacion == "RC00" %}
+                            selected
+                        {% endif %}
+                    >
+                        RC00
+                    </option>
+
+                    <option
+                        value="ZVCL"
+                        {% if filtros_estadisticas.tipo_operacion == "ZVCL" %}
+                            selected
+                        {% endif %}
+                    >
+                        ZVCL
+                    </option>
+
+                </select>
+            </div>
+
+
+            <div>
+                <label>Técnico</label>
+
+                <select
+                    name="tecnico"
+                    class="select-filtro"
+                >
+
+                    <option value="">Todos</option>
+
+                    {% for tecnico in tecnicos_estadisticas %}
+
+                        <option
+                            value="{{ tecnico }}"
+                            {% if filtros_estadisticas.tecnico == tecnico %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ tecnico }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+
+            <div>
+                <label>Auditor / Digitador</label>
+
+                <select
+                    name="auditor"
+                    class="select-filtro"
+                >
+
+                    <option value="">Todos</option>
+
+                    {% for auditor in auditores_estadisticas %}
+
+                        <option
+                            value="{{ auditor }}"
+                            {% if filtros_estadisticas.auditor == auditor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ auditor }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+        </div>
+
+
+        <div class="filtros-botones">
+
+            <button
+                type="submit"
+                class="btn-filtrar"
+            >
+                🔎 Filtrar
+            </button>
+
+            <a
+                href="{% url 'estadistica' %}"
+                class="btn-limpiar"
+            >
+                ↻ Limpiar
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+

@@ -1,57 +1,58 @@
-const elementoDatosOperaciones =
-    document.getElementById('datos-operaciones');
+document.addEventListener("DOMContentLoaded", function () {
 
-if (elementoDatosOperaciones) {
+    const elemento = document.getElementById("datos-operaciones");
 
-    const datosOperaciones =
-        JSON.parse(elementoDatosOperaciones.textContent);
+    if (!elemento) {
+        return;
+    }
 
-    const ctxOperaciones =
-        document.getElementById('graficaAuditorias');
+    const datos = JSON.parse(elemento.textContent);
 
-    if (ctxOperaciones) {
+    const operaciones = ["DC00", "RC00", "ZVCL"];
 
-        new Chart(ctxOperaciones, {
+    const cumple = operaciones.map(
+        operacion => datos[operacion]?.cumple || 0
+    );
 
-            type: 'bar',
+    const noCumple = operaciones.map(
+        operacion => datos[operacion]?.no_cumple || 0
+    );
 
-            plugins: [
-                ChartDataLabels
-            ],
+    const total = operaciones.map(
+        operacion => datos[operacion]?.total || 0
+    );
+
+
+    new Chart(
+        document.getElementById("graficaOperaciones"),
+        {
+            type: "bar",
 
             data: {
 
-                labels: [
-                    'Suspensiones',
-                    'Reconexiones',
-                    'ZVCL'
-                ],
+                labels: operaciones,
 
-                datasets: [{
+                datasets: [
 
-                    label: 'Auditorías',
+                    {
+                        label: "Cumple",
+                        data: cumple,
+                        backgroundColor: "#22c55e",
+                    },
 
-                    data: [
-                        numero(datosOperaciones.Suspensiones),
-                        numero(datosOperaciones.Reconexiones),
-                        numero(datosOperaciones.Zvcl)
-                    ],
+                    {
+                        label: "No cumple",
+                        data: noCumple,
+                        backgroundColor: "#ef4444",
+                    },
 
-                    backgroundColor: [
-                        '#ef4444',
-                        '#22c55e',
-                        '#3b82f6'
-                    ],
+                    {
+                        label: "Total",
+                        data: total,
+                        backgroundColor: "#172554",
+                    }
 
-                    borderRadius: 7,
-
-                    borderSkipped: false,
-
-                    barThickness: 45,
-
-                    maxBarThickness: 45
-
-                }]
+                ]
 
             },
 
@@ -59,68 +60,19 @@ if (elementoDatosOperaciones) {
 
                 responsive: true,
 
-                maintainAspectRatio: false,
-
-                layout: {
-
-                    padding: {
-                        top: 25,
-                        right: 15,
-                        left: 10,
-                        bottom: 5
-                    }
-
-                },
-
                 plugins: {
 
                     legend: {
-                        display: false
+                        position: "top"
                     },
 
                     datalabels: {
-
-                        anchor: 'end',
-
-                        align: 'top',
-
-                        offset: 5,
-
-                        color: '#1e293b',
-
-                        clip: false,
-
+                        color: "#ffffff",
+                        anchor: "center",
+                        align: "center",
                         font: {
-
-                            size: 14,
-
-                            weight: '700'
-
-                        },
-
-                        formatter: function(value) {
-
-                            return formatearNumero(value);
-
+                            weight: "bold"
                         }
-
-                    },
-
-                    tooltip: {
-
-                        callbacks: {
-
-                            label: function(context) {
-
-                                return (
-                                    ' Auditorías: ' +
-                                    formatearNumero(context.parsed.y)
-                                );
-
-                            }
-
-                        }
-
                     }
 
                 },
@@ -128,58 +80,20 @@ if (elementoDatosOperaciones) {
                 scales: {
 
                     y: {
-
                         beginAtZero: true,
-
-                        grace: '15%',
-
                         ticks: {
-
-                            color: '#64748b',
-
-                            font: {
-                                size: 11
-                            }
-
-                        },
-
-                        grid: {
-
-                            color: '#e2e8f0'
-
+                            precision: 0
                         }
-
-                    },
-
-                    x: {
-
-                        ticks: {
-
-                            color: '#334155',
-
-                            font: {
-
-                                size: 12,
-
-                                weight: '600'
-
-                            }
-
-                        },
-
-                        grid: {
-
-                            display: false
-
-                        }
-
                     }
 
                 }
 
-            }
+            },
 
-        });
+            plugins: [
+                ChartDataLabels
+            ]
+        }
+    );
 
-    }
-}
+});

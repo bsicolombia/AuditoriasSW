@@ -1,863 +1,115 @@
-// ============================================================
-// AUDITORÍAS POR DIGITADOR
-// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
+
+    const elemento = document.getElementById(
+        "datos-Auditorias-Por-Digitador"
+    );
+
+    if (!elemento) {
+        return;
+    }
+
+    const datos = JSON.parse(elemento.textContent);
 
 
-const elementoDatosDigitador =
-    document.getElementById(
-        'datos-Auditorias-Por-Digitador'
+    const labels = datos.map(
+        item => `${item.fecha} - ${item.auditor}`
+    );
+
+    const total = datos.map(
+        item => item.total
+    );
+
+    const cumple = datos.map(
+        item => item.cumple
+    );
+
+    const noCumple = datos.map(
+        item => item.no_cumple
     );
 
 
-if (!elementoDatosDigitador) {
-
-    console.error(
-        'No existe datos-Auditorias-Por-Digitador'
-    );
-
-} else {
-
-
-    const datosDigitador =
-        JSON.parse(
-            elementoDatosDigitador.textContent
-        );
-
-
-    // ========================================================
-    // SELECTORES
-    // ========================================================
-
-    const filtroAnio =
+    new Chart(
         document.getElementById(
-            'filtroAnioDigitador'
-        );
+            "graficaAuditoriasDigitador"
+        ),
+        {
+            type: "bar",
 
+            data: {
 
-    const filtroMes =
-        document.getElementById(
-            'filtroMesDigitador'
-        );
+                labels: labels,
 
+                datasets: [
 
-    // ========================================================
-    // TOM SELECT
-    // ========================================================
+                    {
+                        label: "Total",
 
-    const buscadorAnio =
-        new TomSelect(
-            '#filtroAnioDigitador',
-            {
+                        data: total,
 
-                placeholder:
-                    'Buscar año...',
+                        backgroundColor: "#172554",
 
-                searchField:
-                    ['text'],
+                        borderRadius: 5
+                    },
 
-                sortField: {
+                    {
+                        label: "Cumple",
 
-                    field: 'text',
+                        data: cumple,
 
-                    direction: 'desc'
+                        backgroundColor: "#22c55e",
+
+                        borderRadius: 5
+                    },
+
+                    {
+                        label: "No cumple",
+
+                        data: noCumple,
+
+                        backgroundColor: "#ef4444",
+
+                        borderRadius: 5
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+
+                },
+
+                plugins: {
+
+                    datalabels: {
+
+                        color: "#ffffff",
+
+                        font: {
+                            weight: "bold"
+                        }
+
+                    }
 
                 }
 
-            }
-        );
-
-
-    const buscadorMes =
-        new TomSelect(
-            '#filtroMesDigitador',
-            {
-
-                placeholder:
-                    'Buscar mes...',
-
-                searchField:
-                    ['text'],
-
-                sortField: {
-
-                    field: 'text',
-
-                    direction: 'asc'
-
-                }
-
-            }
-        );
-
-
-    // ========================================================
-    // OBTENER AÑO
-    // ========================================================
-
-    function obtenerAnio(fecha) {
-
-        return fecha.substring(0, 4);
-
-    }
-
-
-    // ========================================================
-    // OBTENER MES
-    // ========================================================
-
-    function obtenerMes(fecha) {
-
-        return fecha.substring(5, 7);
-
-    }
-
-
-    // ========================================================
-    // NOMBRES DE MESES
-    // ========================================================
-
-    const nombresMeses = {
-
-        '01': 'Enero',
-        '02': 'Febrero',
-        '03': 'Marzo',
-        '04': 'Abril',
-        '05': 'Mayo',
-        '06': 'Junio',
-        '07': 'Julio',
-        '08': 'Agosto',
-        '09': 'Septiembre',
-        '10': 'Octubre',
-        '11': 'Noviembre',
-        '12': 'Diciembre'
-
-    };
-
-
-    // ========================================================
-    // FORMATEAR FECHA
-    // ========================================================
-
-    function formatearFecha(fecha) {
-
-        const partes =
-            fecha.split('-');
-
-        return (
-            partes[2] +
-            '/' +
-            partes[1] +
-            '/' +
-            partes[0]
-        );
-
-    }
-
-
-    // ========================================================
-    // FORMATEAR NÚMERO
-    // ========================================================
-
-    function formatearNumero(numero) {
-
-        return Number(numero).toLocaleString(
-            'es-CO'
-        );
-
-    }
-
-
-    // ========================================================
-    // CARGAR AÑOS
-    // ========================================================
-
-    const anios = [
-        ...new Set(
-
-            datosDigitador.map(function(dato) {
-
-                return obtenerAnio(
-                    dato.fecha_operacion
-                );
-
-            })
-
-        )
-    ];
-
-
-    anios.sort(function(a, b) {
-
-        return b.localeCompare(a);
-
-    });
-
-
-    anios.forEach(function(anio) {
-
-        buscadorAnio.addOption({
-
-            value: anio,
-
-            text: anio
-
-        });
-
-    });
-
-
-    buscadorAnio.refreshOptions(false);
-
-
-    // ========================================================
-    // CARGAR MESES
-    // ========================================================
-
-    for (
-        let numero = 1;
-        numero <= 12;
-        numero++
-    ) {
-
-        const mes =
-            String(numero).padStart(2, '0');
-
-
-        buscadorMes.addOption({
-
-            value: mes,
-
-            text: nombresMeses[mes]
-
-        });
-
-    }
-
-
-    buscadorMes.refreshOptions(false);
-
-
-    // ========================================================
-    // CONSTRUIR TABLA
-    // ========================================================
-
-    function construirTabla() {
-
-
-        const anioSeleccionado =
-            buscadorAnio.getValue();
-
-
-        const mesSeleccionado =
-            buscadorMes.getValue();
-
-
-        // ====================================================
-        // FILTRAR DATOS
-        // ====================================================
-
-        let datosFiltrados =
-            [...datosDigitador];
-
-
-        if (
-            anioSeleccionado &&
-            anioSeleccionado !== 'todos'
-        ) {
-
-            datosFiltrados =
-                datosFiltrados.filter(
-                    function(dato) {
-
-                        return (
-                            obtenerAnio(
-                                dato.fecha_operacion
-                            ) ===
-                            anioSeleccionado
-                        );
-
-                    }
-                );
-
-        }
-
-
-        if (
-            mesSeleccionado &&
-            mesSeleccionado !== 'todos'
-        ) {
-
-            datosFiltrados =
-                datosFiltrados.filter(
-                    function(dato) {
-
-                        return (
-                            obtenerMes(
-                                dato.fecha_operacion
-                            ) ===
-                            mesSeleccionado
-                        );
-
-                    }
-                );
-
-        }
-
-
-        // ====================================================
-        // OBTENER DIGITADORES
-        // ====================================================
-
-        const digitadores = [
-
-            ...new Set(
-
-                datosFiltrados
-                    .map(function(dato) {
-
-                        return dato.nombre_auditor;
-
-                    })
-                    .filter(function(nombre) {
-
-                        return (
-                            nombre &&
-                            nombre.trim() !== ''
-                        );
-
-                    })
-
-            )
-
-        ];
-
-
-        digitadores.sort(
-            function(a, b) {
-
-                return a.localeCompare(
-                    b,
-                    'es'
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // AGRUPAR POR FECHA
-        // ====================================================
-
-        const fechas = [
-
-            ...new Set(
-
-                datosFiltrados.map(
-                    function(dato) {
-
-                        return dato.fecha_operacion;
-
-                    }
-                )
-
-            )
-
-        ];
-
-
-        fechas.sort(
-            function(a, b) {
-
-                return a.localeCompare(b);
-
-            }
-        );
-
-
-        // ====================================================
-        // CREAR MAPA
-        // ====================================================
-
-        const mapa = {};
-
-
-        datosFiltrados.forEach(
-            function(dato) {
-
-
-                if (!mapa[dato.fecha_operacion]) {
-
-                    mapa[dato.fecha_operacion] = {};
-
-                }
-
-
-                mapa[
-                    dato.fecha_operacion
-                ][
-                    dato.nombre_auditor
-                ] =
-                    Number(dato.total);
-
-
-            }
-        );
-
-
-        // ====================================================
-        // CABECERA
-        // ====================================================
-
-        const cabecera =
-            document.getElementById(
-                'cabeceraAuditoriasDigitador'
-            );
-
-
-        cabecera.innerHTML = '';
-
-
-        const filaCabecera =
-            document.createElement('tr');
-
-
-        const thFecha =
-            document.createElement('th');
-
-
-        thFecha.textContent =
-            'Fecha';
-
-
-        thFecha.className =
-            'digitador-fecha';
-
-
-        filaCabecera.appendChild(
-            thFecha
-        );
-
-
-        digitadores.forEach(
-            function(digitador) {
-
-                const th =
-                    document.createElement('th');
-
-
-                th.textContent =
-                    digitador;
-
-
-                th.className =
-                    'digitador-columna';
-
-
-                filaCabecera.appendChild(
-                    th
-                );
-
-            }
-        );
-
-
-        const thTotal =
-            document.createElement('th');
-
-
-        thTotal.textContent =
-            'Total general';
-
-
-        thTotal.className =
-            'digitador-columna';
-
-
-        filaCabecera.appendChild(
-            thTotal
-        );
-
-
-        cabecera.appendChild(
-            filaCabecera
-        );
-
-
-        // ====================================================
-        // CUERPO
-        // ====================================================
-
-        const cuerpo =
-            document.getElementById(
-                'cuerpoAuditoriasDigitador'
-            );
-
-
-        cuerpo.innerHTML = '';
-
-
-        // ====================================================
-        // TOTALES POR DIGITADOR
-        // ====================================================
-
-        const totalesDigitadores = {};
-
-
-        digitadores.forEach(
-            function(digitador) {
-
-                totalesDigitadores[
-                    digitador
-                ] = 0;
-
-            }
-        );
-
-
-        let totalGeneral = 0;
-
-
-        // ====================================================
-        // UNA FILA POR DÍA
-        // ====================================================
-
-        fechas.forEach(
-            function(fecha) {
-
-
-                const fila =
-                    document.createElement('tr');
-
-
-                // --------------------------------------------
-                // FECHA
-                // --------------------------------------------
-
-                const tdFecha =
-                    document.createElement('td');
-
-
-                tdFecha.textContent =
-                    formatearFecha(fecha);
-
-
-                tdFecha.className =
-                    'digitador-fecha';
-
-
-                fila.appendChild(
-                    tdFecha
-                );
-
-
-                // --------------------------------------------
-                // TOTAL DEL DÍA
-                // --------------------------------------------
-
-                let totalDia = 0;
-
-
-                // --------------------------------------------
-                // DIGITADORES
-                // --------------------------------------------
-
-                digitadores.forEach(
-                    function(digitador) {
-
-
-                        const cantidad =
-                            mapa[fecha] &&
-                            mapa[fecha][digitador]
-                                ? Number(
-                                    mapa[fecha][digitador]
-                                )
-                                : 0;
-
-
-                        totalDia += cantidad;
-
-
-                        totalesDigitadores[
-                            digitador
-                        ] += cantidad;
-
-
-                        const td =
-                            document.createElement('td');
-
-
-                        td.textContent =
-                            formatearNumero(
-                                cantidad
-                            );
-
-
-                        td.className =
-                            'digitador-numero';
-
-
-                        fila.appendChild(
-                            td
-                        );
-
-                    }
-                );
-
-
-                // --------------------------------------------
-                // TOTAL DÍA
-                // --------------------------------------------
-
-                totalGeneral += totalDia;
-
-
-                const tdTotal =
-                    document.createElement('td');
-
-
-                tdTotal.textContent =
-                    formatearNumero(
-                        totalDia
-                    );
-
-
-                tdTotal.className =
-                    'digitador-total-dia';
-
-
-                fila.appendChild(
-                    tdTotal
-                );
-
-
-                cuerpo.appendChild(
-                    fila
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // PIE
-        // ====================================================
-
-        const pie =
-            document.getElementById(
-                'pieAuditoriasDigitador'
-            );
-
-
-        pie.innerHTML = '';
-
-
-        const filaTotal =
-            document.createElement('tr');
-
-
-        const tdTexto =
-            document.createElement('td');
-
-
-        tdTexto.textContent =
-            'Total general';
-
-
-        tdTexto.className =
-            'digitador-total-general';
-
-
-        filaTotal.appendChild(
-            tdTexto
-        );
-
-
-        digitadores.forEach(
-            function(digitador) {
-
-
-                const td =
-                    document.createElement('td');
-
-
-                td.textContent =
-                    formatearNumero(
-                        totalesDigitadores[
-                            digitador
-                        ]
-                    );
-
-
-                td.className =
-                    'digitador-total-general';
-
-
-                filaTotal.appendChild(
-                    td
-                );
-
-            }
-        );
-
-
-        const tdFinal =
-            document.createElement('td');
-
-
-        tdFinal.textContent =
-            formatearNumero(
-                totalGeneral
-            );
-
-
-        tdFinal.className =
-            'digitador-total-final';
-
-
-        filaTotal.appendChild(
-            tdFinal
-        );
-
-
-        pie.appendChild(
-            filaTotal
-        );
-
-
-        // ====================================================
-        // TOTAL SUPERIOR
-        // ====================================================
-
-        const totalElemento =
-            document.getElementById(
-                'totalAuditoriasDigitador'
-            );
-
-
-        totalElemento.textContent =
-            formatearNumero(
-                totalGeneral
-            );
-
-    }
-
-
-    // ========================================================
-    // EVENTOS
-    // ========================================================
-
-    // ========================================================
-// EXPORTAR EXCEL CON LOS MISMOS FILTROS
-// ========================================================
-
-    const botonExportar =
-        document.getElementById(
-            'btnExportarEstadisticas'
-        );
-
-
-    function actualizarUrlExportacion() {
-
-        if (!botonExportar) {
-            return;
-        }
-
-
-        const anio =
-            buscadorAnio.getValue();
-
-
-        const mes =
-            buscadorMes.getValue();
-
-
-        const url =
-            new URL(
-                botonExportar.href,
-                window.location.origin
-            );
-
-
-        // Limpiar parámetros anteriores
-
-        url.searchParams.delete(
-            'anio_digitador'
-        );
-
-        url.searchParams.delete(
-            'mes_digitador'
-        );
-
-
-        // Año
-
-        if (
-            anio &&
-            anio !== 'todos'
-        ) {
-
-            url.searchParams.set(
-                'anio_digitador',
-                anio
-            );
-
-        }
-
-
-        // Mes
-
-        if (
-            mes &&
-            mes !== 'todos'
-        ) {
-
-            url.searchParams.set(
-                'mes_digitador',
-                mes
-            );
-
-        }
-
-
-        botonExportar.href =
-            url.toString();
-
-    }
-
-
-    buscadorAnio.on(
-        'change',
-        function() {
-
-            construirTabla();
-
-            actualizarUrlExportacion();
-
+            },
+
+            plugins: [
+                ChartDataLabels
+            ]
         }
     );
 
-
-    buscadorMes.on(
-        'change',
-        function() {
-
-            construirTabla();
-
-            actualizarUrlExportacion();
-
-        }
-    );
-
-
-    actualizarUrlExportacion();
-
-    
-
-
-    // ========================================================
-    // INICIAL
-    // ========================================================
-
-    construirTabla();
-
-}
+});

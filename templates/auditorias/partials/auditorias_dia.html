@@ -1,127 +1,13 @@
 <div class="grafica-card">
 
-    <div
-        style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        "
-    >
+    <h2>Auditorías por día</h2>
 
-        <div>
+    <p class="grafica-descripcion">
+        Cantidad de auditorías realizadas diariamente.
+    </p>
 
-            <h2
-                style="
-                    margin: 0;
-                    color: #1e293b;
-                    font-size: 20px;
-                "
-            >
-                Auditorías por día
-            </h2>
-
-            <p
-                style="
-                    margin: 5px 0 0;
-                    color: #64748b;
-                    font-size: 13px;
-                "
-            >
-                Cantidad de auditorías realizadas por día
-            </p>
-
-        </div>
-
-        <div
-            style="
-                background: #f5f3ff;
-                border: 1px solid #ddd6fe;
-                border-radius: 10px;
-                padding: 8px 14px;
-                text-align: center;
-                min-width: 80px;
-            "
-        >
-
-            <div
-                style="
-                    font-size: 10px;
-                    color: #64748b;
-                    font-weight: 600;
-                "
-            >
-                AUDITORÍAS
-            </div>
-
-            <div
-                id="totalAuditoriasFiltrado"
-                style="
-                    font-size: 24px;
-                    font-weight: 700;
-                    color: #7c3aed;
-                "
-            >
-                {{ Cantidad }}
-            </div>
-
-        </div>
-
-    </div>
-
-    <div
-        style="
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        "
-    >
-
-        <select id="filtroAnio">
-            <option value="todos">
-                Todos los años
-            </option>
-        </select>
-
-        <select id="filtroMes">
-            <option value="todos">
-                Todos los meses
-            </option>
-        </select>
-
-        <select id="filtroAuditoriaDia">
-            <option value="todos">
-                Todos los días
-            </option>
-        </select>
-
-    </div>
-
-    <div
-        style="
-            height: 350px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 8px;
-        "
-    >
-
-        <div
-            id="ContenedorGraficaAuditoriaDia"
-            style="
-                position: relative;
-                width: 100%;
-                min-height: 350px;
-            "
-        >
-
-            <canvas id="graficaAuditoria_dia"></canvas>
-
-        </div>
-
+    <div class="chart-container">
+        <canvas id="graficaAuditoriasDia"></canvas>
     </div>
 
 </div>

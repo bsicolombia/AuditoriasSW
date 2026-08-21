@@ -6,27 +6,41 @@
 Estadísticas
 {% endblock %}
 
+
 {% block content %}
 
-<h1>Estadísticas de Auditorías</h1>
+<div class="estadisticas-header">
+
+    <h1>
+        Estadísticas de Auditorías
+    </h1>
+
+    <p>
+        Análisis de cumplimiento, hallazgos,
+        técnicos y digitadores.
+    </p>
+
+</div>
 
 
-<div
-    class="estadisticas-grid"
-    style="
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 25px;
-        margin-top: 25px;
-        align-items: start;
-    "
->
+<!-- ================================================= -->
+<!-- FILTROS -->
+<!-- ================================================= -->
+
+{% include "auditorias/partials/filtros_estadisticas.html" %}
+
+
+<!-- ================================================= -->
+<!-- GRÁFICAS -->
+<!-- ================================================= -->
+
+<div class="estadisticas-grid">
 
     {% include "auditorias/partials/operaciones.html" %}
 
-    {% include "auditorias/partials/auditorias_dia.html" %}
-
     {% include "auditorias/partials/no_cumplen.html" %}
+
+    {% include "auditorias/partials/auditorias_dia.html" %}
 
     {% include "auditorias/partials/hallazgos_tecnico.html" %}
 
@@ -34,50 +48,30 @@ Estadísticas
 
     {% include "auditorias/partials/cantidad_hallazgos.html" %}
 
-    <div style="grid-column: 1 / -1; width: 100%; min-width: 0;">
-    {% include 'auditorias/partials/auditorias_digitador.html' %}
+    <div class="grafica-full">
 
-    <div style="margin-top: 15px; margin-bottom: 20px;">
+        {% include "auditorias/partials/auditorias_digitador.html" %}
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- EXPORTAR -->
+<!-- ================================================= -->
+
+<div class="exportar-container">
 
     <a
         id="btnExportarEstadisticas"
         href="{% url 'exportar-estadisticas' %}"
-        style="
-            display: inline-block;
-            padding: 11px 18px;
-            background: #16a34a;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            box-shadow: 0 2px 6px rgba(0,0,0,.10);
-        "
+        class="btn-exportar"
     >
         📊 Exportar estadísticas a Excel
     </a>
 
 </div>
-
-</div>
-
-
-</div>
-
-
-<!-- ================================================= -->
-<!-- LIBRERÍAS -->
-<!-- ================================================= -->
-
-<link
-    href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css"
-    rel="stylesheet"
->
-
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 
 <!-- ================================================= -->
@@ -100,33 +94,59 @@ Estadísticas
 
 {{ Auditorias_Por_Digitador|json_script:"datos-Auditorias-Por-Digitador" }}
 
+
 <!-- ================================================= -->
-<!-- JAVASCRIPT -->
+<!-- LIBRERÍAS -->
 <!-- ================================================= -->
 
-<script src="{% static 'js/utils.js' %}"></script>
+<link
+    href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css"
+    rel="stylesheet"
+>
+
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+
+<!-- ================================================= -->
+<!-- JS -->
+<!-- ================================================= -->
 
 <script src="{% static 'js/operaciones.js' %}"></script>
-
-<script src="{% static 'js/tecnicos.js' %}"></script>
-
 <script src="{% static 'js/auditorias_dia.js' %}"></script>
-
 <script src="{% static 'js/no_cumplen.js' %}"></script>
-
 <script src="{% static 'js/hallazgos_tecnico.js' %}"></script>
-
 <script src="{% static 'js/errores_tecnico.js' %}"></script>
-
 <script src="{% static 'js/cantidad_hallazgos.js' %}"></script>
-
 <script src="{% static 'js/auditorias_digitador.js' %}"></script>
 
+
+
+
 <!-- ================================================= -->
-<!-- ESTILOS -->
+<!-- CSS -->
 <!-- ================================================= -->
 
 <style>
+
+.estadisticas-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 25px;
+
+    margin-top: 25px;
+
+    align-items: start;
+}
+
 
 .grafica-card {
 
@@ -141,26 +161,190 @@ Estadísticas
     box-sizing: border-box;
 
     box-shadow:
-        0 2px 10px rgba(15, 23, 42, 0.06);
+        0 2px 10px
+        rgba(15, 23, 42, 0.06);
 
     border: 1px solid #e2e8f0;
+}
+
+
+.grafica-card h2 {
+
+    margin-top: 0;
+
+    color: #0f172a;
 
 }
 
 
-.grafica-card canvas {
+.grafica-descripcion {
 
-    max-width: 100%;
+    color: #64748b;
+
+    font-size: 14px;
 
 }
 
 
-.grafica-card select {
+.chart-container {
+
+    position: relative;
 
     width: 100%;
 
-    box-sizing: border-box;
+    min-height: 350px;
+}
 
+
+.chart-grande {
+
+    min-height: 450px;
+}
+
+
+.chart-digitadores {
+
+    min-height: 500px;
+}
+
+
+.grafica-full {
+
+    grid-column: 1 / -1;
+
+    width: 100%;
+
+}
+
+
+.filtros-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    margin-top: 20px;
+
+    box-shadow:
+        0 2px 10px
+        rgba(15, 23, 42, 0.06);
+}
+
+
+.filtros-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 15px;
+}
+
+
+.filtros-grid label {
+
+    display: block;
+
+    font-weight: 600;
+
+    margin-bottom: 6px;
+
+    color: #334155;
+}
+
+
+.filtros-grid select {
+
+    width: 100%;
+
+    padding: 10px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    box-sizing: border-box;
+}
+
+
+.filtros-botones {
+
+    margin-top: 20px;
+
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.btn-filtrar {
+
+    border: none;
+
+    padding: 11px 18px;
+
+    border-radius: 8px;
+
+    background: #172554;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+
+.btn-limpiar {
+
+    display: inline-block;
+
+    padding: 11px 18px;
+
+    border-radius: 8px;
+
+    background: #e2e8f0;
+
+    color: #334155;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+.exportar-container {
+
+    margin-top: 25px;
+
+    margin-bottom: 30px;
+}
+
+
+.btn-exportar {
+
+    display: inline-block;
+
+    padding: 11px 18px;
+
+    background: #16a34a;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 2px 6px
+        rgba(0, 0, 0, .10);
 }
 
 
@@ -168,8 +352,17 @@ Estadísticas
 
     .estadisticas-grid {
 
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr;
+    }
 
+    .grafica-full {
+
+        grid-column: auto;
+    }
+
+    .filtros-grid {
+
+        grid-template-columns: 1fr;
     }
 
 }
@@ -180,7 +373,6 @@ Estadísticas
     .grafica-card {
 
         padding: 15px;
-
     }
 
 }

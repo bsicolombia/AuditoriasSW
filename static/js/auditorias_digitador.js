@@ -9,6 +9,10 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
+    // =====================================================
+    // VALIDAR ELEMENTOS
+    // =====================================================
+
     if (!elemento || !canvas) {
 
         console.error(
@@ -28,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
 
         datos = JSON.parse(
-            elemento.textContent
+            elemento.textContent.trim()
         );
 
     } catch (error) {
@@ -42,10 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    if (!Array.isArray(datos)) {
+    // =====================================================
+    // VALIDAR DATOS
+    // =====================================================
 
-        console.error(
-            "❌ Los datos no son un array"
+    if (!Array.isArray(datos) || datos.length === 0) {
+
+        console.warn(
+            "⚠️ No existen datos para mostrar"
         );
 
         return;
@@ -56,36 +64,42 @@ document.addEventListener("DOMContentLoaded", function () {
     // DATOS
     // =====================================================
 
-    const labels = datos.map(
-        item =>
-            `${item.fecha} - ${item.auditor}`
-    );
+    const labels = datos.map(function (item) {
+
+        return {
+            fecha: item.fecha || "",
+            auditor: item.auditor || ""
+        };
+
+    });
 
 
-    const total = datos.map(
-        item =>
-            Number(item.total) || 0
-    );
+    const cumple = datos.map(function (item) {
+
+        return Number(item.cumple) || 0;
+
+    });
 
 
-    const cumple = datos.map(
-        item =>
-            Number(item.cumple) || 0
-    );
+    const noCumple = datos.map(function (item) {
+
+        return Number(item.no_cumple) || 0;
+
+    });
 
 
-    const noCumple = datos.map(
-        item =>
-            Number(item.no_cumple) || 0
-    );
+    const total = datos.map(function (item) {
+
+        return Number(item.total) || 0;
+
+    });
 
 
     // =====================================================
-    // ELIMINAR GRÁFICA ANTERIOR
+    // DESTRUIR GRÁFICA ANTERIOR
     // =====================================================
 
-    const anterior =
-        Chart.getChart(canvas);
+    const anterior = Chart.getChart(canvas);
 
     if (anterior) {
 
@@ -95,27 +109,182 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // ALTURA DINÁMICA
+    // ALTURA REAL DE LA GRÁFICA
     // =====================================================
 
-    const alturaPorRegistro = 48;
+    /*
+     * ESTA ES LA PARTE MÁS IMPORTANTE.
+     *
+     * Cada registro tiene 82px.
+     *
+     * Ejemplo:
+     *
+     * 10 registros  = 820px
+     * 20 registros  = 1640px
+     * 30 registros  = 2460px
+     *
+     * El contenedor seguirá teniendo 500px
+     * y aparecerá el scroll.
+     */
 
-    const alturaMinima = 500;
+    const alturaPorRegistro = 82;
 
-    const altura = Math.max(
-        alturaMinima,
-        labels.length * alturaPorRegistro
-    );
+    const alturaMinima = 520;
+
+
+    const altura =
+        Math.max(
+            alturaMinima,
+            datos.length * alturaPorRegistro
+        );
 
 
     canvas.style.height =
-        altura + "px";
+        `${altura}px`;
 
     canvas.style.width =
         "100%";
 
     canvas.style.display =
         "block";
+
+
+    // =====================================================
+    // PLUGIN PARA MOSTRAR TOTAL
+    // =====================================================
+
+    const totalPlugin = {
+
+        id: "totalPlugin",
+
+
+        afterDatasetsDraw: function (chart) {
+
+            const ctx = chart.ctx;
+
+
+            const metaCumple =
+                chart.getDatasetMeta(0);
+
+            const metaNoCumple =
+                chart.getDatasetMeta(1);
+
+
+            ctx.save();
+
+
+            ctx.font =
+                "700 11px Arial, sans-serif";
+
+            ctx.textBaseline =
+                "middle";
+
+
+            datos.forEach(function (item, index) {
+
+                const barraCumple =
+                    metaCumple.data[index];
+
+                const barraNoCumple =
+                    metaNoCumple.data[index];
+
+
+                if (!barraCumple) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * Obtener el extremo derecho
+                 * de toda la barra.
+                 */
+
+                let x =
+                    barraCumple.x;
+
+
+                if (
+                    barraNoCumple &&
+                    barraNoCumple.x > x
+                ) {
+
+                    x =
+                        barraNoCumple.x;
+
+                }
+
+
+                const y =
+                    barraCumple.y;
+
+
+                const valor =
+                    Number(total[index]) || 0;
+
+
+                const texto =
+                    valor.toLocaleString(
+                        "es-CO"
+                    );
+
+
+                const anchoTexto =
+                    ctx.measureText(texto).width;
+
+
+                /*
+                 * Fondo del TOTAL
+                 */
+
+                ctx.fillStyle =
+                    "#ffffff";
+
+
+                ctx.beginPath();
+
+                ctx.roundRect(
+                    x + 9,
+                    y - 11,
+                    anchoTexto + 14,
+                    22,
+                    6
+                );
+
+                ctx.fill();
+
+
+                ctx.strokeStyle =
+                    "#dbe3ef";
+
+                ctx.lineWidth = 1;
+
+                ctx.stroke();
+
+
+                /*
+                 * TOTAL
+                 */
+
+                ctx.fillStyle =
+                    "#334155";
+
+
+                ctx.fillText(
+                    texto,
+                    x + 16,
+                    y
+                );
+
+            });
+
+
+            ctx.restore();
+
+        }
+
+    };
 
 
     // =====================================================
@@ -126,60 +295,69 @@ document.addEventListener("DOMContentLoaded", function () {
 
         type: "bar",
 
+
         data: {
 
             labels: labels,
 
+
             datasets: [
 
-                {
-                    label: "Total",
-
-                    data: total,
-
-                    backgroundColor: "#172554",
-
-                    borderRadius: 6,
-
-                    borderSkipped: false,
-
-                    barPercentage: 0.68,
-
-                    categoryPercentage: 0.70
-                },
-
+                // =================================================
+                // CUMPLE
+                // =================================================
 
                 {
+
                     label: "Cumple",
 
                     data: cumple,
 
-                    backgroundColor: "#22c55e",
+                    backgroundColor:
+                        "#16c47f",
 
-                    borderRadius: 6,
+                    hoverBackgroundColor:
+                        "#0ea968",
+
+                    borderRadius: 7,
 
                     borderSkipped: false,
 
-                    barPercentage: 0.68,
+                    barThickness: 34,
 
-                    categoryPercentage: 0.70
+                    maxBarThickness: 34,
+
+                    stack: "auditorias"
+
                 },
 
 
+                // =================================================
+                // NO CUMPLE
+                // =================================================
+
                 {
+
                     label: "No cumple",
 
                     data: noCumple,
 
-                    backgroundColor: "#ef4444",
+                    backgroundColor:
+                        "#ef4444",
 
-                    borderRadius: 6,
+                    hoverBackgroundColor:
+                        "#dc2626",
+
+                    borderRadius: 7,
 
                     borderSkipped: false,
 
-                    barPercentage: 0.68,
+                    barThickness: 34,
 
-                    categoryPercentage: 0.70
+                    maxBarThickness: 34,
+
+                    stack: "auditorias"
+
                 }
 
             ]
@@ -187,17 +365,52 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
 
+        // =====================================================
+        // OPCIONES
+        // =====================================================
+
         options: {
+
+            indexAxis: "y",
 
             responsive: true,
 
             maintainAspectRatio: false,
 
-            /*
-             * BARRAS HORIZONTALES
-             */
 
-            indexAxis: "y",
+            animation: {
+
+                duration: 500,
+
+                easing: "easeOutQuart"
+
+            },
+
+
+            interaction: {
+
+                mode: "nearest",
+
+                intersect: true
+
+            },
+
+
+            layout: {
+
+                padding: {
+
+                    top: 5,
+
+                    right: 85,
+
+                    bottom: 20,
+
+                    left: 5
+
+                }
+
+            },
 
 
             // =================================================
@@ -206,17 +419,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
             scales: {
 
+                // =================================================
+                // EJE X
+                // =================================================
+
                 x: {
+
+                    stacked: true,
 
                     beginAtZero: true,
 
+                    grace: "10%",
+
+
                     grid: {
 
-                        color: "#e5e7eb",
+                        color:
+                            "rgba(148, 163, 184, 0.16)",
 
-                        drawBorder: false
+                        drawTicks: false,
+
+                        lineWidth: 1
 
                     },
+
 
                     border: {
 
@@ -224,26 +450,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     },
 
+
                     ticks: {
 
                         precision: 0,
 
-                        color: "#64748b",
+                        color:
+                            "#64748b",
 
-                        padding: 6,
+                        padding: 9,
+
 
                         font: {
 
-                            size: 11
+                            size: 11,
 
-                        }
+                            weight: "500"
+
+                        },
+
+
+                        callback:
+                            function (value) {
+
+                                return Number(value)
+                                    .toLocaleString(
+                                        "es-CO"
+                                    );
+
+                            }
 
                     }
 
                 },
 
 
+                // =================================================
+                // EJE Y
+                // =================================================
+
                 y: {
+
+                    stacked: true,
+
+                    offset: true,
+
+
+                    /*
+                     * Espacio para los nombres.
+                     */
+
+                    afterFit:
+                        function (scale) {
+
+                            scale.width = 235;
+
+                        },
+
 
                     grid: {
 
@@ -251,17 +514,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     },
 
+
                     border: {
 
                         display: false
 
                     },
 
+
                     ticks: {
 
-                        color: "#334155",
+                        padding: 12,
 
-                        padding: 10,
+                        color:
+                            "#334155",
+
 
                         font: {
 
@@ -271,35 +538,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         },
 
+
                         callback:
                             function (value) {
 
-                                const texto =
-                                    this.getLabelForValue(
-                                        value
-                                    );
+                                const item =
+                                    this.chart
+                                        .data
+                                        .labels[value];
 
 
-                                /*
-                                 * Cortar nombres largos
-                                 */
+                                if (!item) {
 
-                                if (
-                                    texto.length > 32
-                                ) {
-
-                                    return (
-                                        texto.substring(
-                                            0,
-                                            32
-                                        ) +
-                                        "..."
-                                    );
+                                    return "";
 
                                 }
 
 
-                                return texto;
+                                /*
+                                 * DOS LÍNEAS
+                                 *
+                                 * Fecha
+                                 * Digitador
+                                 */
+
+                                return [
+
+                                    item.fecha,
+
+                                    item.auditor
+
+                                ];
 
                             }
 
@@ -328,6 +597,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     align: "start",
 
+
                     labels: {
 
                         usePointStyle: true,
@@ -335,13 +605,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         pointStyle:
                             "rectRounded",
 
-                        boxWidth: 10,
+                        boxWidth: 11,
 
-                        boxHeight: 10,
+                        boxHeight: 11,
 
-                        padding: 18,
+                        padding: 22,
 
-                        color: "#334155",
+                        color:
+                            "#334155",
+
 
                         font: {
 
@@ -363,7 +635,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 tooltip: {
 
                     backgroundColor:
-                        "rgba(15, 23, 42, 0.96)",
+                        "rgba(15, 23, 42, 0.97)",
 
                     titleColor:
                         "#ffffff",
@@ -372,18 +644,49 @@ document.addEventListener("DOMContentLoaded", function () {
                         "#e2e8f0",
 
                     borderColor:
-                        "#475569",
+                        "rgba(148, 163, 184, 0.30)",
 
                     borderWidth: 1,
 
-                    padding: 12,
+                    cornerRadius: 10,
 
-                    cornerRadius: 8,
+                    padding: 13,
 
                     displayColors: true,
 
+                    boxPadding: 5,
+
 
                     callbacks: {
+
+                        title:
+                            function (items) {
+
+                                if (
+                                    !items.length
+                                ) {
+
+                                    return "";
+
+                                }
+
+
+                                const index =
+                                    items[0]
+                                        .dataIndex;
+
+
+                                const item =
+                                    datos[index];
+
+
+                                return (
+                                    `${item.fecha} - ` +
+                                    `${item.auditor}`
+                                );
+
+                            },
+
 
                         label:
                             function (context) {
@@ -395,10 +698,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                                 return (
-                                    " " +
-                                    context.dataset.label +
-                                    ": " +
+                                    ` ${context.dataset.label}: ` +
                                     valor.toLocaleString(
+                                        "es-CO"
+                                    )
+                                );
+
+                            },
+
+
+                        afterBody:
+                            function (items) {
+
+                                if (
+                                    !items.length
+                                ) {
+
+                                    return "";
+
+                                }
+
+
+                                const index =
+                                    items[0]
+                                        .dataIndex;
+
+
+                                return (
+                                    "\n Total: " +
+                                    Number(
+                                        total[index]
+                                    ).toLocaleString(
                                         "es-CO"
                                     )
                                 );
@@ -411,24 +741,60 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 // =================================================
-                // VALORES
+                // DATOS DENTRO DE LAS BARRAS
                 // =================================================
 
                 datalabels: {
 
-                    color: "#ffffff",
+                    /*
+                     * Solo mostrar números grandes.
+                     *
+                     * Los valores pequeños se dejan
+                     * fuera para evitar amontonamiento.
+                     */
 
-                    anchor: "center",
+                    display:
+                        function (context) {
 
-                    align: "center",
+                            const valor =
+                                Number(
+                                    context.dataset
+                                        .data[
+                                            context.dataIndex
+                                        ]
+                                ) || 0;
 
-                    clamp: true,
+
+                            return valor >= 10;
+
+                        },
+
+
+                    color:
+                        "#ffffff",
+
+
+                    anchor:
+                        "center",
+
+
+                    align:
+                        "center",
+
+
+                    clamp:
+                        true,
+
+
+                    clip:
+                        true,
+
 
                     font: {
 
                         size: 10,
 
-                        weight: "bold"
+                        weight: "700"
 
                     },
 
@@ -436,8 +802,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     formatter:
                         function (value) {
 
+                            const numero =
+                                Number(value) || 0;
+
+
                             if (
-                                Number(value) === 0
+                                numero < 10
                             ) {
 
                                 return "";
@@ -445,7 +815,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
 
 
-                            return Number(value)
+                            return numero
                                 .toLocaleString(
                                     "es-CO"
                                 );
@@ -461,7 +831,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         plugins: [
 
-            ChartDataLabels
+            ChartDataLabels,
+
+            totalPlugin
 
         ]
 
@@ -469,7 +841,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     console.log(
-        "✅ GRÁFICA HORIZONTAL CON SCROLL CREADA"
+        `✅ Gráfica creada: ${datos.length} registros`
     );
 
 });

@@ -15,41 +15,58 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+
+    // =====================================================
+    // LEER JSON
+    // =====================================================
+
     let datos;
 
     try {
-        datos = JSON.parse(elemento.textContent);
+
+        datos = JSON.parse(
+            elemento.textContent.trim()
+        );
+
     } catch (error) {
+
         console.error("❌ ERROR JSON:", error);
+
         return;
     }
+
 
     if (!Array.isArray(datos)) {
-        console.error("❌ datos_operaciones NO ES ARRAY");
+
+        console.error(
+            "❌ datos_operaciones NO ES ARRAY"
+        );
+
         return;
     }
-
-    console.log("DATOS OPERACIONES:", datos);
 
 
     // =====================================================
-    // DATOS POR OPERACIÓN
+    // DATOS
     // =====================================================
 
     const operaciones = datos.map(
         item => item.operacion
     );
 
+
+    const total = datos.map(
+        item => Number(item.total) || 0
+    );
+
+
     const cumple = datos.map(
         item => Number(item.cumple) || 0
     );
 
+
     const noCumple = datos.map(
         item => Number(item.no_cumple) || 0
-    );
-
-    const total = datos.map(
-        item => Number(item.total) || 0
     );
 
 
@@ -58,25 +75,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
 
     const totalCumple = cumple.reduce(
-        (acumulado, valor) => acumulado + valor,
+        (acumulado, valor) =>
+            acumulado + valor,
         0
     );
+
 
     const totalNoCumple = noCumple.reduce(
-        (acumulado, valor) => acumulado + valor,
+        (acumulado, valor) =>
+            acumulado + valor,
         0
     );
 
+
     const totalAuditorias = total.reduce(
-        (acumulado, valor) => acumulado + valor,
+        (acumulado, valor) =>
+            acumulado + valor,
         0
     );
 
 
     console.log("================================");
+    console.log("TOTAL AUDITORÍAS:", totalAuditorias);
     console.log("TOTAL CUMPLE:", totalCumple);
     console.log("TOTAL NO CUMPLE:", totalNoCumple);
-    console.log("TOTAL AUDITORÍAS:", totalAuditorias);
     console.log("================================");
 
 
@@ -84,17 +106,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // MOSTRAR TOTALES EN LOS CÍRCULOS
     // =====================================================
 
-    const elementoCumple = document.getElementById(
-        "totalCumple"
-    );
+    const elementoCumple =
+        document.getElementById("totalCumple");
 
-    const elementoNoCumple = document.getElementById(
-        "totalNoCumple"
-    );
 
-    const elementoTotal = document.getElementById(
-        "totalAuditorias"
-    );
+    const elementoNoCumple =
+        document.getElementById("totalNoCumple");
+
+
+    const elementoTotal =
+        document.getElementById("totalAuditorias");
 
 
     if (elementoCumple) {
@@ -125,67 +146,109 @@ document.addEventListener("DOMContentLoaded", function () {
     // DESTRUIR GRÁFICA ANTERIOR
     // =====================================================
 
-    const graficaExistente = Chart.getChart(canvas);
+    const graficaExistente =
+        Chart.getChart(canvas);
+
 
     if (graficaExistente) {
+
         graficaExistente.destroy();
+
     }
 
 
     // =====================================================
-    // GRÁFICA POR OPERACIÓN
+    // GRÁFICA
     // =====================================================
 
     new Chart(canvas, {
 
         type: "bar",
 
+
         data: {
 
             labels: operaciones,
 
+
             datasets: [
 
-                {
-                    label: "Cumple",
-
-                    data: cumple,
-
-                    backgroundColor: "#22c55e",
-
-                    borderRadius: 6,
-
-                    minBarLength: 8
-                },
+                // =================================================
+                // 1️⃣ TOTAL
+                // =================================================
 
                 {
-                    label: "No cumple",
 
-                    data: noCumple,
-
-                    backgroundColor: "#ef4444",
-
-                    borderRadius: 6,
-
-                    minBarLength: 8
-                },
-
-                {
                     label: "Total",
 
                     data: total,
 
                     backgroundColor: "#172554",
 
+                    hoverBackgroundColor: "#1e3a8a",
+
                     borderRadius: 6,
 
+                    borderSkipped: false,
+
                     minBarLength: 8
+
+                },
+
+
+                // =================================================
+                // 2️⃣ CUMPLE
+                // =================================================
+
+                {
+
+                    label: "Cumple",
+
+                    data: cumple,
+
+                    backgroundColor: "#22c55e",
+
+                    hoverBackgroundColor: "#16a34a",
+
+                    borderRadius: 6,
+
+                    borderSkipped: false,
+
+                    minBarLength: 8
+
+                },
+
+
+                // =================================================
+                // 3️⃣ NO CUMPLE
+                // =================================================
+
+                {
+
+                    label: "No cumple",
+
+                    data: noCumple,
+
+                    backgroundColor: "#ef4444",
+
+                    hoverBackgroundColor: "#dc2626",
+
+                    borderRadius: 6,
+
+                    borderSkipped: false,
+
+                    minBarLength: 8
+
                 }
 
             ]
 
         },
 
+
+        // =====================================================
+        // OPCIONES
+        // =====================================================
 
         options: {
 
@@ -200,6 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     beginAtZero: true,
 
+
                     ticks: {
 
                         precision: 0,
@@ -207,16 +271,30 @@ document.addEventListener("DOMContentLoaded", function () {
                         color: "#374151",
 
                         font: {
+
                             size: 11
+
                         }
 
                     },
 
+
                     grid: {
-                        color: "#e5e7eb"
+
+                        color:
+                            "rgba(148, 163, 184, 0.18)"
+
+                    },
+
+
+                    border: {
+
+                        display: false
+
                     }
 
                 },
+
 
                 x: {
 
@@ -225,14 +303,27 @@ document.addEventListener("DOMContentLoaded", function () {
                         color: "#374151",
 
                         font: {
+
                             weight: "bold",
+
                             size: 12
+
                         }
 
                     },
 
+
                     grid: {
+
                         display: false
+
+                    },
+
+
+                    border: {
+
+                        display: false
+
                     }
 
                 }
@@ -240,60 +331,119 @@ document.addEventListener("DOMContentLoaded", function () {
             },
 
 
+            // =====================================================
+            // PLUGINS
+            // =====================================================
+
             plugins: {
+
+                // =================================================
+                // LEYENDA
+                // =================================================
 
                 legend: {
 
                     position: "top",
 
+                    align: "start",
+
+
                     labels: {
 
                         usePointStyle: true,
 
-                        padding: 15,
+                        pointStyle: "circle",
+
+                        padding: 18,
+
 
                         font: {
+
                             size: 12,
+
                             weight: "bold"
+
                         },
 
-                        generateLabels: function (chart) {
 
-                            return [
+                        /*
+                         * ORDEN:
+                         *
+                         * 1. Total
+                         * 2. Cumple
+                         * 3. No cumple
+                         */
 
-                                {
-                                    text: `Cumple (${totalCumple.toLocaleString("es-CO")})`,
-                                    fillStyle: "#22c55e",
-                                    strokeStyle: "#22c55e",
-                                    pointStyle: "circle",
-                                    datasetIndex: 0
-                                },
+                        generateLabels:
+                            function (chart) {
 
-                                {
-                                    text: `No cumple (${totalNoCumple.toLocaleString("es-CO")})`,
-                                    fillStyle: "#ef4444",
-                                    strokeStyle: "#ef4444",
-                                    pointStyle: "circle",
-                                    datasetIndex: 1
-                                },
+                                return [
 
-                                {
-                                    text: `Total (${totalAuditorias.toLocaleString("es-CO")})`,
-                                    fillStyle: "#172554",
-                                    strokeStyle: "#172554",
-                                    pointStyle: "circle",
-                                    datasetIndex: 2
-                                }
+                                    {
+                                        text:
+                                            `Total (${totalAuditorias.toLocaleString("es-CO")})`,
 
-                            ];
+                                        fillStyle:
+                                            "#172554",
 
-                        }
+                                        strokeStyle:
+                                            "#172554",
+
+                                        pointStyle:
+                                            "circle",
+
+                                        datasetIndex:
+                                            0
+                                    },
+
+
+                                    {
+                                        text:
+                                            `Cumple (${totalCumple.toLocaleString("es-CO")})`,
+
+                                        fillStyle:
+                                            "#22c55e",
+
+                                        strokeStyle:
+                                            "#22c55e",
+
+                                        pointStyle:
+                                            "circle",
+
+                                        datasetIndex:
+                                            1
+                                    },
+
+
+                                    {
+                                        text:
+                                            `No cumple (${totalNoCumple.toLocaleString("es-CO")})`,
+
+                                        fillStyle:
+                                            "#ef4444",
+
+                                        strokeStyle:
+                                            "#ef4444",
+
+                                        pointStyle:
+                                            "circle",
+
+                                        datasetIndex:
+                                            2
+                                    }
+
+                                ];
+
+                            }
 
                     }
 
                 },
 
 
+                // =================================================
+                // DATOS SOBRE LAS BARRAS
+                // =================================================
 
                 datalabels: {
 
@@ -305,6 +455,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     clamp: true,
 
+
                     font: {
 
                         weight: "bold",
@@ -313,15 +464,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     },
 
-                    formatter: function (value) {
 
-                        if (!value) {
-                            return "";
+                    formatter:
+                        function (value) {
+
+                            if (!value) {
+
+                                return "";
+
+                            }
+
+
+                            return Number(value)
+                                .toLocaleString(
+                                    "es-CO"
+                                );
+
                         }
-
-                        return value.toLocaleString("es-CO");
-
-                    }
 
                 }
 
@@ -331,12 +490,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         plugins: [
+
             ChartDataLabels
+
         ]
 
     });
 
 
-    console.log("✅ GRÁFICA CREADA");
+    console.log(
+        "✅ GRÁFICA CREADA"
+    );
 
 });

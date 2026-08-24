@@ -293,40 +293,13 @@ def exportar_excel(request):
         )
         
         return response
-    
+
 def estadistica(request):
-
-    # ==========================================
-    # ESTADÍSTICAS DE OPERACIONES
-    # ==========================================
-
-    suspensiones = Auditoria.objects.filter(
-        tipo_operacion="DC00"
-    ).count()
-
-    reconexiones = Auditoria.objects.filter(
-        tipo_operacion="RC00"
-    ).count()
-
-    zvcl = Auditoria.objects.filter(
-        tipo_operacion="ZVCL"
-    ).count()
-
-    datos_operaciones = {
-        "Suspensiones": suspensiones,
-        "Reconexiones": reconexiones,
-        "Zvcl": zvcl,
-    }
 
     return render(
         request,
-        "auditorias/estadistica.html",
-        {
-            "datos_operaciones": datos_operaciones,
-        }
+        "auditorias/estadistica.html"
     )
-
-
 
 def exportar_estadisticas_excel(request):
 

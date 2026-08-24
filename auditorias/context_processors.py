@@ -161,6 +161,8 @@ def obtener_datos_operaciones(queryset):
         .order_by("tipo_operacion")
     )
 
+    
+
     operaciones_base = {
         "DC00": {
             "cumple": 0,
@@ -183,7 +185,7 @@ def obtener_datos_operaciones(queryset):
 
         tipo = texto_seguro(
             item.get("tipo_operacion")
-        )
+        ).upper()
 
         if tipo in operaciones_base:
 
@@ -204,8 +206,11 @@ def obtener_datos_operaciones(queryset):
             "total": valores["total"],
         })
 
+
     return resultado
 
+
+    
 
 # ============================================================
 # 2. AUDITORÍAS POR DÍA
@@ -270,16 +275,14 @@ def obtener_datos_no_cumplen(queryset):
         resultado_auditoria="no_cumple"
     ).count()
 
-    return [
-        {
-            "resultado": "cumple",
-            "cantidad": cumple,
-        },
-        {
-            "resultado": "no_cumple",
-            "cantidad": no_cumple,
-        },
-    ]
+    total = queryset.count()
+
+    return {
+        "cumple": cumple,
+        "no_cumple": no_cumple,
+        "total": total,
+    }
+
 
 
 # ============================================================
@@ -515,6 +518,9 @@ def obtener_auditorias_por_digitador(queryset):
     return resultado
 
 
+
+
+
 # ============================================================
 # CONTEXT PROCESSOR PRINCIPAL
 # ============================================================
@@ -532,19 +538,50 @@ def estadisticas_auditorias(request):
 
     opciones = obtener_opciones_filtros()
 
+    # ====================================================
+    # TOTALES POR TIPO DE OPERACIÓN
+    # ====================================================
+
+    total_dc00 = queryset.filter(
+        tipo_operacion="DC00"
+    ).count()
+
+    total_rc00 = queryset.filter(
+        tipo_operacion="RC00"
+    ).count()
+
+    total_zvcl = queryset.filter(
+        tipo_operacion="ZVCL"
+    ).count()
+    
+    total_operaciones = (
+        total_dc00
+        + total_rc00
+        + total_zvcl
+    )
+
     return {
 
-        # ----------------------------------------------------
+        # ====================================================
         # FILTROS
-        # ----------------------------------------------------
+        # ====================================================
 
         "filtros_estadisticas": filtros,
 
         **opciones,
 
-        # ----------------------------------------------------
+        # ====================================================
+        # TOTALES DE OPERACIONES
+        # ====================================================
+
+        "Suspensiones": total_dc00,
+        "Reconexiones": total_rc00,
+        "Zvcl": total_zvcl,
+        "total_operaciones": total_operaciones,
+
+        # ====================================================
         # ESTADÍSTICAS
-        # ----------------------------------------------------
+        # ====================================================
 
         "datos_operaciones": obtener_datos_operaciones(
             queryset

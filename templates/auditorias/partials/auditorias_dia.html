@@ -6,8 +6,74 @@
         Cantidad de auditorías realizadas diariamente.
     </p>
 
-    <div class="chart-container">
+    <div class="grafica-scroll">
         <canvas id="graficaAuditoriasDia"></canvas>
     </div>
 
 </div>
+
+<style>
+.grafica-scroll {
+    width: 100%;
+
+    /*
+     * Altura visible del cuadro
+     */
+    height: 500px;
+
+    /*
+     * Scroll vertical
+     */
+    overflow-y: auto;
+
+    /*
+     * Evita que aparezca scroll horizontal
+     */
+    overflow-x: hidden;
+
+    padding-right: 8px;
+    padding-bottom: 10px;
+
+    box-sizing: border-box;
+}
+
+
+/*
+ * Canvas
+ */
+
+.grafica-scroll {
+    width: 100%;
+    height: 500px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding-right: 8px;
+    padding-bottom: 10px;
+
+    box-sizing: border-box;
+}
+
+/*
+ * Scroll elegante
+ */
+
+.grafica-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.grafica-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.grafica-scroll::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+}
+
+.grafica-scroll::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+</style>

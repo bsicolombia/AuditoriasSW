@@ -1,13 +1,119 @@
 <div class="grafica-card">
 
-    <h2>Hallazgos por técnico</h2>
+    <h2>Errores por técnico</h2>
 
     <p class="grafica-descripcion">
-        Hallazgos encontrados en auditorías que no cumplen.
+        Cantidad total de errores encontrados en auditorías que no cumplen.
     </p>
 
-    <div class="chart-container chart-grande">
-        <canvas id="graficaHallazgosTecnico"></canvas>
+    <div class="grafica-scroll-tecnicos">
+
+        <div class="grafica-contenedor-tecnicos">
+
+            <canvas id="graficaHallazgosTecnico"></canvas>
+
+        </div>
+
     </div>
 
 </div>
+
+
+<style>
+
+/* =====================================================
+   CONTENEDOR DEL SCROLL
+   ===================================================== */
+
+.grafica-scroll-tecnicos {
+
+    width: 100%;
+
+    height: 650px;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    padding-right: 8px;
+
+}
+
+
+/* =====================================================
+   CONTENEDOR INTERNO
+   ===================================================== */
+
+.grafica-contenedor-tecnicos {
+
+    width: 100%;
+
+    min-width: 700px;
+
+}
+
+
+/* =====================================================
+   CANVAS
+   ===================================================== */
+
+.grafica-contenedor-tecnicos canvas {
+
+    display: block;
+
+    width: 100% !important;
+
+}
+
+
+/* =====================================================
+   SCROLLBAR
+   ===================================================== */
+
+.grafica-scroll-tecnicos::-webkit-scrollbar {
+
+    width: 12px;
+
+}
+
+
+.grafica-scroll-tecnicos::-webkit-scrollbar-track {
+
+    background: #e5e7eb;
+
+    border-radius: 10px;
+
+}
+
+
+.grafica-scroll-tecnicos::-webkit-scrollbar-thumb {
+
+    background: #94a3b8;
+
+    border-radius: 10px;
+
+}
+
+
+.grafica-scroll-tecnicos::-webkit-scrollbar-thumb:hover {
+
+    background: #64748b;
+
+}
+
+
+/* Firefox */
+
+.grafica-scroll-tecnicos {
+
+    scrollbar-width: auto;
+
+    scrollbar-color:
+        #94a3b8
+        #e5e7eb;
+
+}
+
+</style>

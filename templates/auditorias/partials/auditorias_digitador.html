@@ -3,11 +3,128 @@
     <h2>Auditorías por digitador</h2>
 
     <p class="grafica-descripcion">
-        Cantidad de auditorías realizadas por cada digitador.
+        Cantidad de auditorías realizadas por fecha y digitador.
     </p>
 
-    <div class="chart-container chart-digitadores">
+    <div class="contenedor-grafica-digitador">
+
         <canvas id="graficaAuditoriasDigitador"></canvas>
+
     </div>
 
 </div>
+
+<style>
+
+/* =====================================================
+   CONTENEDOR GENERAL
+===================================================== */
+
+.grafica-card {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 14px;
+}
+
+
+/* =====================================================
+   CONTENEDOR DEL GRÁFICO
+===================================================== */
+
+.contenedor-grafica-digitador {
+
+    width: 100%;
+
+    height: 500px;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding: 10px 12px 15px 5px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+}
+
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+.contenedor-grafica-digitador canvas {
+
+    display: block;
+
+    width: 100% !important;
+
+    max-width: 100%;
+
+    /*
+     * IMPORTANTE:
+     * NO poner height: auto.
+     *
+     * El JavaScript controla
+     * la altura del canvas.
+     */
+
+}
+
+
+/* =====================================================
+   SCROLL
+===================================================== */
+
+.contenedor-grafica-digitador::-webkit-scrollbar {
+
+    width: 8px;
+
+}
+
+
+.contenedor-grafica-digitador::-webkit-scrollbar-track {
+
+    background: #f1f5f9;
+
+    border-radius: 10px;
+
+    margin: 5px 0;
+
+}
+
+
+.contenedor-grafica-digitador::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+
+    border-radius: 10px;
+
+}
+
+
+.contenedor-grafica-digitador::-webkit-scrollbar-thumb:hover {
+
+    background: #94a3b8;
+
+}
+
+
+/* =====================================================
+   FIREFOX
+===================================================== */
+
+.contenedor-grafica-digitador {
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #cbd5e1
+        #f1f5f9;
+
+}
+
+</style>

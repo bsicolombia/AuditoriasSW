@@ -1,32 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const elemento = document.getElementById(
-        "datos-Auditoria_Dia"
-    );
-
-    const canvas = document.getElementById(
-        "graficaAuditoriasDia"
-    );
+    console.log("=== AUDITORÍAS POR DÍA ===");
 
 
     // =====================================================
-    // VALIDAR ELEMENTOS
+    // ELEMENTOS
     // =====================================================
 
-    if (!elemento) {
-
-        console.error(
-            "❌ NO EXISTE #datos-Auditoria_Dia"
+    const elemento =
+        document.getElementById(
+            "datos-Auditoria_Dia"
         );
 
-        return;
-    }
+    const canvas =
+        document.getElementById(
+            "graficaAuditoriasDia"
+        );
 
 
-    if (!canvas) {
+    if (!elemento || !canvas) {
 
         console.error(
-            "❌ NO EXISTE #graficaAuditoriasDia"
+            "❌ No se encontró datos o canvas de Auditorías por día"
         );
 
         return;
@@ -48,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) {
 
         console.error(
-            "❌ ERROR CONVIRTIENDO JSON:",
+            "❌ Error leyendo JSON:",
             error
         );
 
@@ -57,23 +52,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // VALIDAR DATOS
+    // VALIDAR
     // =====================================================
 
-    if (!Array.isArray(datos)) {
-
-        console.error(
-            "❌ Los datos no son un array"
-        );
-
-        return;
-    }
-
-
-    if (datos.length === 0) {
+    if (
+        !Array.isArray(datos) ||
+        datos.length === 0
+    ) {
 
         console.warn(
-            "⚠️ No existen datos para mostrar"
+            "⚠️ No existen datos para Auditorías por día"
         );
 
         return;
@@ -81,90 +69,165 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // DATOS
+    // ORDENAR POR FECHA
     // =====================================================
 
-    const labels = datos.map(function (item) {
+    datos.sort(function (a, b) {
 
-        return item.fecha || "";
-
-    });
-
-
-    const total = datos.map(function (item) {
-
-        return Number(item.total) || 0;
+        return (
+            new Date(a.fecha) -
+            new Date(b.fecha)
+        );
 
     });
 
 
-    const cumple = datos.map(function (item) {
+    // =====================================================
+    // PREPARAR DATOS
+    // =====================================================
 
-        return Number(item.cumple) || 0;
+    const labels =
+        datos.map(function (item) {
 
-    });
+            return item.fecha || "";
 
-
-    const noCumple = datos.map(function (item) {
-
-        return Number(item.no_cumple) || 0;
-
-    });
+        });
 
 
-    console.log("FECHAS:", labels);
-    console.log("TOTAL:", total);
-    console.log("CUMPLE:", cumple);
-    console.log("NO CUMPLE:", noCumple);
+    const cumple =
+        datos.map(function (item) {
+
+            return Number(
+                item.cumple ??
+                item.cumplen ??
+                0
+            ) || 0;
+
+        });
+
+
+    const noCumple =
+        datos.map(function (item) {
+
+            return Number(
+                item.no_cumple ??
+                item.noCumple ??
+                0
+            ) || 0;
+
+        });
+
+
+    /*
+     * TOTAL
+     *
+     * Primero intentamos utilizar el total
+     * enviado por Django.
+     *
+     * Si no existe:
+     *
+     * TOTAL = CUMPLE + NO CUMPLE
+     */
+
+    const total =
+        datos.map(function (item, index) {
+
+            const valor =
+                Number(item.total) || 0;
+
+
+            if (valor > 0) {
+
+                return valor;
+
+            }
+
+
+            return (
+                cumple[index] +
+                noCumple[index]
+            );
+
+        });
+
+
+    console.log(
+        "📅 Fechas:",
+        labels
+    );
+
+    console.log(
+        "🔵 Total:",
+        total
+    );
+
+    console.log(
+        "🟢 Cumplen:",
+        cumple
+    );
+
+    console.log(
+        "🟠 No cumplen:",
+        noCumple
+    );
 
 
     // =====================================================
     // DESTRUIR GRÁFICA ANTERIOR
     // =====================================================
 
-    const graficaExistente =
+    const anterior =
         Chart.getChart(canvas);
 
 
-    if (graficaExistente) {
+    if (anterior) {
 
-        graficaExistente.destroy();
+        anterior.destroy();
 
     }
 
 
     // =====================================================
-    // ALTURA DINÁMICA
+    // ALTURA
     // =====================================================
 
     /*
-     * Cada día tendrá 65px.
      *
-     * Si hay muchos días aparecerá
-     * automáticamente el scroll.
+     * CADA DÍA TIENE:
+     *
+     *   TOTAL
+     *   CUMPLEN
+     *   NO CUMPLEN
+     *
+     * 90px por día da bastante separación.
+     *
      */
 
-    const alturaPorDia = 65;
+    const alturaPorDia = 90;
 
     const alturaMinima = 500;
 
+    const alturaMaxima = 4000;
 
-    const altura = Math.max(
 
-        alturaMinima,
-
-        labels.length * alturaPorDia
-
-    );
+    const altura =
+        Math.min(
+            alturaMaxima,
+            Math.max(
+                alturaMinima,
+                datos.length *
+                alturaPorDia
+            )
+        );
 
 
     canvas.style.height =
         `${altura}px`;
 
-    canvas.style.width =
-        "100%";
+    canvas.style.minHeight =
+        `${altura}px`;
 
-    canvas.style.maxWidth =
+    canvas.style.width =
         "100%";
 
     canvas.style.display =
@@ -180,6 +243,10 @@ document.addEventListener("DOMContentLoaded", function () {
         type: "bar",
 
 
+        // =================================================
+        // DATOS
+        // =================================================
+
         data: {
 
             labels: labels,
@@ -187,48 +254,62 @@ document.addEventListener("DOMContentLoaded", function () {
 
             datasets: [
 
-                // =================================================
-                // 1️⃣ TOTAL
-                // =================================================
+                // =========================================
+                // TOTAL
+                // =========================================
 
                 {
 
-                    label: "Total",
+                    label:
+                        "Total",
 
-                    data: total,
+                    data:
+                        total,
 
                     backgroundColor:
-                        "#172554",
+                        "#2563eb",
 
                     hoverBackgroundColor:
-                        "#1e3a8a",
+                        "#1d4ed8",
 
-                    borderRadius: 6,
+                    borderColor:
+                        "#2563eb",
 
-                    borderSkipped: false,
+                    borderWidth:
+                        0,
 
-                    barPercentage: 0.70,
+                    borderRadius:
+                        6,
 
-                    categoryPercentage: 0.72,
+                    borderSkipped:
+                        false,
 
-                    minBarLength: 3,
+                    barThickness:
+                        14,
 
-                    barThickness: 17,
+                    maxBarThickness:
+                        14,
 
-                    maxBarThickness: 17
+                    categoryPercentage:
+                        0.72,
+
+                    barPercentage:
+                        0.70
 
                 },
 
 
-                // =================================================
-                // 2️⃣ CUMPLE
-                // =================================================
+                // =========================================
+                // CUMPLEN
+                // =========================================
 
                 {
 
-                    label: "Cumple",
+                    label:
+                        "Cumplen",
 
-                    data: cumple,
+                    data:
+                        cumple,
 
                     backgroundColor:
                         "#22c55e",
@@ -236,52 +317,74 @@ document.addEventListener("DOMContentLoaded", function () {
                     hoverBackgroundColor:
                         "#16a34a",
 
-                    borderRadius: 6,
+                    borderColor:
+                        "#22c55e",
 
-                    borderSkipped: false,
+                    borderWidth:
+                        0,
 
-                    barPercentage: 0.70,
+                    borderRadius:
+                        6,
 
-                    categoryPercentage: 0.72,
+                    borderSkipped:
+                        false,
 
-                    minBarLength: 3,
+                    barThickness:
+                        14,
 
-                    barThickness: 17,
+                    maxBarThickness:
+                        14,
 
-                    maxBarThickness: 17
+                    categoryPercentage:
+                        0.72,
+
+                    barPercentage:
+                        0.70
 
                 },
 
 
-                // =================================================
-                // 3️⃣ NO CUMPLE
-                // =================================================
+                // =========================================
+                // NO CUMPLEN
+                // =========================================
 
                 {
 
-                    label: "No cumple",
+                    label:
+                        "No cumplen",
 
-                    data: noCumple,
+                    data:
+                        noCumple,
 
                     backgroundColor:
-                        "#ef4444",
+                        "#f97316",
 
                     hoverBackgroundColor:
-                        "#dc2626",
+                        "#ea580c",
 
-                    borderRadius: 6,
+                    borderColor:
+                        "#f97316",
 
-                    borderSkipped: false,
+                    borderWidth:
+                        0,
 
-                    barPercentage: 0.70,
+                    borderRadius:
+                        6,
 
-                    categoryPercentage: 0.72,
+                    borderSkipped:
+                        false,
 
-                    minBarLength: 3,
+                    barThickness:
+                        14,
 
-                    barThickness: 17,
+                    maxBarThickness:
+                        14,
 
-                    maxBarThickness: 17
+                    categoryPercentage:
+                        0.72,
+
+                    barPercentage:
+                        0.70
 
                 }
 
@@ -290,53 +393,76 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
 
-        // =====================================================
+        // =================================================
         // OPCIONES
-        // =====================================================
+        // =================================================
 
         options: {
 
-            responsive: true,
+            responsive:
+                true,
 
-            maintainAspectRatio: false,
+            maintainAspectRatio:
+                false,
 
 
-            /*
-             * Barras horizontales
-             */
+            // =================================================
+            // HORIZONTAL
+            // =================================================
 
-            indexAxis: "y",
+            indexAxis:
+                "y",
 
+
+            // =================================================
+            // ANIMACIÓN
+            // =================================================
 
             animation: {
 
-                duration: 500,
+                duration:
+                    600,
 
-                easing: "easeOutQuart"
+                easing:
+                    "easeOutQuart"
 
             },
 
+
+            // =================================================
+            // INTERACCIÓN
+            // =================================================
 
             interaction: {
 
-                mode: "index",
+                mode:
+                    "index",
 
-                intersect: false
+                intersect:
+                    false
 
             },
 
+
+            // =================================================
+            // LAYOUT
+            // =================================================
 
             layout: {
 
                 padding: {
 
-                    top: 5,
+                    top:
+                        10,
 
-                    right: 20,
+                    right:
+                        70,
 
-                    bottom: 15,
+                    bottom:
+                        20,
 
-                    left: 5
+                    left:
+                        10
 
                 }
 
@@ -349,32 +475,58 @@ document.addEventListener("DOMContentLoaded", function () {
 
             scales: {
 
-                // =================================================
+
+                // =============================================
                 // EJE X
-                // =================================================
+                // =============================================
 
                 x: {
 
-                    beginAtZero: true,
+                    beginAtZero:
+                        true,
 
-                    grace: "8%",
+                    grace:
+                        "10%",
+
+
+                    border: {
+
+                        display:
+                            false
+
+                    },
+
+
+                    grid: {
+
+                        color:
+                            "rgba(148, 163, 184, 0.16)",
+
+                        drawTicks:
+                            false
+
+                    },
 
 
                     ticks: {
 
-                        precision: 0,
+                        precision:
+                            0,
 
                         color:
                             "#64748b",
 
-                        padding: 8,
+                        padding:
+                            8,
 
 
                         font: {
 
-                            size: 11,
+                            size:
+                                11,
 
-                            weight: "500"
+                            weight:
+                                "500"
 
                         },
 
@@ -382,42 +534,46 @@ document.addEventListener("DOMContentLoaded", function () {
                         callback:
                             function (value) {
 
-                                return Number(value)
-                                    .toLocaleString(
-                                        "es-CO"
-                                    );
+                                return Number(
+                                    value
+                                ).toLocaleString(
+                                    "es-CO"
+                                );
 
                             }
-
-                    },
-
-
-                    grid: {
-
-                        color:
-                            "rgba(148, 163, 184, 0.18)",
-
-                        drawTicks: false
-
-                    },
-
-
-                    border: {
-
-                        display: false
 
                     }
 
                 },
 
 
-                // =================================================
+                // =============================================
                 // EJE Y
-                // =================================================
+                // =============================================
 
                 y: {
 
-                    offset: true,
+                    offset:
+                        true,
+
+                    stacked:
+                        false,
+
+
+                    border: {
+
+                        display:
+                            false
+
+                    },
+
+
+                    grid: {
+
+                        display:
+                            false
+
+                    },
 
 
                     ticks: {
@@ -425,30 +581,22 @@ document.addEventListener("DOMContentLoaded", function () {
                         color:
                             "#334155",
 
-                        padding: 12,
+                        padding:
+                            18,
+
+                        autoSkip:
+                            false,
 
 
                         font: {
 
-                            size: 12,
+                            size:
+                                11,
 
-                            weight: "600"
+                            weight:
+                                "600"
 
                         }
-
-                    },
-
-
-                    grid: {
-
-                        display: false
-
-                    },
-
-
-                    border: {
-
-                        display: false
 
                     }
 
@@ -463,110 +611,53 @@ document.addEventListener("DOMContentLoaded", function () {
 
             plugins: {
 
+
                 // =================================================
                 // LEYENDA
                 // =================================================
 
                 legend: {
 
-                    position: "top",
+                    display:
+                        true,
 
-                    align: "start",
+                    position:
+                        "top",
+
+                    align:
+                        "start",
 
 
                     labels: {
 
-                        usePointStyle: true,
+                        usePointStyle:
+                            true,
 
-                        pointStyle: "circle",
+                        pointStyle:
+                            "circle",
 
-                        padding: 20,
+                        boxWidth:
+                            10,
+
+                        boxHeight:
+                            10,
+
+                        padding:
+                            22,
+
+                        color:
+                            "#334155",
 
 
                         font: {
 
-                            size: 12,
+                            size:
+                                12,
 
-                            weight: "600"
+                            weight:
+                                "600"
 
-                        },
-
-
-                        /*
-                         * ORDEN DE LA LEYENDA
-                         *
-                         * Total
-                         * Cumple
-                         * No cumple
-                         */
-
-                        generateLabels:
-                            function (chart) {
-
-                                return [
-
-                                    {
-
-                                        text:
-                                            "Total",
-
-                                        fillStyle:
-                                            "#172554",
-
-                                        strokeStyle:
-                                            "#172554",
-
-                                        pointStyle:
-                                            "circle",
-
-                                        datasetIndex:
-                                            0
-
-                                    },
-
-
-                                    {
-
-                                        text:
-                                            "Cumple",
-
-                                        fillStyle:
-                                            "#22c55e",
-
-                                        strokeStyle:
-                                            "#22c55e",
-
-                                        pointStyle:
-                                            "circle",
-
-                                        datasetIndex:
-                                            1
-
-                                    },
-
-
-                                    {
-
-                                        text:
-                                            "No cumple",
-
-                                        fillStyle:
-                                            "#ef4444",
-
-                                        strokeStyle:
-                                            "#ef4444",
-
-                                        pointStyle:
-                                            "circle",
-
-                                        datasetIndex:
-                                            2
-
-                                    }
-
-                                ];
-
-                            }
+                        }
 
                     }
 
@@ -591,18 +682,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     borderColor:
                         "rgba(148, 163, 184, 0.30)",
 
-                    borderWidth: 1,
+                    borderWidth:
+                        1,
 
-                    cornerRadius: 10,
+                    cornerRadius:
+                        10,
 
-                    padding: 13,
+                    padding:
+                        13,
 
-                    displayColors: true,
+                    displayColors:
+                        true,
 
-                    boxPadding: 5,
+                    boxPadding:
+                        5,
 
 
                     callbacks: {
+
 
                         title:
                             function (items) {
@@ -648,15 +745,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 // =================================================
-                // NÚMEROS SOBRE LAS BARRAS
+                // DATALABELS
                 // =================================================
 
                 datalabels: {
-
-                    /*
-                     * No mostrar números pequeños
-                     * para evitar amontonamiento.
-                     */
 
                     display:
                         function (context) {
@@ -666,6 +758,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                     context.raw
                                 ) || 0;
 
+
+                            /*
+                             * Mostrar únicamente
+                             * valores >= 5.
+                             */
 
                             return valor >= 5;
 
@@ -694,11 +791,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     font: {
 
-                        weight:
-                            "bold",
-
                         size:
-                            10
+                            9,
+
+                        weight:
+                            "700"
 
                     },
 
@@ -719,10 +816,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
 
 
-                            return numero
-                                .toLocaleString(
-                                    "es-CO"
-                                );
+                            return numero.toLocaleString(
+                                "es-CO"
+                            );
 
                         }
 
@@ -742,8 +838,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
+    // =====================================================
+    // FINAL
+    // =====================================================
+
     console.log(
-        `✅ GRÁFICA AUDITORÍAS POR DÍA CREADA: ${datos.length} días`
+        `✅ Auditorías por día creada correctamente: ${datos.length} días`
     );
 
 });

@@ -1,17 +1,21 @@
-<div class="grafica-card">
+<div class="grafica-card grafica-card-digitador">
 
     <div class="grafica-header">
 
         <div>
+
             <span class="grafica-badge">
                 AUDITORÍAS
             </span>
 
-            <h2>Auditorías por digitador</h2>
+            <h2>
+                Auditorías por digitador
+            </h2>
 
-            <p>
+            <p class="grafica-descripcion">
                 Cantidad de auditorías realizadas por fecha y digitador.
             </p>
+
         </div>
 
     </div>
@@ -20,9 +24,9 @@
     <div class="grafica-separador"></div>
 
 
-    <div class="contenedor-grafica-digitador">
+    <div class="grafica-scroll-digitador">
 
-        <div class="grafica-scroll">
+        <div class="grafica-canvas-digitador">
 
             <canvas id="graficaAuditoriasDigitador"></canvas>
 
@@ -35,158 +39,11 @@
 
 <style>
 
-/* =====================================================
-   CARD
-===================================================== */
-
-.grafica-card {
-
-    width: 100%;
-
-    background: #ffffff;
-
-    border: 1px solid #e2e8f0;
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 4px 14px rgba(15, 23, 42, 0.05),
-        0 1px 3px rgba(15, 23, 42, 0.04);
-
-    overflow: hidden;
-
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.grafica-header {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 22px 24px 18px 24px;
-
-}
-
-
-.grafica-header h2 {
-
-    margin: 6px 0 5px 0;
-
-    color: #0f172a;
-
-    font-size: 20px;
-
-    font-weight: 700;
-
-    letter-spacing: -0.02em;
-
-}
-
-
-.grafica-header p {
-
-    margin: 0;
-
-    color: #64748b;
-
-    font-size: 13px;
-
-    line-height: 1.5;
-
-}
-
-
-/* =====================================================
-   BADGE
-===================================================== */
-
-.grafica-badge {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    padding: 5px 9px;
-
-    border-radius: 7px;
-
-    background: #eff6ff;
-
-    color: #2563eb;
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    letter-spacing: 0.08em;
-
-}
-
-
-/* =====================================================
-   SEPARADOR
-===================================================== */
-
-.grafica-separador {
-
-    height: 1px;
-
-    background:
-        linear-gradient(
-            to right,
-            transparent,
-            #e2e8f0 10%,
-            #e2e8f0 90%,
-            transparent
-        );
-
-}
-
-
-/* =====================================================
-   CONTENEDOR DEL SCROLL
-===================================================== */
-
-.contenedor-grafica-digitador {
-
-    position: relative;
-
-    width: 100%;
-
-    height: 500px;
-
-    overflow-y: auto;
-
-    overflow-x: hidden;
-
-    box-sizing: border-box;
-
-    padding: 14px 18px 20px 8px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #ffffff 0%,
-            #fafcff 100%
-        );
-
-}
-
-
-/* =====================================================
-   CONTENEDOR INTERNO
-===================================================== */
-
-.grafica-scroll {
-
-    position: relative;
+/* =========================================================
+   AUDITORÍAS POR DIGITADOR
+   ========================================================= */
+
+.grafica-card-digitador {
 
     width: 100%;
 
@@ -195,99 +52,157 @@
 }
 
 
-/* =====================================================
-   CANVAS
-===================================================== */
+.grafica-header {
 
-.grafica-scroll canvas {
+    width: 100%;
+
+}
+
+
+.grafica-badge {
+
+    display: inline-block;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    color: #2563eb;
+
+    background: #eff6ff;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+}
+
+
+.grafica-header h2 {
+
+    margin-top: 6px;
+
+    margin-bottom: 6px;
+
+}
+
+
+.grafica-header p {
+
+    margin-top: 0;
+
+}
+
+
+/* =========================================================
+   SEPARADOR
+   ========================================================= */
+
+.grafica-separador {
+
+    height: 1px;
+
+    background: #e2e8f0;
+
+    margin: 15px 0;
+
+}
+
+
+/* =========================================================
+   SCROLL
+   ========================================================= */
+
+.grafica-scroll-digitador {
+
+    width: 100%;
+
+    height: 600px;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    position: relative;
+
+    box-sizing: border-box;
+
+    padding-right: 8px;
+
+}
+
+
+/*
+ * Altura REAL de la gráfica.
+ */
+
+.grafica-canvas-digitador {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 1200px;
+
+}
+
+
+.grafica-canvas-digitador canvas {
 
     display: block;
 
     width: 100% !important;
 
-    max-width: none;
+}
+
+
+/* =========================================================
+   SCROLL
+   ========================================================= */
+
+.grafica-scroll-digitador::-webkit-scrollbar {
+
+    width: 8px;
 
 }
 
 
-/* =====================================================
-   SCROLLBAR CHROME / EDGE
-===================================================== */
+.grafica-scroll-digitador::-webkit-scrollbar-track {
 
-.contenedor-grafica-digitador::-webkit-scrollbar {
+    background: #f1f5f9;
 
-    width: 9px;
+    border-radius: 10px;
 
 }
 
 
-.contenedor-grafica-digitador::-webkit-scrollbar-track {
-
-    margin: 10px 0;
-
-    background: transparent;
-
-}
-
-
-.contenedor-grafica-digitador::-webkit-scrollbar-thumb {
+.grafica-scroll-digitador::-webkit-scrollbar-thumb {
 
     background: #cbd5e1;
 
-    border-radius: 20px;
-
-    border: 2px solid #ffffff;
+    border-radius: 10px;
 
 }
 
 
-.contenedor-grafica-digitador::-webkit-scrollbar-thumb:hover {
+.grafica-scroll-digitador::-webkit-scrollbar-thumb:hover {
 
     background: #94a3b8;
 
 }
 
 
-/* =====================================================
-   FIREFOX
-===================================================== */
-
-.contenedor-grafica-digitador {
-
-    scrollbar-width: thin;
-
-    scrollbar-color:
-        #cbd5e1
-        transparent;
-
-}
-
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+/* =========================================================
+   MÓVIL
+   ========================================================= */
 
 @media (max-width: 768px) {
 
-    .grafica-header {
+    .grafica-scroll-digitador {
 
-        padding: 18px;
-
-    }
-
-
-    .grafica-header h2 {
-
-        font-size: 18px;
-
-    }
-
-
-    .contenedor-grafica-digitador {
-
-        height: 450px;
-
-        padding-right: 12px;
+        height: 500px;
 
     }
 

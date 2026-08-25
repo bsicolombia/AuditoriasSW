@@ -19,14 +19,50 @@
         <div class="encabezado-pagina">
 
             <div>
-                <h1>Carga masiva de auditorías</h1>
+
+                <h1>
+                    Carga masiva de auditorías
+                </h1>
 
                 <p>
-                    Cargue, procese y revise múltiples auditorías desde un archivo Excel.
+                    Cargue, procese y revise múltiples auditorías desde el archivo Excel.
                 </p>
+
+            </div>
+
+
+            <!-- =====================================================
+                ÚLTIMA ACTUALIZACIÓN
+            ====================================================== -->
+
+            <div class="ultima-carga">
+
+                <div>
+
+                    <span class="ultima-carga-label">
+                        ↻ Última carga actualizada
+                    </span>
+
+                    {% if ultima_carga %}
+
+                        <strong class="ultima-carga-fecha">
+                            {{ ultima_carga }}
+                        </strong>
+
+                    {% else %}
+
+                        <strong class="ultima-carga-fecha sin-carga">
+                            Sin cargas realizadas
+                        </strong>
+
+                    {% endif %}
+
+                </div>
+
             </div>
 
         </div>
+
         
         
         <div class="grid-carga">
@@ -60,50 +96,7 @@
                 <div class="panel-body panel-body-scroll">
 
 
-                    <!-- MENSAJES -->
-
-                    {% if messages %}
-
-                        {% for message in messages %}
-
-                            <div class="mensaje
-                                {% if message.tags == 'success' %}
-                                    mensaje-success
-                                {% elif message.tags == 'warning' %}
-                                    mensaje-warning
-                                {% elif message.tags == 'error' %}
-                                    mensaje-error
-                                {% else %}
-                                    mensaje-info
-                                {% endif %}
-                            ">
-
-                                {{ message }}
-
-                            </div>
-
-                        {% endfor %}
-
-                    {% endif %}
-
-
-                    <!-- ERROR GENERAL -->
-
-                    {% if error %}
-
-                        <div class="mensaje mensaje-error">
-
-                            <strong>
-                                Error:
-                            </strong>
-
-                            {{ error }}
-
-                        </div>
-
-                    {% endif %}
-
-
+                    
                     <!-- FORMULARIO -->
 
                     <form
@@ -215,7 +208,7 @@
 
                                 <div>
                                     <span class="contador-titulo">
-                                        Total
+                                        Ordenes Auditorias_Erroress
                                     </span>
 
                                     <strong class="contador-numero">
@@ -234,7 +227,7 @@
 
                                 <div>
                                     <span class="contador-titulo">
-                                        Creadas
+                                        Ordenes y diligenciamiento de auditorias Correctamente.
                                     </span>
 
                                     <strong class="contador-numero">
@@ -253,7 +246,7 @@
 
                                 <div>
                                     <span class="contador-titulo">
-                                        Errores
+                                        Ordenes / Auditorias que presentan error por diligenciamiento del Auditor
                                     </span>
 
                                     <strong class="contador-numero">
@@ -283,20 +276,20 @@
                                     {{ total_rows }}
                                 </strong>
 
-                                registros.
+                                Ordenes Auditadas.
 
                             </p>
 
                             <p>
 
                                 <span class="texto-verde">
-                                    {{ successful_count }} creados correctamente
+                                    {{ successful_count }} Ordenes Auditadas correctamente.
                                 </span>
 
                                 y
 
                                 <span class="texto-rojo">
-                                    {{ error_count }} con errores
+                                    {{ error_count }} presentan error por diligenciamiento del Auditor.
                                 </span>.
 
                             </p>
@@ -380,7 +373,7 @@
                     <div class="panel-header-text">
 
                         <h2>
-                            Registros con errores
+                            Errores Cometidos por digitador
                         </h2>
 
                         <p>

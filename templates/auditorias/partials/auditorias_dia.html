@@ -1,4 +1,4 @@
-<div class="grafica-card">
+<div class="grafica-card grafica-card-dia">
 
     <h2>Auditorías por día</h2>
 
@@ -6,74 +6,124 @@
         Cantidad de auditorías realizadas diariamente.
     </p>
 
-    <div class="grafica-scroll">
-        <canvas id="graficaAuditoriasDia"></canvas>
+    <div class="grafica-scroll-dia">
+        <div class="grafica-canvas-dia">
+            <canvas id="graficaAuditoriasDia"></canvas>
+        </div>
     </div>
 
 </div>
 
+
 <style>
-.grafica-scroll {
+
+/* =========================================================
+   AUDITORÍAS POR DÍA
+   ========================================================= */
+
+.grafica-card-dia {
     width: 100%;
-
-    /*
-     * Altura visible del cuadro
-     */
-    height: 500px;
-
-    /*
-     * Scroll vertical
-     */
-    overflow-y: auto;
-
-    /*
-     * Evita que aparezca scroll horizontal
-     */
-    overflow-x: hidden;
-
-    padding-right: 8px;
-    padding-bottom: 10px;
-
-    box-sizing: border-box;
+    min-width: 0;
 }
 
 
 /*
- * Canvas
+ * Área visible.
+ *
+ * La gráfica puede ser mucho más alta,
+ * pero solamente mostramos 520px.
  */
 
-.grafica-scroll {
+.grafica-scroll-dia {
+
     width: 100%;
-    height: 500px;
+
+    height: 520px;
 
     overflow-y: auto;
+
     overflow-x: hidden;
 
-    padding-right: 8px;
-    padding-bottom: 10px;
+    position: relative;
 
     box-sizing: border-box;
+
+    padding-right: 8px;
 }
 
+
 /*
- * Scroll elegante
+ * Este div es el que tendrá la altura
+ * real de la gráfica.
  */
 
-.grafica-scroll::-webkit-scrollbar {
+.grafica-canvas-dia {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 1000px;
+}
+
+
+.grafica-canvas-dia canvas {
+
+    display: block;
+
+    width: 100% !important;
+
+}
+
+
+/* =========================================================
+   SCROLL
+   ========================================================= */
+
+.grafica-scroll-dia::-webkit-scrollbar {
+
     width: 8px;
+
 }
 
-.grafica-scroll::-webkit-scrollbar-track {
+
+.grafica-scroll-dia::-webkit-scrollbar-track {
+
     background: #f1f5f9;
+
     border-radius: 10px;
+
 }
 
-.grafica-scroll::-webkit-scrollbar-thumb {
+
+.grafica-scroll-dia::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+
+    border-radius: 10px;
+
+}
+
+
+.grafica-scroll-dia::-webkit-scrollbar-thumb:hover {
+
     background: #94a3b8;
-    border-radius: 10px;
+
 }
 
-.grafica-scroll::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .grafica-scroll-dia {
+
+        height: 450px;
+
+    }
+
 }
+
 </style>

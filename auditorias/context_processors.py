@@ -418,15 +418,26 @@ def obtener_errores_por_tecnico(queryset):
 
 
 # ============================================================
-# 6. CANTIDAD DE HALLAZGOS
+# 6. CANTIDAD DE HALLAZGOS POR TÉCNICO
 # ============================================================
 
 def obtener_errores_por_hallazgo(queryset):
     """
-    Total de hallazgos:
-        Alto
-        Medio
-        Bajo
+    Cantidad de hallazgos por técnico y tipo de hallazgo.
+
+    Ejemplo:
+
+    Técnico A
+        alto: 10
+        medio: 5
+        bajo: 2
+        total: 17
+
+    Técnico B
+        alto: 4
+        medio: 8
+        bajo: 1
+        total: 13
     """
 
     queryset = queryset.filter(
@@ -435,28 +446,71 @@ def obtener_errores_por_hallazgo(queryset):
 
     datos = (
         queryset
-        .values("tipo_hallazgo")
+        .values(
+            "nombre_tecnico",
+            "tipo_hallazgo"
+        )
         .annotate(
             cantidad=Count("id")
         )
-        .order_by("-cantidad")
+        .order_by(
+            "nombre_tecnico",
+            "-cantidad"
+        )
     )
 
-    resultado = []
+    tecnicos = {}
 
     for item in datos:
 
-        resultado.append({
-            "tipo_hallazgo": texto_seguro(
-                item.get("tipo_hallazgo"),
-                "sin_tipo"
-            ).lower(),
+        tecnico = texto_seguro(
+            item.get("nombre_tecnico"),
+            "Sin técnico"
+        )
 
-            "cantidad": item["cantidad"],
-        })
+        tipo = texto_seguro(
+            item.get("tipo_hallazgo"),
+            "sin_tipo"
+        ).lower()
+
+        cantidad = item["cantidad"]
+
+        if tecnico not in tecnicos:
+
+            tecnicos[tecnico] = {
+                "tecnico": tecnico,
+                "alto": 0,
+                "medio": 0,
+                "bajo": 0,
+                "sin_tipo": 0,
+                "total": 0
+            }
+
+        if tipo in (
+            "alto",
+            "medio",
+            "bajo"
+        ):
+
+            tecnicos[tecnico][tipo] += cantidad
+
+        else:
+
+            tecnicos[tecnico]["sin_tipo"] += cantidad
+
+        tecnicos[tecnico]["total"] += cantidad
+
+    resultado = list(
+        tecnicos.values()
+    )
+
+    # Mayor cantidad de hallazgos primero
+    resultado.sort(
+        key=lambda x: x["total"],
+        reverse=True
+    )
 
     return resultado
-
 
 # ============================================================
 # 7. AUDITORÍAS POR DIGITADOR
@@ -517,9 +571,88 @@ def obtener_auditorias_por_digitador(queryset):
 
     return resultado
 
+# ============================================================
+# ERRORES DETALLADOS POR TÉCNICO
+# ============================================================
 
+def obtener_errores_detallados_por_tecnico(queryset):
+    """
+    Obtiene los hallazgos NO CUMPLE agrupados por técnico
+    y posteriormente por el texto exacto del hallazgo.
 
+    Ejemplo:
 
+    Técnico A
+        total: 50
+        hallazgos:
+            Registro fotográfico incompleto: 50
+
+    Técnico B
+        total: 36
+        hallazgos:
+            Registro fotográfico incompleto: 30
+            Troque de válvula: 6
+    """
+
+    queryset = queryset.filter(
+        resultado_auditoria="no_cumple"
+    )
+
+    datos = (
+        queryset
+        .values(
+            "nombre_tecnico",
+            "hallazgo"
+        )
+        .annotate(
+            cantidad=Count("id")
+        )
+        .order_by(
+            "nombre_tecnico",
+            "-cantidad"
+        )
+    )
+
+    tecnicos = {}
+
+    for item in datos:
+
+        tecnico = texto_seguro(
+            item.get("nombre_tecnico"),
+            "Sin técnico"
+        )
+
+        hallazgo = texto_seguro(
+            item.get("hallazgo"),
+            "Sin hallazgo"
+        )
+
+        cantidad = item["cantidad"]
+
+        if tecnico not in tecnicos:
+
+            tecnicos[tecnico] = {
+                "tecnico": tecnico,
+                "total": 0,
+                "hallazgos": []
+            }
+
+        tecnicos[tecnico]["total"] += cantidad
+
+        tecnicos[tecnico]["hallazgos"].append({
+            "hallazgo": hallazgo,
+            "cantidad": cantidad
+        })
+
+    # Convertir a lista y ordenar por total
+    resultado = list(tecnicos.values())
+
+    resultado.sort(
+        key=lambda x: x["total"],
+        reverse=True
+    )
+
+    return resultado
 
 # ============================================================
 # CONTEXT PROCESSOR PRINCIPAL
@@ -599,10 +732,6 @@ def estadisticas_auditorias(request):
             queryset
         ),
 
-        "Errores_Por_Tecnicos": obtener_errores_por_tecnico(
-            queryset
-        ),
-
         "Errores_Por_Hallazgo": obtener_errores_por_hallazgo(
             queryset
         ),
@@ -610,4 +739,13 @@ def estadisticas_auditorias(request):
         "Auditorias_Por_Digitador": obtener_auditorias_por_digitador(
             queryset
         ),
+        
+        "Errores_Detallados_Tecnico": obtener_errores_detallados_por_tecnico(
+            queryset
+        ),
+        
+        "Errores_Por_Tecnicos": obtener_errores_por_tecnico(
+            queryset
+        ),
+
     }

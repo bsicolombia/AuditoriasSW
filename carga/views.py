@@ -1,15 +1,14 @@
 from datetime import datetime, date
 import json
-
+import re
+from django.utils import timezone
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import get_template
-
 from openpyxl import load_workbook
 from xhtml2pdf import pisa
-
 from .forms import CsvUploadForm, AuditoriaForm
 from auditorias.models import Auditoria
 
@@ -22,13 +21,19 @@ def carga(request):
 
     form = CsvUploadForm()
 
+    ultima_carga = request.session.get(
+        "ultima_carga_auditorias"
+    )
+
     return render(
         request,
         "carga/carga.html",
         {
             "form": form,
+            "ultima_carga": ultima_carga,
         }
     )
+
 
 
 # ==========================================================
@@ -59,15 +64,30 @@ def convertir_fecha(value):
     if value is None:
         return None
 
+    # ------------------------------------------------------
+    # DATETIME
+    # ------------------------------------------------------
+
     if isinstance(value, datetime):
         return value.date()
+
+    # ------------------------------------------------------
+    # DATE
+    # ------------------------------------------------------
 
     if isinstance(value, date):
         return value
 
+    # ------------------------------------------------------
+    # TEXTO
+    # ------------------------------------------------------
+
     if isinstance(value, str):
 
         value = value.strip()
+
+        if not value:
+            return None
 
         formatos = [
             "%Y-%m-%d",
@@ -88,7 +108,193 @@ def convertir_fecha(value):
             except ValueError:
                 continue
 
-    return value
+        return None
+
+    return None
+
+
+# ==========================================================
+# VALIDAR FECHA DE AUDITORÍA
+# ==========================================================
+
+def validar_fecha_auditoria(value):
+
+    """
+    Valida que la fecha:
+
+    - Sea una fecha válida.
+    - Tenga año de 4 dígitos.
+    - No sea anterior a 2025.
+    - No sea superior a la fecha actual.
+    - No tenga años como 0026.
+    - No tenga años futuros.
+    """
+
+    if value is None:
+
+        return (
+            False,
+            "La fecha es obligatoria."
+        )
+
+    # ------------------------------------------------------
+    # CONVERTIR A DATE
+    # ------------------------------------------------------
+
+    if isinstance(value, datetime):
+
+        fecha = value.date()
+
+    elif isinstance(value, date):
+
+        fecha = value
+
+    else:
+
+        return (
+            False,
+            "La fecha no tiene un formato válido."
+        )
+
+    # ------------------------------------------------------
+    # FECHA ACTUAL
+    # ------------------------------------------------------
+
+    hoy = date.today()
+
+    # ------------------------------------------------------
+    # AÑO MENOR A 1000
+    # ------------------------------------------------------
+
+    if fecha.year < 1000:
+
+        return (
+            False,
+            (
+                f"El año {fecha.year:04d} no es válido. "
+                "El año debe tener 4 dígitos."
+            )
+        )
+
+    # ------------------------------------------------------
+    # AÑO MÍNIMO
+    # ------------------------------------------------------
+
+    año_minimo = 2025
+
+    if fecha.year < año_minimo:
+
+        return (
+            False,
+            (
+                f"El año {fecha.year} no es válido. "
+                f"La fecha debe corresponder al año "
+                f"{año_minimo} o posterior."
+            )
+        )
+
+    # ------------------------------------------------------
+    # FECHA FUTURA
+    # ------------------------------------------------------
+
+    if fecha > hoy:
+
+        return (
+            False,
+            (
+                f"La fecha {fecha.strftime('%d/%m/%Y')} "
+                f"es superior a la fecha actual "
+                f"({hoy.strftime('%d/%m/%Y')})."
+            )
+        )
+
+    # ------------------------------------------------------
+    # AÑO FUTURO
+    # ------------------------------------------------------
+
+    if fecha.year > hoy.year:
+
+        return (
+            False,
+            (
+                f"El año {fecha.year} no es válido. "
+                f"No se permiten años posteriores "
+                f"a {hoy.year}."
+            )
+        )
+
+    return (
+        True,
+        ""
+    )
+
+
+# ==========================================================
+# VALIDAR TEXTO DE FECHA
+# ==========================================================
+
+def validar_texto_fecha(value):
+
+    """
+    Valida específicamente que un texto tenga año de 4 dígitos.
+
+    Ejemplos inválidos:
+
+        25/08/26
+        25/08/0026
+        2026/08/25?  -> se valida según formatos permitidos
+
+    Ejemplos válidos:
+
+        25/08/2026
+        2026-08-25
+        08/25/2026
+    """
+
+    if not isinstance(value, str):
+
+        return True
+
+    value = value.strip()
+
+    if not value:
+        return True
+
+    numeros = re.findall(
+        r"\d+",
+        value
+    )
+
+    # ------------------------------------------------------
+    # Detectar años escritos con cantidad incorrecta
+    # ------------------------------------------------------
+
+    for numero in numeros:
+
+        numero_int = int(numero)
+
+        # Si tiene 2 dígitos y parece año
+        if len(numero) == 2:
+
+            # Ej: 25/08/26
+            if numero_int <= 99:
+
+                return False
+
+        # Año con menos de 4 dígitos
+        elif len(numero) == 3:
+
+            return False
+
+        # Año escrito como 0026
+        elif len(numero) == 4:
+
+            # Si empieza por 0, no es un año válido
+            if numero.startswith("0"):
+
+                return False
+
+    return True
 
 
 # ==========================================================
@@ -103,10 +309,18 @@ def normalizar_resultado(value):
     valor = str(value).strip().lower()
 
     equivalencias = {
-        "cumple": "cumple",
-        "no cumple": "no_cumple",
-        "no_cumple": "no_cumple",
-        "nocumple": "no_cumple",
+
+        "cumple":
+            "cumple",
+
+        "no cumple":
+            "no_cumple",
+
+        "no_cumple":
+            "no_cumple",
+
+        "nocumple":
+            "no_cumple",
     }
 
     return equivalencias.get(
@@ -127,9 +341,15 @@ def normalizar_tipo_hallazgo(value):
     valor = str(value).strip().lower()
 
     equivalencias = {
-        "alto": "alto",
-        "medio": "medio",
-        "bajo": "bajo",
+
+        "alto":
+            "alto",
+
+        "medio":
+            "medio",
+
+        "bajo":
+            "bajo",
     }
 
     return equivalencias.get(
@@ -145,6 +365,7 @@ def normalizar_tipo_hallazgo(value):
 def generar_firma_registro(data):
 
     campos = [
+
         "fecha",
         "nombre_auditor",
         "numero_cedula",
@@ -179,11 +400,17 @@ def generar_firma_registro(data):
 
         else:
 
-            valor = str(valor).strip().lower()
+            valor = str(
+                valor
+            ).strip().lower()
 
-        valores.append(valor)
+        valores.append(
+            valor
+        )
 
-    return tuple(valores)
+    return tuple(
+        valores
+    )
 
 
 # ==========================================================
@@ -224,9 +451,6 @@ def obtener_hallazgo(
 
 # ==========================================================
 # PREPARAR DATOS PARA JSON
-#
-# Esto permite enviar los errores al PDF sin sesión.
-# Convierte fechas y otros objetos a texto.
 # ==========================================================
 
 def preparar_para_json(obj):
@@ -257,6 +481,30 @@ def preparar_para_json(obj):
 
 
 # ==========================================================
+# CREAR REGISTRO DE ERROR
+# ==========================================================
+
+def crear_error(
+    row_number,
+    form_data,
+    campo,
+    mensaje
+):
+
+    return {
+        "row": row_number,
+
+        # IMPORTANTE:
+        # aquí se conserva TODA la fila
+        "data": form_data.copy(),
+
+        "errors": {
+            campo: mensaje
+        },
+    }
+
+
+# ==========================================================
 # PROCESAR EXCEL
 # ==========================================================
 
@@ -279,7 +527,7 @@ def auditoria_crear(request):
         )
 
     # ------------------------------------------------------
-    # FORMULARIO DE CARGA
+    # FORMULARIO
     # ------------------------------------------------------
 
     upload_form = CsvUploadForm(
@@ -320,7 +568,7 @@ def auditoria_crear(request):
         )
 
     # ------------------------------------------------------
-    # VALIDAR EXTENSIÓN
+    # EXTENSIÓN
     # ------------------------------------------------------
 
     if not excel_file.name.lower().endswith(".xlsx"):
@@ -365,7 +613,7 @@ def auditoria_crear(request):
         )
 
     # ------------------------------------------------------
-    # OBTENER FILAS
+    # FILAS
     # ------------------------------------------------------
 
     rows = worksheet.iter_rows(
@@ -373,7 +621,7 @@ def auditoria_crear(request):
     )
 
     # ------------------------------------------------------
-    # OBTENER ENCABEZADOS
+    # ENCABEZADOS
     # ------------------------------------------------------
 
     try:
@@ -398,15 +646,17 @@ def auditoria_crear(request):
     # ------------------------------------------------------
 
     headers = [
+
         str(header).strip().lower()
         if header is not None
         else ""
+
         for header in headers
     ]
 
-    # ------------------------------------------------------
+    # ======================================================
     # MAPEO DE COLUMNAS
-    # ------------------------------------------------------
+    # ======================================================
 
     column_mapping = {
 
@@ -496,36 +746,51 @@ def auditoria_crear(request):
     }
 
     headers = [
+
         column_mapping.get(
             header,
             None
         )
+
         for header in headers
     ]
 
-    # ------------------------------------------------------
+    # ======================================================
     # CAMPOS DEL MODELO
-    # ------------------------------------------------------
+    # ======================================================
 
     campos_modelo = {
+
         "fecha",
+
         "nombre_auditor",
+
         "numero_cedula",
+
         "aplicativo",
+
         "fecha_operacion",
+
         "nombre_tecnico",
+
         "numero_cuenta_contrato",
+
         "numero_orden",
+
         "tipo_operacion",
+
         "resultado_auditoria",
+
         "observacion",
+
         "tipo_hallazgo",
+
         "hallazgo",
     }
 
-    # ------------------------------------------------------
-    # VARIABLES DE PROCESAMIENTO
-    # ------------------------------------------------------
+    # ======================================================
+    # VARIABLES
+    # ======================================================
 
     successful_records = []
 
@@ -533,14 +798,19 @@ def auditoria_crear(request):
 
     auditorias_creadas = []
 
+    # Registros que ya estaban correctamente guardados
+    registros_existentes = []
+
+    # Firmas de registros NUEVOS del archivo
     firmas_excel = set()
 
+    # Órdenes NUEVAS del archivo
     ordenes_excel = set()
 
     total_rows = 0
 
     # ======================================================
-    # PROCESAR CADA FILA
+    # PROCESAR FILAS
     # ======================================================
 
     for row_number, row in enumerate(
@@ -549,7 +819,7 @@ def auditoria_crear(request):
     ):
 
         # --------------------------------------------------
-        # IGNORAR FILAS COMPLETAMENTE VACÍAS
+        # IGNORAR FILA VACÍA
         # --------------------------------------------------
 
         if not any(
@@ -563,7 +833,7 @@ def auditoria_crear(request):
         total_rows += 1
 
         # --------------------------------------------------
-        # VARIABLES DE HALLAZGO
+        # HALLAZGOS
         # --------------------------------------------------
 
         hallazgo_alto = ""
@@ -573,14 +843,20 @@ def auditoria_crear(request):
         hallazgo_bajo = ""
 
         # --------------------------------------------------
-        # DATOS DEL FORMULARIO
+        # DATOS
         # --------------------------------------------------
 
         form_data = {}
 
         # --------------------------------------------------
-        # RECORRER COLUMNAS
+        # ERRORES DE FECHA
         # --------------------------------------------------
+
+        errores_fecha = []
+
+        # ==================================================
+        # LEER TODA LA FILA
+        # ==================================================
 
         for header, value in zip(
             headers,
@@ -591,7 +867,7 @@ def auditoria_crear(request):
                 continue
 
             # ----------------------------------------------
-            # HALLAZGOS ESPECIALES
+            # HALLAZGO ALTO
             # ----------------------------------------------
 
             if header == "hallazgo_alto":
@@ -602,6 +878,10 @@ def auditoria_crear(request):
 
                 continue
 
+            # ----------------------------------------------
+            # HALLAZGO MEDIO
+            # ----------------------------------------------
+
             if header == "hallazgo_medio":
 
                 hallazgo_medio = convertir_texto(
@@ -609,6 +889,10 @@ def auditoria_crear(request):
                 )
 
                 continue
+
+            # ----------------------------------------------
+            # HALLAZGO BAJO
+            # ----------------------------------------------
 
             if header == "hallazgo_bajo":
 
@@ -619,82 +903,180 @@ def auditoria_crear(request):
                 continue
 
             # ----------------------------------------------
-            # IGNORAR COLUMNAS DESCONOCIDAS
+            # COLUMNA DESCONOCIDA
             # ----------------------------------------------
 
             if header not in campos_modelo:
 
                 continue
 
-            # ----------------------------------------------
+            # ==================================================
             # FECHAS
-            # ----------------------------------------------
+            # ==================================================
 
             if header in [
                 "fecha",
                 "fecha_operacion",
             ]:
 
-                value = convertir_fecha(
-                    value
+                valor_original = value
+
+                # ------------------------------------------
+                # VALIDAR TEXTO
+                # ------------------------------------------
+
+                if isinstance(
+                    valor_original,
+                    str
+                ):
+
+                    if not validar_texto_fecha(
+                        valor_original
+                    ):
+
+                        errores_fecha.append(
+                            (
+                                header,
+                                (
+                                    "La fecha no es válida. "
+                                    "El año debe tener "
+                                    "exactamente 4 dígitos. "
+                                    "Ejemplo: 25/08/2026."
+                                )
+                            )
+                        )
+
+                        form_data[header] = (
+                            convertir_texto(
+                                valor_original
+                            )
+                        )
+
+                        continue
+
+                # ------------------------------------------
+                # CONVERTIR
+                # ------------------------------------------
+
+                fecha_convertida = convertir_fecha(
+                    valor_original
                 )
 
-            # ----------------------------------------------
-            # NÚMEROS QUE DEBEN SER TEXTO
-            # ----------------------------------------------
+                if fecha_convertida is None:
+
+                    errores_fecha.append(
+                        (
+                            header,
+                            (
+                                "La fecha no es válida. "
+                                "Debe utilizar un formato "
+                                "válido y un año de 4 dígitos."
+                            )
+                        )
+                    )
+
+                    form_data[header] = (
+                        convertir_texto(
+                            valor_original
+                        )
+                    )
+
+                    continue
+
+                # ------------------------------------------
+                # VALIDAR FECHA
+                # ------------------------------------------
+
+                fecha_valida, mensaje_fecha = (
+                    validar_fecha_auditoria(
+                        fecha_convertida
+                    )
+                )
+
+                if not fecha_valida:
+
+                    errores_fecha.append(
+                        (
+                            header,
+                            mensaje_fecha
+                        )
+                    )
+
+                form_data[header] = (
+                    fecha_convertida
+                )
+
+            # ==================================================
+            # NÚMEROS COMO TEXTO
+            # ==================================================
 
             elif header in [
+
                 "numero_cedula",
+
                 "numero_cuenta_contrato",
+
                 "numero_orden",
             ]:
 
-                value = convertir_texto(
-                    value
+                form_data[header] = (
+                    convertir_texto(
+                        value
+                    )
                 )
 
-            # ----------------------------------------------
+            # ==================================================
             # RESULTADO
-            # ----------------------------------------------
+            # ==================================================
 
             elif header == "resultado_auditoria":
 
-                value = normalizar_resultado(
-                    value
+                form_data[header] = (
+                    normalizar_resultado(
+                        value
+                    )
                 )
 
-            # ----------------------------------------------
+            # ==================================================
             # TIPO DE HALLAZGO
-            # ----------------------------------------------
+            # ==================================================
 
             elif header == "tipo_hallazgo":
 
-                value = normalizar_tipo_hallazgo(
-                    value
+                form_data[header] = (
+                    normalizar_tipo_hallazgo(
+                        value
+                    )
                 )
 
-            # ----------------------------------------------
+            # ==================================================
             # TEXTOS
-            # ----------------------------------------------
+            # ==================================================
 
             elif header in [
+
                 "nombre_auditor",
+
                 "aplicativo",
+
                 "nombre_tecnico",
+
                 "tipo_operacion",
+
                 "observacion",
+
                 "hallazgo",
             ]:
 
-                value = convertir_texto(
-                    value
+                form_data[header] = (
+                    convertir_texto(
+                        value
+                    )
                 )
 
-            form_data[header] = value
-
-        # --------------------------------------------------
+        # ==================================================
         # VALORES POR DEFECTO
-        # --------------------------------------------------
+        # ==================================================
 
         form_data.setdefault(
             "observacion",
@@ -706,9 +1088,9 @@ def auditoria_crear(request):
             ""
         )
 
-        # --------------------------------------------------
-        # OBTENER HALLAZGO SEGÚN TIPO
-        # --------------------------------------------------
+        # ==================================================
+        # OBTENER HALLAZGO
+        # ==================================================
 
         form_data["hallazgo"] = obtener_hallazgo(
             form_data.get(
@@ -721,79 +1103,29 @@ def auditoria_crear(request):
         )
 
         # ==================================================
-        # DUPLICADO EXACTO DENTRO DEL EXCEL
+        # VALIDAR FECHAS
         # ==================================================
 
-        firma = generar_firma_registro(
-            form_data
-        )
+        if errores_fecha:
 
-        if firma in firmas_excel:
-
-            error_records.append(
-                {
-                    "row": row_number,
-                    "data": form_data,
-                    "errors": {
-                        "Registro duplicado": (
-                            "Este registro aparece "
-                            "más de una vez dentro "
-                            "del archivo Excel."
-                        )
-                    },
-                }
-            )
-
-            continue
-
-        firmas_excel.add(
-            firma
-        )
-
-        # ==================================================
-        # NÚMERO DE ORDEN
-        # ==================================================
-
-        numero_orden = form_data.get(
-            "numero_orden",
-            ""
-        )
-
-        numero_orden = str(
-            numero_orden
-        ).strip()
-
-        # --------------------------------------------------
-        # DUPLICADO DE ORDEN DENTRO DEL EXCEL
-        # --------------------------------------------------
-
-        if numero_orden:
-
-            if numero_orden in ordenes_excel:
+            for campo, mensaje in errores_fecha:
 
                 error_records.append(
-                    {
-                        "row": row_number,
-                        "data": form_data,
-                        "errors": {
-                            "Número de orden": (
-                                f"La orden "
-                                f"{numero_orden} "
-                                "aparece más de una vez "
-                                "en el archivo Excel."
-                            )
-                        },
-                    }
+                    crear_error(
+                        row_number,
+                        form_data,
+                        campo,
+                        mensaje
+                    )
                 )
 
-                continue
-
-            ordenes_excel.add(
-                numero_orden
-            )
+            # IMPORTANTE:
+            # NO se registra como procesado.
+            # En la siguiente carga volverá a intentarse.
+            continue
 
         # ==================================================
-        # VALIDAR CON AUDITORIAFORM
+        # VALIDAR FORMULARIO
         # ==================================================
 
         row_form = AuditoriaForm(
@@ -814,15 +1146,32 @@ def auditoria_crear(request):
             error_records.append(
                 {
                     "row": row_number,
-                    "data": form_data,
+
+                    "data": form_data.copy(),
+
                     "errors": errors,
                 }
             )
 
+            # IMPORTANTE:
+            # No se guarda.
+            # Por eso, en la próxima carga
+            # volverá a aparecer el error.
             continue
 
         # ==================================================
-        # COMPROBAR BASE DE DATOS
+        # NÚMERO DE ORDEN
+        # ==================================================
+
+        numero_orden = str(
+            form_data.get(
+                "numero_orden",
+                ""
+            )
+        ).strip()
+
+        # ==================================================
+        # COMPROBAR SI YA EXISTE EN BD
         # ==================================================
 
         try:
@@ -844,11 +1193,13 @@ def auditoria_crear(request):
             error_records.append(
                 {
                     "row": row_number,
-                    "data": form_data,
+
+                    "data": form_data.copy(),
+
                     "errors": {
                         "Base de datos": (
                             "No fue posible comprobar "
-                            "si la orden ya existe: "
+                            "si la auditoría ya existe: "
                             f"{e}"
                         )
                     },
@@ -858,22 +1209,52 @@ def auditoria_crear(request):
             continue
 
         # ==================================================
-        # ORDEN YA EXISTENTE EN BASE DE DATOS
+        # YA EXISTE EN BD
         # ==================================================
 
         if registro_existente:
 
+            # NO es error.
+            #
+            # Significa que esta auditoría ya fue
+            # procesada correctamente en una carga
+            # anterior.
+            registros_existentes.append(
+                {
+                    "row": row_number,
+
+                    "data": form_data.copy(),
+                }
+            )
+
+            continue
+
+        # ==================================================
+        # DESDE AQUÍ EL REGISTRO ES NUEVO
+        # ==================================================
+
+        # ==================================================
+        # DUPLICADO EXACTO ENTRE REGISTROS NUEVOS
+        # ==================================================
+
+        firma = generar_firma_registro(
+            form_data
+        )
+
+        if firma in firmas_excel:
+
             error_records.append(
                 {
                     "row": row_number,
-                    "data": form_data,
+
+                    "data": form_data.copy(),
+
                     "errors": {
                         "Registro duplicado": (
-                            f"La orden "
-                            f"{numero_orden} "
-                            "ya existe en la base "
-                            "de datos. "
-                            "No se creó nuevamente."
+                            "Esta auditoría aparece "
+                            "más de una vez dentro "
+                            "de las nuevas auditorías "
+                            "del archivo."
                         )
                     },
                 }
@@ -881,8 +1262,44 @@ def auditoria_crear(request):
 
             continue
 
+        firmas_excel.add(
+            firma
+        )
+
         # ==================================================
-        # PREPARAR AUDITORÍA
+        # DUPLICADO DE ORDEN ENTRE REGISTROS NUEVOS
+        # ==================================================
+
+        if numero_orden:
+
+            if numero_orden in ordenes_excel:
+
+                error_records.append(
+                    {
+                        "row": row_number,
+
+                        "data": form_data.copy(),
+
+                        "errors": {
+                            "Número de orden": (
+                                f"La orden "
+                                f"{numero_orden} "
+                                "aparece más de una vez "
+                                "entre las nuevas "
+                                "auditorías del archivo."
+                            )
+                        },
+                    }
+                )
+
+                continue
+
+            ordenes_excel.add(
+                numero_orden
+            )
+
+        # ==================================================
+        # PREPARAR AUDITORÍA PARA INSERTAR
         # ==================================================
 
         try:
@@ -898,7 +1315,8 @@ def auditoria_crear(request):
             successful_records.append(
                 {
                     "row": row_number,
-                    "data": form_data,
+
+                    "data": form_data.copy(),
                 }
             )
 
@@ -907,7 +1325,9 @@ def auditoria_crear(request):
             error_records.append(
                 {
                     "row": row_number,
-                    "data": form_data,
+
+                    "data": form_data.copy(),
+
                     "errors": {
                         "Registro": (
                             "No fue posible preparar "
@@ -919,7 +1339,7 @@ def auditoria_crear(request):
             )
 
     # ======================================================
-    # GUARDAR TODAS LAS AUDITORÍAS
+    # GUARDAR AUDITORÍAS
     # ======================================================
 
     if auditorias_creadas:
@@ -933,17 +1353,28 @@ def auditoria_crear(request):
                     batch_size=1000
                 )
 
-        except Exception as e:
+            # --------------------------------------------------
+            # ÚLTIMA CARGA
+            # --------------------------------------------------
 
-            # ----------------------------------------------
-            # Si falla la carga masiva, ninguna se considera
-            # creada correctamente.
-            # ----------------------------------------------
+            request.session[
+                "ultima_carga_auditorias"
+            ] = (
+                timezone.localtime().strftime(
+                    "%d/%m/%Y %H:%M:%S"
+                )
+            )
+
+            request.session.modified = True
+
+        except Exception as e:
 
             error_records.append(
                 {
                     "row": "-",
+
                     "data": {},
+
                     "errors": {
                         "Base de datos": (
                             "No fue posible guardar "
@@ -970,6 +1401,10 @@ def auditoria_crear(request):
         error_records
     )
 
+    existing_count = len(
+        registros_existentes
+    )
+
     # ======================================================
     # MENSAJES
     # ======================================================
@@ -981,7 +1416,18 @@ def auditoria_crear(request):
             (
                 "Proceso finalizado correctamente. "
                 f"{successful_count} auditorías "
-                "creadas."
+                "_ok."
+            )
+        )
+
+    if existing_count:
+
+        messages.info(
+            request,
+            (
+                f"{existing_count} auditorías "
+                "ya habían sido cargadas anteriormente "
+                "y fueron ignoradas."
             )
         )
 
@@ -990,13 +1436,13 @@ def auditoria_crear(request):
         messages.warning(
             request,
             (
-                f"{error_count} registros "
-                "no fueron creados."
+                f"{error_count} Auditorias "
+                "Presentan Errores por diligenciamiento del Auditor."
             )
         )
 
     # ======================================================
-    # PREPARAR ERRORES
+    # JSON PARA PDF
     # ======================================================
 
     errores_json_data = preparar_para_json(
@@ -1009,18 +1455,30 @@ def auditoria_crear(request):
     )
 
     # ======================================================
+    # ÚLTIMA CARGA
+    # ======================================================
+
+    ultima_carga = request.session.get(
+        "ultima_carga_auditorias"
+    )
+
+    # ======================================================
     # CONTEXTO
     # ======================================================
 
     context = {
 
-        "form": upload_form,
+        "form":
+            upload_form,
 
         "successful_count":
             successful_count,
 
         "error_count":
             error_count,
+
+        "existing_count":
+            existing_count,
 
         "total_rows":
             total_rows,
@@ -1031,11 +1489,17 @@ def auditoria_crear(request):
         "successful_records":
             successful_records,
 
+        "existing_records":
+            registros_existentes,
+
         "report_generated":
             True,
 
         "errores_json":
             errores_json,
+
+        "ultima_carga":
+            ultima_carga,
     }
 
     return render(
@@ -1044,9 +1508,16 @@ def auditoria_crear(request):
         context
     )
 
+
+
+# ==========================================================
+# GENERAR PDF DE ERRORES
+# ==========================================================
+
 def generar_pdf_errores(request):
 
     if request.method != "POST":
+
         return HttpResponse(
             "Método no permitido.",
             status=405
@@ -1057,6 +1528,7 @@ def generar_pdf_errores(request):
     )
 
     if not errores_json:
+
         return HttpResponse(
             "No se recibieron errores para generar el PDF.",
             status=400
@@ -1078,6 +1550,10 @@ def generar_pdf_errores(request):
             status=400
         )
 
+    # ======================================================
+    # TEMPLATE
+    # ======================================================
+
     template = get_template(
         "carga/reporte_errores.html"
     )
@@ -1087,6 +1563,10 @@ def generar_pdf_errores(request):
             "errores": error_records,
         }
     )
+
+    # ======================================================
+    # RESPUESTA PDF
+    # ======================================================
 
     response = HttpResponse(
         content_type="application/pdf"
@@ -1098,6 +1578,10 @@ def generar_pdf_errores(request):
         'attachment; '
         'filename="reporte_errores_auditorias.pdf"'
     )
+
+    # ======================================================
+    # GENERAR PDF
+    # ======================================================
 
     pisa_status = pisa.CreatePDF(
         html,

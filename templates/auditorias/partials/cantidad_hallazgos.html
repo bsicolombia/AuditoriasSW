@@ -1,13 +1,128 @@
-<div class="grafica-card">
+<div class="grafica-card grafica-full-hallazgos">
 
-    <h2>Cantidad de hallazgos</h2>
+    <div class="grafica-header-hallazgos">
 
-    <p class="grafica-descripcion">
-        Cantidad total de errores por tipo.
-    </p>
+        <div>
 
-    <div class="chart-container">
+            <h2>
+                Cantidad de hallazgos
+            </h2>
+
+            <p class="grafica-descripcion">
+                Total de hallazgos cometidos por cada técnico,
+                clasificados por nivel.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="chart-container-hallazgos">
+
         <canvas id="graficaCantidadHallazgos"></canvas>
+
     </div>
 
 </div>
+
+
+<style>
+.chart-container-hallazgos {
+
+    width: 100%;
+
+    height: 550px;
+
+    max-height: 550px;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    padding-right: 10px;
+
+    padding-bottom: 15px;
+
+    position: relative;
+
+    min-width: 0;
+
+    background: #ffffff;
+}
+
+
+/* Canvas */
+
+.chart-container-hallazgos canvas {
+
+    display: block;
+
+}
+
+
+/* Scroll */
+
+.chart-container-hallazgos::-webkit-scrollbar {
+
+    width: 8px;
+
+}
+
+
+.chart-container-hallazgos::-webkit-scrollbar-track {
+
+    background: #f1f5f9;
+
+    border-radius: 10px;
+
+}
+
+
+.chart-container-hallazgos::-webkit-scrollbar-thumb {
+
+    background: #94a3b8;
+
+    border-radius: 10px;
+
+}
+
+
+.chart-container-hallazgos::-webkit-scrollbar-thumb:hover {
+
+    background: #64748b;
+
+}
+
+
+.chart-container-hallazgos {
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #94a3b8
+        #f1f5f9;
+
+}
+
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .chart-container-hallazgos {
+
+        height: 500px;
+
+        max-height: 500px;
+
+    }
+
+}
+
+
+</style>

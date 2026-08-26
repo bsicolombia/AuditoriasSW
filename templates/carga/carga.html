@@ -16,6 +16,10 @@
 
     <div class="contenido-carga">
 
+        <!-- =====================================================
+             ENCABEZADO
+        ====================================================== -->
+
         <div class="encabezado-pagina">
 
             <div>
@@ -29,11 +33,6 @@
                 </p>
 
             </div>
-
-
-            <!-- =====================================================
-                ÚLTIMA ACTUALIZACIÓN
-            ====================================================== -->
 
             <div class="ultima-carga">
 
@@ -63,8 +62,11 @@
 
         </div>
 
-        
-        
+
+        <!-- =====================================================
+             GRID PRINCIPAL
+        ====================================================== -->
+
         <div class="grid-carga">
 
 
@@ -81,6 +83,7 @@
                     </div>
 
                     <div>
+
                         <h2>
                             Carga masiva
                         </h2>
@@ -88,16 +91,13 @@
                         <p>
                             Seleccione el archivo Excel que desea procesar.
                         </p>
+
                     </div>
 
                 </div>
-            
+
 
                 <div class="panel-body panel-body-scroll">
-
-
-                    
-                    <!-- FORMULARIO -->
 
                     <form
                         method="POST"
@@ -107,13 +107,11 @@
 
                         {% csrf_token %}
 
-
                         <div class="campo-archivo">
 
                             <label for="{{ form.csv_file.id_for_label }}">
                                 {{ form.csv_file.label }}
                             </label>
-
 
                             <div class="archivo-input">
 
@@ -126,7 +124,6 @@
                                 >
 
                             </div>
-
 
                             <small class="ayuda-archivo">
                                 Formato permitido: .xlsx
@@ -157,12 +154,9 @@
 
                     </form>
 
-
                 </div>
 
             </section>
-        
-
 
 
             <!-- =================================================
@@ -178,6 +172,7 @@
                     </div>
 
                     <div>
+
                         <h2>
                             Resultado del procesamiento
                         </h2>
@@ -185,6 +180,7 @@
                         <p>
                             Resumen de la carga realizada.
                         </p>
+
                     </div>
 
                 </div>
@@ -194,11 +190,10 @@
 
                     {% if report_generated %}
 
-
-                        <!-- CONTADORES -->
-
                         <div class="contadores">
 
+
+                            <!-- TOTAL -->
 
                             <div class="contador contador-total">
 
@@ -207,17 +202,21 @@
                                 </span>
 
                                 <div>
+
                                     <span class="contador-titulo">
-                                        Ordenes Auditorias_Erroress
+                                        Registros procesados
                                     </span>
 
                                     <strong class="contador-numero">
                                         {{ total_rows }}
                                     </strong>
+
                                 </div>
 
                             </div>
 
+
+                            <!-- EXITOSOS -->
 
                             <div class="contador contador-exitos">
 
@@ -226,17 +225,21 @@
                                 </span>
 
                                 <div>
+
                                     <span class="contador-titulo">
-                                        Ordenes y diligenciamiento de auditorias Correctamente.
+                                        Auditorías creadas correctamente
                                     </span>
 
                                     <strong class="contador-numero">
                                         {{ successful_count }}
                                     </strong>
+
                                 </div>
 
                             </div>
 
+
+                            <!-- ERRORES -->
 
                             <div class="contador contador-errores">
 
@@ -245,13 +248,18 @@
                                 </span>
 
                                 <div>
+
                                     <span class="contador-titulo">
-                                        Ordenes / Auditorias que presentan error por diligenciamiento del Auditor
+                                        Auditorías con errores
                                     </span>
 
-                                    <strong class="contador-numero">
-                                        {{ error_count }}
+                                    <strong
+                                        class="contador-numero"
+                                        id="contador-errores-resumen"
+                                    >
+                                        {{ errors_records|length }}
                                     </strong>
+
                                 </div>
 
                             </div>
@@ -260,13 +268,16 @@
                         </div>
 
 
-                        <!-- RESUMEN -->
+                        <!-- =================================================
+                             RESUMEN
+                        ================================================== -->
 
                         <div class="resumen">
 
                             <div class="resumen-titulo">
                                 Resumen de la carga
                             </div>
+
 
                             <p>
 
@@ -276,58 +287,87 @@
                                     {{ total_rows }}
                                 </strong>
 
-                                Ordenes Auditadas.
+                                órdenes auditadas.
 
                             </p>
+
 
                             <p>
 
                                 <span class="texto-verde">
-                                    {{ successful_count }} Ordenes Auditadas correctamente.
+
+                                    {{ successful_count }}
+                                    auditorías creadas correctamente.
+
                                 </span>
 
-                                y
 
-                                <span class="texto-rojo">
-                                    {{ error_count }} presentan error por diligenciamiento del Auditor.
-                                </span>.
+                                {% if errors_records %}
+
+                                    <span>
+                                        y
+                                    </span>
+
+                                    <span class="texto-rojo">
+
+                                        {{ errors_records|length }}
+                                        presentan errores.
+
+                                    </span>
+
+                                {% endif %}
 
                             </p>
 
+
+                            {% if existing_count %}
+
+                                <p>
+
+                                    <span>
+                                        {{ existing_count }}
+                                        auditorías ya existían y fueron ignoradas.
+                                    </span>
+
+                                </p>
+
+                            {% endif %}
+
                         </div>
 
 
-                        <!-- BARRA DE PROGRESO VISUAL -->
+                        <!-- =================================================
+                             BARRA DE PROGRESO
+                        ================================================== -->
 
                         {% if total_rows > 0 %}
 
-                        <div class="progreso">
+                            <div class="progreso">
 
-                            <div class="progreso-label">
+                                <div class="progreso-label">
 
-                                <span>
-                                    Registros procesados
-                                </span>
+                                    <span>
+                                        Registros procesados
+                                    </span>
 
-                                <strong>
-                                    {{ total_rows }}
-                                </strong>
+                                    <strong>
+                                        {{ total_rows }}
+                                    </strong>
 
-                            </div>
+                                </div>
 
 
-                            <div class="progreso-barra">
+                                <div class="progreso-barra">
 
-                                <div
-                                    class="progreso-exitos"
-                                    style="width:
-                                    {% widthratio successful_count total_rows 100 %}%"
-                                >
+                                    <div
+                                        class="progreso-exitos"
+                                        style="width: {% widthratio successful_count total_rows 100 %}%"
+                                    >
+                                    </div>
+
                                 </div>
 
                             </div>
-
-                        </div>
 
                         {% endif %}
 
@@ -357,12 +397,16 @@
             </section>
 
 
-
             <!-- =================================================
                  3. REGISTROS CON ERRORES
             ================================================== -->
 
             <section class="panel panel-errores">
+
+
+                <!-- =================================================
+                     HEADER
+                ================================================== -->
 
                 <div class="panel-header">
 
@@ -370,95 +414,420 @@
                         !
                     </div>
 
+
                     <div class="panel-header-text">
 
                         <h2>
-                            Errores Cometidos por digitador
+                            Errores cometidos por digitador
                         </h2>
 
                         <p>
-                            Revise los registros que no pudieron procesarse.
+                            Revise y filtre todos los registros que presentan errores.
                         </p>
 
                     </div>
 
 
-                    {% if error_count %}
+                    <!-- =================================================
+                         CONTADOR DINÁMICO
+                    ================================================== -->
 
-                    <span class="badge-error">
-                        {{ error_count }}
-                    </span>
+                    {% if report_generated %}
+
+                        <span
+                            class="badge-error"
+                            id="contador-errores"
+                            data-total="{{ errors_records|length }}"
+                        >
+                            {{ errors_records|length }}
+                        </span>
 
                     {% endif %}
 
                 </div>
 
 
+                <!-- =================================================
+                     FILTROS
+                ================================================== -->
+
+                {% if report_generated and errors_records %}
+
+                    <div class="filtros-errores">
+
+
+                        <!-- =================================================
+                             DIGITADOR
+                        ================================================== -->
+
+                        <div class="filtro">
+
+                            <label for="filtro-digitador">
+                                Digitador
+                            </label>
+
+                            <select id="filtro-digitador">
+
+                                <option value="">
+                                    Todos
+                                </option>
+
+                                {% for record in errors_records %}
+
+                                    {% if record.data.nombre_auditor %}
+
+                                        <option
+                                            value="{{ record.data.nombre_auditor }}"
+                                        >
+                                            {{ record.data.nombre_auditor }}
+                                        </option>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             TIPO DE ERROR
+                        ================================================== -->
+
+                        <div class="filtro">
+
+                            <label for="filtro-tipo-error">
+                                Tipo de error
+                            </label>
+
+                            <select id="filtro-tipo-error">
+
+                                <option value="">
+                                    Todos
+                                </option>
+
+                                {% for record in errors_records %}
+
+                                    {% for field, errors in record.errors.items %}
+
+                                        <option value="{{ field }}">
+                                            {{ field }}
+                                        </option>
+
+                                    {% endfor %}
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             TÉCNICO
+                        ================================================== -->
+
+                        <div class="filtro">
+
+                            <label for="filtro-tecnico">
+                                Técnico
+                            </label>
+
+                            <select id="filtro-tecnico">
+
+                                <option value="">
+                                    Todos
+                                </option>
+
+                                {% for record in errors_records %}
+
+                                    {% if record.data.nombre_tecnico %}
+
+                                        <option
+                                            value="{{ record.data.nombre_tecnico }}"
+                                        >
+                                            {{ record.data.nombre_tecnico }}
+                                        </option>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             AÑO
+                        ================================================== -->
+
+                        <div class="filtro">
+
+                            <label for="filtro-año">
+                                Año
+                            </label>
+
+                            <select id="filtro-año">
+
+                                <option value="">
+                                    Todos
+                                </option>
+
+                                {% for record in errors_records %}
+
+                                    {% if record.data.fecha %}
+
+                                        <option
+                                            value="{{ record.data.fecha|date:'Y' }}"
+                                        >
+                                            {{ record.data.fecha|date:'Y' }}
+                                        </option>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             MES
+                        ================================================== -->
+
+                        <div class="filtro">
+
+                            <label for="filtro-mes">
+                                Mes
+                            </label>
+
+                            <select id="filtro-mes">
+
+                                <option value="">
+                                    Todos
+                                </option>
+
+                                <option value="01">Enero</option>
+                                <option value="02">Febrero</option>
+                                <option value="03">Marzo</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Mayo</option>
+                                <option value="06">Junio</option>
+                                <option value="07">Julio</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Septiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             DÍA
+                        ================================================== -->
+
+                        <div class="filtro">
+
+                            <label for="filtro-dia">
+                                Día
+                            </label>
+
+                            <select id="filtro-dia">
+
+                                <option value="">
+                                    Todos
+                                </option>
+
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                                <option value="24">24</option>
+                                <option value="25">25</option>
+                                <option value="26">26</option>
+                                <option value="27">27</option>
+                                <option value="28">28</option>
+                                <option value="29">29</option>
+                                <option value="30">30</option>
+                                <option value="31">31</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             LIMPIAR
+                        ================================================== -->
+
+                        <button
+                            type="button"
+                            id="btn-limpiar-filtros"
+                            class="btn btn-filtro-limpiar"
+                        >
+                            Limpiar filtros
+                        </button>
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =================================================
+                     CUERPO DE ERRORES
+                ================================================== -->
+
                 <div class="panel-body panel-body-scroll">
 
                     {% if report_generated and errors_records %}
 
-
-                        <div class="registros-container">
+                        <div
+                            class="registros-container"
+                            id="registros-container"
+                        >
 
                             {% for record in errors_records %}
 
-                            <details class="error-item">
+                                <details
+                                    class="error-item"
 
-                                <summary class="error-header">
+                                    data-digitador="{{ record.data.nombre_auditor|default:''|escape }}"
 
-                                    <div class="error-resumen">
+                                    data-tecnico="{{ record.data.nombre_tecnico|default:''|escape }}"
 
-                                        <span class="fila-error">
-                                            Fila {{ record.row }}
+                                    data-fecha="{{ record.data.fecha|date:'Y-m-d' }}"
+
+                                    data-errores="{% for field, errors in record.errors.items %}{{ field|escape }}{% if not forloop.last %}|{% endif %}{% endfor %}"
+                                >
+
+
+                                    <!-- =================================================
+                                         CABECERA
+                                    ================================================== -->
+
+                                    <summary class="error-header">
+
+                                        <div class="error-resumen">
+
+                                            <span class="fila-error">
+                                                Fila {{ record.row }}
+                                            </span>
+
+
+                                            {% for field, errors in record.errors.items %}
+
+                                                <span class="campo-error">
+                                                    {{ field }}
+                                                </span>
+
+                                            {% endfor %}
+
+                                        </div>
+
+
+                                        <span class="ver-detalle">
+
+                                            Detalles
+
+                                            <span class="flecha">
+                                                ▾
+                                            </span>
+
                                         </span>
+
+                                    </summary>
+
+
+                                    <!-- =================================================
+                                         DETALLE
+                                    ================================================== -->
+
+                                    <div class="error-content">
 
 
                                         {% for field, errors in record.errors.items %}
 
-                                            <span class="campo-error">
-                                                {{ field }}
-                                            </span>
+                                            <div class="error-mensaje">
+
+                                                <div class="error-campo-titulo">
+                                                    {{ field }}
+                                                </div>
+
+
+                                                {% for key, value in record.data.items %}
+
+                                                    {% if key == field %}
+
+                                                        <div class="valor-error">
+
+                                                            <span>
+                                                                Valor:
+                                                            </span>
+
+                                                            <code>
+                                                                {{ value }}
+                                                            </code>
+
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                {% endfor %}
+
+
+                                                <p>
+                                                    {{ errors }}
+                                                </p>
+
+                                            </div>
 
                                         {% endfor %}
 
-                                    </div>
 
+                                        <!-- =================================================
+                                             DATOS DEL REGISTRO
+                                        ================================================== -->
 
-                                    <span class="ver-detalle">
-                                        Detalles
-                                        <span class="flecha">▾</span>
-                                    </span>
-
-                                </summary>
-
-
-                                <!-- DETALLES -->
-
-                                <div class="error-content">
-
-                                    {% for field, errors in record.errors.items %}
-
-                                        <div class="error-mensaje">
-
-                                            <div class="error-campo-titulo">
-                                                {{ field }}
-                                            </div>
-
+                                        <div class="datos-grid">
 
                                             {% for key, value in record.data.items %}
 
-                                                {% if key == field %}
+                                                {% if value != "" and value != None %}
 
-                                                    <div class="valor-error">
+                                                    <div class="dato">
 
-                                                        <span>
-                                                            Valor:
+                                                        <span class="dato-label">
+                                                            {{ key }}
                                                         </span>
 
-                                                        <code>
+                                                        <span class="dato-valor">
                                                             {{ value }}
-                                                        </code>
+                                                        </span>
 
                                                     </div>
 
@@ -466,47 +835,38 @@
 
                                             {% endfor %}
 
-
-                                            <p>
-                                                {{ errors }}
-                                            </p>
-
                                         </div>
-
-                                    {% endfor %}
-
-
-                                    <!-- DATOS DEL REGISTRO -->
-
-                                    <div class="datos-grid">
-
-                                        {% for key, value in record.data.items %}
-
-                                            {% if value != "" and value != None %}
-
-                                                <div class="dato">
-
-                                                    <span class="dato-label">
-                                                        {{ key }}
-                                                    </span>
-
-                                                    <span class="dato-valor">
-                                                        {{ value }}
-                                                    </span>
-
-                                                </div>
-
-                                            {% endif %}
-
-                                        {% endfor %}
 
                                     </div>
 
-                                </div>
-
-                            </details>
+                                </details>
 
                             {% endfor %}
+
+                        </div>
+
+
+                        <!-- =================================================
+                             MENSAJE CUANDO FILTRO NO ENCUENTRA NADA
+                        ================================================== -->
+
+                        <div
+                            id="sin-resultados-filtro"
+                            class="estado-vacio"
+                            style="display: none;"
+                        >
+
+                            <div class="estado-icon">
+                                🔎
+                            </div>
+
+                            <h3>
+                                No hay resultados
+                            </h3>
+
+                            <p>
+                                No existen errores que coincidan con los filtros seleccionados.
+                            </p>
 
                         </div>
 
@@ -550,34 +910,44 @@
 
                     {% endif %}
 
-                    {% if report_generated and error_count %}
 
-                    <div class="acciones-pdf">
+                    <!-- =================================================
+                         PDF
+                    ================================================== -->
 
-                        <form
-                            method="POST"
-                            action="{% url 'reporte_errores_pdf' %}"
-                        >
-                            {% csrf_token %}
+                    {% if report_generated and errors_records %}
 
-                            <textarea name="errores_json" hidden>{{ errores_json }}</textarea>
+                        <div class="acciones-pdf">
 
-                            <button
-                                type="submit"
-                                class="btn btn-pdf"
+                            <form
+                                method="POST"
+                                action="{% url 'reporte_errores_pdf' %}"
                             >
-                                ↓ Descargar errores PDF
-                            </button>
-                        </form>
 
-                    </div>
+                                {% csrf_token %}
+
+                                <textarea
+                                    name="errores_json"
+                                    hidden
+                                >{{ errores_json }}</textarea>
+
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-pdf"
+                                >
+                                    ↓ Descargar errores PDF
+                                </button>
+
+                            </form>
+
+                        </div>
 
                     {% endif %}
 
                 </div>
 
             </section>
-
 
 
             <!-- =================================================
@@ -591,6 +961,7 @@
                     <div class="panel-icon icon-verde">
                         ✓
                     </div>
+
 
                     <div class="panel-header-text">
 
@@ -607,9 +978,9 @@
 
                     {% if successful_count %}
 
-                    <span class="badge-success">
-                        {{ successful_count }}
-                    </span>
+                        <span class="badge-success">
+                            {{ successful_count }}
+                        </span>
 
                     {% endif %}
 
@@ -620,7 +991,6 @@
 
                     {% if report_generated and successful_records %}
 
-
                         <div class="exitosos-container">
 
                             <table class="tabla-exitosos">
@@ -629,12 +999,29 @@
 
                                     <tr>
 
-                                        <th>Fila</th>
-                                        <th>Auditor</th>
-                                        <th>Técnico</th>
-                                        <th>Operación</th>
-                                        <th>Resultado</th>
-                                        <th>Estado</th>
+                                        <th>
+                                            Fila
+                                        </th>
+
+                                        <th>
+                                            Auditor
+                                        </th>
+
+                                        <th>
+                                            Técnico
+                                        </th>
+
+                                        <th>
+                                            Operación
+                                        </th>
+
+                                        <th>
+                                            Resultado
+                                        </th>
+
+                                        <th>
+                                            Estado
+                                        </th>
 
                                     </tr>
 
@@ -645,44 +1032,46 @@
 
                                     {% for record in successful_records %}
 
-                                    <tr>
+                                        <tr>
 
-                                        <td>
-                                            <span class="numero-fila">
-                                                {{ record.row }}
-                                            </span>
-                                        </td>
+                                            <td>
 
+                                                <span class="numero-fila">
+                                                    {{ record.row }}
+                                                </span>
 
-                                        <td>
-                                            {{ record.data.nombre_auditor }}
-                                        </td>
+                                            </td>
 
 
-                                        <td>
-                                            {{ record.data.nombre_tecnico }}
-                                        </td>
+                                            <td>
+                                                {{ record.data.nombre_auditor }}
+                                            </td>
 
 
-                                        <td>
-                                            {{ record.data.tipo_operacion }}
-                                        </td>
+                                            <td>
+                                                {{ record.data.nombre_tecnico }}
+                                            </td>
 
 
-                                        <td>
-                                            {{ record.data.resultado_auditoria }}
-                                        </td>
+                                            <td>
+                                                {{ record.data.tipo_operacion }}
+                                            </td>
 
 
-                                        <td>
+                                            <td>
+                                                {{ record.data.resultado_auditoria }}
+                                            </td>
 
-                                            <span class="estado-creada">
-                                                ✓ Creada
-                                            </span>
 
-                                        </td>
+                                            <td>
 
-                                    </tr>
+                                                <span class="estado-creada">
+                                                    ✓ Creada
+                                                </span>
+
+                                            </td>
+
+                                        </tr>
 
                                     {% endfor %}
 
@@ -736,7 +1125,6 @@
 
             </section>
 
-
         </div>
 
 
@@ -751,6 +1139,7 @@
                 <div class="advertencia-icon">
                     !
                 </div>
+
 
                 <div>
 
@@ -768,9 +1157,515 @@
 
         {% endif %}
 
-
     </div>
 
 </div>
+
+
+<!-- ==========================================================
+     JAVASCRIPT DE FILTROS
+========================================================== -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const filtroDigitador = document.getElementById("filtro-digitador");
+    const filtroTipoError = document.getElementById("filtro-tipo-error");
+    const filtroTecnico = document.getElementById("filtro-tecnico");
+    const filtroAño = document.getElementById("filtro-año");
+    const filtroMes = document.getElementById("filtro-mes");
+    const filtroDia = document.getElementById("filtro-dia");
+
+    const btnLimpiar = document.getElementById("btn-limpiar-filtros");
+
+    const contadorErrores = document.getElementById("contador-errores");
+
+    const contadorErroresResumen =
+        document.getElementById("contador-errores-resumen");
+
+    const registros =
+        document.querySelectorAll(".error-item");
+
+    const sinResultados =
+        document.getElementById("sin-resultados-filtro");
+
+
+    /*
+     * ==========================================================
+     * ELIMINAR OPCIONES DUPLICADAS
+     * ==========================================================
+     */
+
+    function eliminarDuplicados(select) {
+
+        if (!select) {
+            return;
+        }
+
+        const valores = new Set();
+
+        Array.from(select.options).forEach(function (option, index) {
+
+            if (index === 0) {
+                return;
+            }
+
+            const valor =
+                option.value
+                    .trim()
+                    .toLowerCase();
+
+            if (!valor) {
+                return;
+            }
+
+            if (valores.has(valor)) {
+
+                option.remove();
+
+            } else {
+
+                valores.add(valor);
+
+            }
+
+        });
+
+    }
+
+
+    eliminarDuplicados(filtroDigitador);
+    eliminarDuplicados(filtroTipoError);
+    eliminarDuplicados(filtroTecnico);
+    eliminarDuplicados(filtroAño);
+
+
+    /*
+     * ==========================================================
+     * NORMALIZAR TEXTO
+     * ==========================================================
+     */
+
+    function normalizar(valor) {
+
+        return (valor || "")
+            .toString()
+            .trim()
+            .toLowerCase();
+
+    }
+
+
+    /*
+     * ==========================================================
+     * APLICAR FILTROS
+     * ==========================================================
+     */
+
+    function aplicarFiltros() {
+
+        const digitador =
+            normalizar(
+                filtroDigitador
+                    ? filtroDigitador.value
+                    : ""
+            );
+
+
+        const tipoError =
+            normalizar(
+                filtroTipoError
+                    ? filtroTipoError.value
+                    : ""
+            );
+
+
+        const tecnico =
+            normalizar(
+                filtroTecnico
+                    ? filtroTecnico.value
+                    : ""
+            );
+
+
+        const año =
+            filtroAño
+                ? filtroAño.value
+                : "";
+
+
+        const mes =
+            filtroMes
+                ? filtroMes.value
+                : "";
+
+
+        const dia =
+            filtroDia
+                ? filtroDia.value
+                : "";
+
+
+        let cantidadVisibles = 0;
+
+
+        /*
+         * ======================================================
+         * RECORRER TODOS LOS ERRORES
+         * ======================================================
+         */
+
+        registros.forEach(function (registro) {
+
+            const registroDigitador =
+                normalizar(
+                    registro.dataset.digitador
+                );
+
+
+            const registroTecnico =
+                normalizar(
+                    registro.dataset.tecnico
+                );
+
+
+            const registroFecha =
+                (
+                    registro.dataset.fecha || ""
+                ).trim();
+
+
+            const errores =
+                normalizar(
+                    registro.dataset.errores
+                );
+
+
+            /*
+             * ==================================================
+             * FECHA
+             * ==================================================
+             *
+             * Se espera:
+             *
+             * YYYY-MM-DD
+             *
+             * Ejemplo:
+             *
+             * 2026-08-26
+             */
+
+            let registroAño = "";
+            let registroMes = "";
+            let registroDia = "";
+
+
+            if (registroFecha.length >= 10) {
+
+                registroAño =
+                    registroFecha.substring(0, 4);
+
+                registroMes =
+                    registroFecha.substring(5, 7);
+
+                registroDia =
+                    registroFecha.substring(8, 10);
+
+            }
+
+
+            /*
+             * ==================================================
+             * COMPARAR DIGITADOR
+             * ==================================================
+             */
+
+            const coincideDigitador =
+                !digitador ||
+                registroDigitador === digitador;
+
+
+            /*
+             * ==================================================
+             * COMPARAR TÉCNICO
+             * ==================================================
+             */
+
+            const coincideTecnico =
+                !tecnico ||
+                registroTecnico === tecnico;
+
+
+            /*
+             * ==================================================
+             * COMPARAR TIPO DE ERROR
+             * ==================================================
+             */
+
+            const listaErrores =
+                errores
+                    .split("|")
+                    .map(function (item) {
+
+                        return item
+                            .trim()
+                            .toLowerCase();
+
+                    })
+                    .filter(Boolean);
+
+
+            const coincideTipoError =
+                !tipoError ||
+                listaErrores.includes(tipoError);
+
+
+            /*
+             * ==================================================
+             * COMPARAR AÑO
+             * ==================================================
+             */
+
+            const coincideAño =
+                !año ||
+                registroAño === año;
+
+
+            /*
+             * ==================================================
+             * COMPARAR MES
+             * ==================================================
+             */
+
+            const coincideMes =
+                !mes ||
+                registroMes === mes;
+
+
+            /*
+             * ==================================================
+             * COMPARAR DÍA
+             * ==================================================
+             */
+
+            const coincideDia =
+                !dia ||
+                registroDia === dia;
+
+
+            /*
+             * ==================================================
+             * RESULTADO FINAL
+             * ==================================================
+             *
+             * Todos los filtros deben coincidir.
+             */
+
+            const mostrar =
+                coincideDigitador &&
+                coincideTipoError &&
+                coincideTecnico &&
+                coincideAño &&
+                coincideMes &&
+                coincideDia;
+
+
+            if (mostrar) {
+
+                registro.style.display = "";
+
+                cantidadVisibles++;
+
+            } else {
+
+                registro.style.display = "none";
+
+            }
+
+        });
+
+
+        /*
+         * ======================================================
+         * ACTUALIZAR BADGE
+         * ======================================================
+         */
+
+        if (contadorErrores) {
+
+            contadorErrores.textContent =
+                cantidadVisibles;
+
+        }
+
+
+        /*
+         * ======================================================
+         * ACTUALIZAR CONTADOR DEL RESUMEN
+         *
+         * Este contador solamente representa el total real
+         * acumulado. No cambia con el filtro.
+         * ======================================================
+         */
+
+        if (contadorErroresResumen) {
+
+            const total =
+                contadorErrores
+                    ? contadorErrores.dataset.total
+                    : registros.length;
+
+            contadorErroresResumen.textContent =
+                total;
+
+        }
+
+
+        /*
+         * ======================================================
+         * MOSTRAR / OCULTAR "SIN RESULTADOS"
+         * ======================================================
+         */
+
+        if (sinResultados) {
+
+            if (cantidadVisibles === 0) {
+
+                sinResultados.style.display = "";
+
+            } else {
+
+                sinResultados.style.display = "none";
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * ==========================================================
+     * EVENTOS
+     * ==========================================================
+     */
+
+    if (filtroDigitador) {
+
+        filtroDigitador.addEventListener(
+            "change",
+            aplicarFiltros
+        );
+
+    }
+
+
+    if (filtroTipoError) {
+
+        filtroTipoError.addEventListener(
+            "change",
+            aplicarFiltros
+        );
+
+    }
+
+
+    if (filtroTecnico) {
+
+        filtroTecnico.addEventListener(
+            "change",
+            aplicarFiltros
+        );
+
+    }
+
+
+    if (filtroAño) {
+
+        filtroAño.addEventListener(
+            "change",
+            aplicarFiltros
+        );
+
+    }
+
+
+    if (filtroMes) {
+
+        filtroMes.addEventListener(
+            "change",
+            aplicarFiltros
+        );
+
+    }
+
+
+    if (filtroDia) {
+
+        filtroDia.addEventListener(
+            "change",
+            aplicarFiltros
+        );
+
+    }
+
+
+    /*
+     * ==========================================================
+     * LIMPIAR FILTROS
+     * ==========================================================
+     */
+
+    if (btnLimpiar) {
+
+        btnLimpiar.addEventListener(
+            "click",
+            function () {
+
+                if (filtroDigitador) {
+                    filtroDigitador.value = "";
+                }
+
+                if (filtroTipoError) {
+                    filtroTipoError.value = "";
+                }
+
+                if (filtroTecnico) {
+                    filtroTecnico.value = "";
+                }
+
+                if (filtroAño) {
+                    filtroAño.value = "";
+                }
+
+                if (filtroMes) {
+                    filtroMes.value = "";
+                }
+
+                if (filtroDia) {
+                    filtroDia.value = "";
+                }
+
+                aplicarFiltros();
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ==========================================================
+     * ESTADO INICIAL
+     * ==========================================================
+     */
+
+    aplicarFiltros();
+
+});
+
+</script>
+
 
 {% endblock %}

@@ -1393,13 +1393,23 @@ def auditoria_crear(request):
     # CONTADORES
     # ======================================================
 
-    successful_count = len(
-        successful_records
-    )
+    successful_count = len(successful_records)
 
-    error_count = len(
-        error_records
-    )
+    # ======================================================
+    # TIPOS DE ERROR ÚNICOS
+    # ======================================================
+
+    tipos_error_unicos = set()
+
+    for record in error_records:
+
+        for campo in record.get("errors", {}).keys():
+
+            tipos_error_unicos.add(
+                str(campo).strip()
+            )
+
+    error_count = len(tipos_error_unicos)
 
     existing_count = len(
         registros_existentes

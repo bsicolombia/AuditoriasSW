@@ -191,6 +191,35 @@
                 </select>
             </div>
 
+            <div>
+            <label>Hallazgo</label>
+
+            <select
+                name="hallazgo"
+                class="select-filtro"
+            >
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for hallazgo in hallazgos_estadisticas %}
+
+                    <option
+                        value="{{ hallazgo }}"
+                        {% if filtros_estadisticas.hallazgo == hallazgo %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ hallazgo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+        </div>
+
+
         </div>
 
 

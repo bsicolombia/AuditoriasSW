@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("=== CANTIDAD DE HALLAZGOS POR TÉCNICO ===");
+    console.log(
+        "=== CANTIDAD DE HALLAZGOS ==="
+    );
 
 
     // =====================================================
@@ -9,13 +11,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const elemento =
         document.getElementById(
-            "datos-Errores-Por-Hallazgo"
+            "datos-Cantidad-Por-Hallazgo"
         );
+
 
     const canvas =
         document.getElementById(
             "graficaCantidadHallazgos"
         );
+
 
     const contenedor =
         document.querySelector(
@@ -23,10 +27,14 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
 
+    // =====================================================
+    // VALIDACIONES
+    // =====================================================
+
     if (!elemento) {
 
         console.error(
-            "❌ NO EXISTE #datos-Errores-Por-Hallazgo"
+            "❌ NO EXISTE #datos-Cantidad-Por-Hallazgo"
         );
 
         return;
@@ -53,6 +61,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    if (typeof Chart === "undefined") {
+
+        console.error(
+            "❌ Chart.js no está cargado"
+        );
+
+        return;
+    }
+
+
     // =====================================================
     // LEER JSON
     // =====================================================
@@ -72,14 +90,38 @@ document.addEventListener("DOMContentLoaded", function () {
             error
         );
 
+        console.error(
+            elemento.textContent
+        );
+
         return;
     }
 
 
-    if (!Array.isArray(datos) || datos.length === 0) {
+    console.log(
+        "📦 DATOS RECIBIDOS:",
+        datos
+    );
+
+
+    // =====================================================
+    // VALIDAR DATOS
+    // =====================================================
+
+    if (!Array.isArray(datos)) {
+
+        console.error(
+            "❌ LOS DATOS NO SON UN ARRAY"
+        );
+
+        return;
+    }
+
+
+    if (datos.length === 0) {
 
         console.warn(
-            "⚠️ NO EXISTEN DATOS DE HALLAZGOS"
+            "⚠️ NO HAY HALLAZGOS PARA MOSTRAR"
         );
 
         return;
@@ -91,74 +133,43 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
 
     const estadisticas =
-        datos.map(function (item) {
-
-            const alto =
-                Number(item.alto) || 0;
-
-            const medio =
-                Number(item.medio) || 0;
-
-            const bajo =
-                Number(item.bajo) || 0;
-
-            const sinTipo =
-                Number(item.sin_tipo) || 0;
-
-
-            /*
-             * Si Django ya envía total,
-             * usamos ese valor.
-             *
-             * Si no, lo calculamos.
-             */
-
-            const total =
-                Number(item.total) ||
-                (
-                    alto +
-                    medio +
-                    bajo +
-                    sinTipo
-                );
-
+        datos
+        .map(function (item) {
 
             return {
 
-                tecnico:
+                hallazgo:
                     String(
-                        item.tecnico ||
-                        "Sin técnico"
+                        item.hallazgo ||
+                        "Sin hallazgo"
                     ).trim(),
 
-                alto:
-                    alto,
-
-                medio:
-                    medio,
-
-                bajo:
-                    bajo,
-
-                sin_tipo:
-                    sinTipo,
-
-                total:
-                    total
+                cantidad:
+                    Number(
+                        item.cantidad
+                    ) || 0
 
             };
+
+        })
+        .filter(function (item) {
+
+            return item.cantidad > 0;
 
         });
 
 
     // =====================================================
-    // ORDENAR MAYOR A MENOR
+    // ORDENAR
     // =====================================================
 
     estadisticas.sort(
         function (a, b) {
 
-            return b.total - a.total;
+            return (
+                b.cantidad -
+                a.cantidad
+            );
 
         }
     );
@@ -170,54 +181,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // TOTALES GENERALES
-    // =====================================================
-
-    const totalGeneral =
-        estadisticas.reduce(
-            function (acumulado, item) {
-
-                return acumulado + item.total;
-
-            },
-            0
-        );
-
-
-    const totalTecnicos =
-        estadisticas.length;
-
-
-    console.log(
-        "👷 Técnicos:",
-        totalTecnicos
-    );
-
-    console.log(
-        "📊 Total hallazgos:",
-        totalGeneral
-    );
-
-
-    // =====================================================
-    // MOSTRAR TOTAL DE TÉCNICOS
-    // =====================================================
-
-    const elementoTotalTecnicos =
-        document.getElementById(
-            "totalTecnicosHallazgos"
-        );
-
-
-    if (elementoTotalTecnicos) {
-
-        elementoTotalTecnicos.textContent =
-            `${totalTecnicos.toLocaleString("es-CO")} técnicos`;
-
-    }
-
-
-    // =====================================================
     // LABELS
     // =====================================================
 
@@ -225,44 +188,54 @@ document.addEventListener("DOMContentLoaded", function () {
         estadisticas.map(
             function (item) {
 
-                return item.tecnico;
+                return item.hallazgo;
 
             }
         );
 
 
     // =====================================================
-    // DATASETS
+    // CANTIDADES
     // =====================================================
 
-    const alto =
+    const cantidades =
         estadisticas.map(
             function (item) {
 
-                return item.alto;
+                return item.cantidad;
 
             }
         );
 
 
-    const medio =
-        estadisticas.map(
-            function (item) {
+    // =====================================================
+    // TOTAL
+    // =====================================================
 
-                return item.medio;
+    const totalGeneral =
+        cantidades.reduce(
+            function (total, cantidad) {
 
-            }
+                return (
+                    total +
+                    cantidad
+                );
+
+            },
+            0
         );
 
 
-    const bajo =
-        estadisticas.map(
-            function (item) {
+    console.log(
+        "📊 TOTAL HALLAZGOS:",
+        totalGeneral
+    );
 
-                return item.bajo;
 
-            }
-        );
+    console.log(
+        "🔎 HALLAZGOS DIFERENTES:",
+        estadisticas.length
+    );
 
 
     // =====================================================
@@ -281,23 +254,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // ALTURA REAL
+    // ALTURA
     // =====================================================
 
-    /*
-     * IMPORTANTE:
-     *
-     * Antes Chart.js estaba tomando la altura
-     * del contenedor de 550px.
-     *
-     * Ahora dejamos una altura REAL para cada técnico.
-     *
-     * 58px por técnico.
-     */
+    const espacioPorHallazgo = 55;
 
-    const espacioPorTecnico = 58;
-
-    const alturaMinima = 500;
+    const alturaMinima = 450;
 
     const alturaMaxima = 7000;
 
@@ -308,18 +270,32 @@ document.addEventListener("DOMContentLoaded", function () {
             Math.max(
                 alturaMinima,
                 estadisticas.length *
-                espacioPorTecnico
+                espacioPorHallazgo
             )
         );
 
 
     // =====================================================
-    // CONFIGURAR CANVAS
+    // ANCHO
     // =====================================================
 
     const ancho =
         contenedor.clientWidth;
 
+
+    if (ancho <= 0) {
+
+        console.error(
+            "❌ EL CONTENEDOR NO TIENE ANCHO"
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // CANVAS
+    // =====================================================
 
     canvas.width =
         ancho;
@@ -334,9 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
     canvas.style.height =
         `${altura}px`;
 
-    canvas.style.display =
-        "block";
-
 
     // =====================================================
     // PLUGIN TOTAL
@@ -345,8 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const totalPlugin = {
 
         id:
-            "totalHallazgosTecnico",
-
+            "totalHallazgo",
 
         afterDatasetsDraw:
             function (chart) {
@@ -354,28 +326,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 const ctx =
                     chart.ctx;
 
-
-                /*
-                 * Dataset 0 = Alto
-                 * Dataset 1 = Medio
-                 * Dataset 2 = Bajo
-                 */
-
-                const metaAlto =
+                const meta =
                     chart.getDatasetMeta(0);
-
-                const metaMedio =
-                    chart.getDatasetMeta(1);
-
-                const metaBajo =
-                    chart.getDatasetMeta(2);
-
 
                 ctx.save();
 
-
                 ctx.font =
-                    "700 11px Arial, sans-serif";
+                    "700 11px Arial";
 
                 ctx.textBaseline =
                     "middle";
@@ -384,47 +341,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 estadisticas.forEach(
                     function (item, index) {
 
-                        let barra = null;
+                        const barra =
+                            meta.data[index];
 
 
-                        /*
-                         * Buscamos el último segmento
-                         * visible de la barra.
-                         */
-
-                        if (
-                            item.bajo > 0 &&
-                            metaBajo.data[index]
-                        ) {
-
-                            barra =
-                                metaBajo.data[index];
-
-                        }
-                        else if (
-                            item.medio > 0 &&
-                            metaMedio.data[index]
-                        ) {
-
-                            barra =
-                                metaMedio.data[index];
-
-                        }
-                        else if (
-                            item.alto > 0 &&
-                            metaAlto.data[index]
-                        ) {
-
-                            barra =
-                                metaAlto.data[index];
-
-                        }
-
-
-                        if (
-                            !barra ||
-                            item.total <= 0
-                        ) {
+                        if (!barra) {
 
                             return;
 
@@ -432,7 +353,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                         const texto =
-                            `Total: ${item.total.toLocaleString("es-CO")}`;
+                            item.cantidad.toLocaleString(
+                                "es-CO"
+                            );
 
 
                         const anchoTexto =
@@ -449,9 +372,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             barra.y;
 
 
-                        // =================================================
-                        // FONDO
-                        // =================================================
+                        // Fondo
 
                         ctx.fillStyle =
                             "#ffffff";
@@ -472,24 +393,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         ctx.fill();
 
 
-                        // =================================================
-                        // BORDE
-                        // =================================================
+                        // Borde
 
                         ctx.strokeStyle =
                             "#dbe3ef";
 
-
                         ctx.lineWidth =
                             1;
-
 
                         ctx.stroke();
 
 
-                        // =================================================
-                        // TEXTO
-                        // =================================================
+                        // Texto
 
                         ctx.fillStyle =
                             "#172554";
@@ -517,259 +432,400 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
 
     const grafica =
-        new Chart(canvas, {
+        new Chart(
+            canvas,
+            {
 
-            type:
-                "bar",
+                type:
+                    "bar",
 
+                data: {
 
-            data: {
+                    labels:
+                        labels,
 
-                labels:
-                    labels,
+                    datasets: [
 
+                        {
 
-                datasets: [
+                            label:
+                                "Cantidad de hallazgos",
 
-                    // =============================================
-                    // ALTO
-                    // =============================================
+                            data:
+                                cantidades,
 
-                    {
+                            backgroundColor:
+                                "#2563eb",
 
-                        label:
-                            "Alto",
+                            hoverBackgroundColor:
+                                "#1d4ed8",
 
-                        data:
-                            alto,
+                            borderRadius:
+                                7,
 
-                        backgroundColor:
-                            "#ef4444",
+                            borderSkipped:
+                                false,
 
-                        hoverBackgroundColor:
-                            "#dc2626",
+                            barThickness:
+                                26,
 
-                        borderRadius:
-                            6,
+                            maxBarThickness:
+                                26
 
-                        borderSkipped:
-                            false,
+                        }
 
-                        barThickness:
-                            24,
-
-                        maxBarThickness:
-                            24
-
-                    },
-
-
-                    // =============================================
-                    // MEDIO
-                    // =============================================
-
-                    {
-
-                        label:
-                            "Medio",
-
-                        data:
-                            medio,
-
-                        backgroundColor:
-                            "#f59e0b",
-
-                        hoverBackgroundColor:
-                            "#d97706",
-
-                        borderRadius:
-                            6,
-
-                        borderSkipped:
-                            false,
-
-                        barThickness:
-                            24,
-
-                        maxBarThickness:
-                            24
-
-                    },
-
-
-                    // =============================================
-                    // BAJO
-                    // =============================================
-
-                    {
-
-                        label:
-                            "Bajo",
-
-                        data:
-                            bajo,
-
-                        backgroundColor:
-                            "#22c55e",
-
-                        hoverBackgroundColor:
-                            "#16a34a",
-
-                        borderRadius:
-                            6,
-
-                        borderSkipped:
-                            false,
-
-                        barThickness:
-                            24,
-
-                        maxBarThickness:
-                            24
-
-                    }
-
-                ]
-
-            },
-
-
-            // =====================================================
-            // OPCIONES
-            // =====================================================
-
-            options: {
-
-                /*
-                 * IMPORTANTE:
-                 *
-                 * false permite que el canvas tenga
-                 * una altura mayor que el contenedor.
-                 *
-                 * Así funciona correctamente el scroll.
-                 */
-
-                responsive:
-                    false,
-
-                maintainAspectRatio:
-                    false,
-
-                indexAxis:
-                    "y",
-
-
-                animation: {
-
-                    duration:
-                        600,
-
-                    easing:
-                        "easeOutQuart"
+                    ]
 
                 },
 
 
-                interaction: {
+                options: {
 
-                    mode:
-                        "index",
+                    responsive:
+                        false,
 
-                    axis:
+                    maintainAspectRatio:
+                        false,
+
+                    indexAxis:
                         "y",
 
-                    intersect:
-                        false
 
-                },
+                    animation: {
 
+                        duration:
+                            600,
 
-                layout: {
+                        easing:
+                            "easeOutQuart"
 
-                    padding: {
-
-                        top:
-                            10,
-
-                        right:
-                            115,
-
-                        bottom:
-                            25,
-
-                        left:
-                            5
-
-                    }
-
-                },
+                    },
 
 
-                // =================================================
-                // EJES
-                // =================================================
+                    layout: {
 
-                scales: {
+                        padding: {
 
-                    // =============================================
-                    // X
-                    // =============================================
+                            top:
+                                10,
 
-                    x: {
+                            right:
+                                90,
 
-                        stacked:
-                            true,
+                            bottom:
+                                25,
 
-                        beginAtZero:
-                            true,
+                            left:
+                                5
 
-                        grace:
-                            "12%",
+                        }
+
+                    },
 
 
-                        border: {
+                    scales: {
 
-                            display:
-                                false
+                        x: {
+
+                            beginAtZero:
+                                true,
+
+                            grace:
+                                "12%",
+
+                            border: {
+
+                                display:
+                                    false
+
+                            },
+
+                            grid: {
+
+                                color:
+                                    "rgba(148, 163, 184, 0.18)",
+
+                                drawTicks:
+                                    false
+
+                            },
+
+                            ticks: {
+
+                                precision:
+                                    0,
+
+                                color:
+                                    "#374151",
+
+                                font: {
+
+                                    size:
+                                        11,
+
+                                    weight:
+                                        "500"
+
+                                },
+
+                                callback:
+                                    function (value) {
+
+                                        return Number(
+                                            value
+                                        ).toLocaleString(
+                                            "es-CO"
+                                        );
+
+                                    }
+
+                            }
 
                         },
 
 
-                        grid: {
+                        y: {
 
-                            color:
-                                "rgba(148, 163, 184, 0.18)",
+                            offset:
+                                true,
 
-                            drawTicks:
-                                false
+                            border: {
 
-                        },
+                                display:
+                                    false
 
+                            },
 
-                        ticks: {
+                            grid: {
 
-                            precision:
-                                0,
-
-                            color:
-                                "#374151",
-
-                            padding:
-                                8,
-
-
-                            font: {
-
-                                size:
-                                    11,
-
-                                weight:
-                                    "500"
+                                display:
+                                    false
 
                             },
 
 
-                            callback:
+                            afterFit:
+                                function (scale) {
+
+                                    scale.width =
+                                        300;
+
+                                },
+
+
+                            ticks: {
+
+                                color:
+                                    "#172554",
+
+                                padding:
+                                    12,
+
+                                autoSkip:
+                                    false,
+
+                                font: {
+
+                                    size:
+                                        11,
+
+                                    weight:
+                                        "700"
+
+                                },
+
+
+                                callback:
+                                    function (value) {
+
+                                        const nombre =
+                                            this.getLabelForValue(
+                                                value
+                                            );
+
+
+                                        if (
+                                            !nombre
+                                        ) {
+
+                                            return "";
+
+                                        }
+
+
+                                        if (
+                                            nombre.length > 50
+                                        ) {
+
+                                            return (
+                                                nombre.substring(
+                                                    0,
+                                                    50
+                                                ) +
+                                                "..."
+                                            );
+
+                                        }
+
+
+                                        return nombre;
+
+                                    }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    plugins: {
+
+                        legend: {
+
+                            display:
+                                true,
+
+                            position:
+                                "top",
+
+                            align:
+                                "start",
+
+                            labels: {
+
+                                usePointStyle:
+                                    true,
+
+                                pointStyle:
+                                    "circle",
+
+                                boxWidth:
+                                    10,
+
+                                boxHeight:
+                                    10,
+
+                                padding:
+                                    18,
+
+                                color:
+                                    "#334155",
+
+                                font: {
+
+                                    size:
+                                        11,
+
+                                    weight:
+                                        "700"
+
+                                }
+
+                            }
+
+                        },
+
+
+                        tooltip: {
+
+                            backgroundColor:
+                                "rgba(15, 23, 42, 0.97)",
+
+                            titleColor:
+                                "#ffffff",
+
+                            bodyColor:
+                                "#e2e8f0",
+
+                            cornerRadius:
+                                10,
+
+                            padding:
+                                13,
+
+
+                            callbacks: {
+
+                                title:
+                                    function (items) {
+
+                                        if (
+                                            !items.length
+                                        ) {
+
+                                            return "";
+
+                                        }
+
+
+                                        return (
+                                            "🔎 " +
+                                            items[0].label
+                                        );
+
+                                    },
+
+
+                                label:
+                                    function (context) {
+
+                                        return (
+                                            " Cantidad: " +
+                                            Number(
+                                                context.raw
+                                            ).toLocaleString(
+                                                "es-CO"
+                                            ) +
+                                            " hallazgos"
+                                        );
+
+                                    }
+
+                            }
+
+                        },
+
+
+                        datalabels: {
+
+                            display:
+                                function (context) {
+
+                                    return (
+                                        Number(
+                                            context.raw
+                                        ) > 0
+                                    );
+
+                                },
+
+                            color:
+                                "#ffffff",
+
+                            anchor:
+                                "center",
+
+                            align:
+                                "center",
+
+                            clamp:
+                                true,
+
+                            clip:
+                                true,
+
+                            font: {
+
+                                size:
+                                    10,
+
+                                weight:
+                                    "700"
+
+                            },
+
+                            formatter:
                                 function (value) {
 
                                     return Number(
@@ -782,422 +838,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         }
 
-                    },
-
-
-                    // =============================================
-                    // Y
-                    // =============================================
-
-                    y: {
-
-                        stacked:
-                            true,
-
-                        offset:
-                            true,
-
-
-                        border: {
-
-                            display:
-                                false
-
-                        },
-
-
-                        grid: {
-
-                            display:
-                                false
-
-                        },
-
-
-                        afterFit:
-                            function (scale) {
-
-                                /*
-                                 * Espacio suficiente para
-                                 * nombres largos.
-                                 */
-
-                                scale.width =
-                                    245;
-
-                            },
-
-
-                        ticks: {
-
-                            color:
-                                "#172554",
-
-                            padding:
-                                12,
-
-                            autoSkip:
-                                false,
-
-
-                            font: {
-
-                                size:
-                                    11,
-
-                                weight:
-                                    "700"
-
-                            },
-
-
-                            callback:
-                                function (value) {
-
-                                    const nombre =
-                                        this.getLabelForValue(
-                                            value
-                                        );
-
-
-                                    if (!nombre) {
-
-                                        return "";
-
-                                    }
-
-
-                                    /*
-                                     * Cortamos nombres
-                                     * excesivamente largos.
-                                     */
-
-                                    if (
-                                        nombre.length > 38
-                                    ) {
-
-                                        return (
-                                            nombre.substring(
-                                                0,
-                                                38
-                                            ) +
-                                            "..."
-                                        );
-
-                                    }
-
-
-                                    return nombre;
-
-                                }
-
-                        }
-
                     }
 
                 },
 
 
-                // =================================================
-                // PLUGINS
-                // =================================================
+                plugins: [
 
-                plugins: {
+                    ChartDataLabels,
 
-                    // =============================================
-                    // LEYENDA
-                    // =============================================
+                    totalPlugin
 
-                    legend: {
+                ]
 
-                        display:
-                            true,
-
-                        position:
-                            "top",
-
-                        align:
-                            "start",
-
-
-                        labels: {
-
-                            usePointStyle:
-                                true,
-
-                            pointStyle:
-                                "circle",
-
-                            boxWidth:
-                                10,
-
-                            boxHeight:
-                                10,
-
-                            padding:
-                                18,
-
-                            color:
-                                "#334155",
-
-
-                            font: {
-
-                                size:
-                                    11,
-
-                                weight:
-                                    "700"
-
-                            }
-
-                        }
-
-                    },
-
-
-                    // =============================================
-                    // TOOLTIP
-                    // =============================================
-
-                    tooltip: {
-
-                        backgroundColor:
-                            "rgba(15, 23, 42, 0.97)",
-
-                        titleColor:
-                            "#ffffff",
-
-                        bodyColor:
-                            "#e2e8f0",
-
-                        borderColor:
-                            "rgba(148, 163, 184, 0.30)",
-
-                        borderWidth:
-                            1,
-
-                        cornerRadius:
-                            10,
-
-                        padding:
-                            13,
-
-                        displayColors:
-                            true,
-
-                        boxPadding:
-                            5,
-
-
-                        callbacks: {
-
-                            // =====================================
-                            // TÍTULO
-                            // =====================================
-
-                            title:
-                                function (items) {
-
-                                    if (
-                                        !items.length
-                                    ) {
-
-                                        return "";
-
-                                    }
-
-
-                                    return (
-                                        "👷 " +
-                                        items[0].label
-                                    );
-
-                                },
-
-
-                            // =====================================
-                            // VALORES
-                            // =====================================
-
-                            label:
-                                function (context) {
-
-                                    const valor =
-                                        Number(
-                                            context.raw
-                                        ) || 0;
-
-
-                                    if (
-                                        valor <= 0
-                                    ) {
-
-                                        return null;
-
-                                    }
-
-
-                                    return (
-                                        ` ${context.dataset.label}: ` +
-                                        valor.toLocaleString(
-                                            "es-CO"
-                                        ) +
-                                        " hallazgos"
-                                    );
-
-                                },
-
-
-                            // =====================================
-                            // TOTAL
-                            // =====================================
-
-                            afterBody:
-                                function (items) {
-
-                                    if (
-                                        !items.length
-                                    ) {
-
-                                        return "";
-
-                                    }
-
-
-                                    const index =
-                                        items[0]
-                                            .dataIndex;
-
-
-                                    const item =
-                                        estadisticas[
-                                            index
-                                        ];
-
-
-                                    return [
-
-                                        "",
-
-                                        "━━━━━━━━━━━━━━━━",
-
-                                        `TOTAL: ${item.total.toLocaleString("es-CO")} hallazgos`
-
-                                    ];
-
-                                }
-
-                        }
-
-                    },
-
-
-                    // =============================================
-                    // NÚMEROS SOBRE LAS BARRAS
-                    // =============================================
-
-                    datalabels: {
-
-                        /*
-                         * Solo mostramos números
-                         * cuando el segmento tenga
-                         * al menos 2.
-                         */
-
-                        display:
-                            function (context) {
-
-                                const valor =
-                                    Number(
-                                        context.raw
-                                    ) || 0;
-
-
-                                return valor >= 2;
-
-                            },
-
-
-                        color:
-                            "#ffffff",
-
-
-                        anchor:
-                            "center",
-
-                        align:
-                            "center",
-
-
-                        clamp:
-                            true,
-
-                        clip:
-                            true,
-
-
-                        font: {
-
-                            size:
-                                10,
-
-                            weight:
-                                "700"
-
-                        },
-
-
-                        formatter:
-                            function (value) {
-
-                                const numero =
-                                    Number(
-                                        value
-                                    ) || 0;
-
-
-                                if (
-                                    numero < 2
-                                ) {
-
-                                    return "";
-
-                                }
-
-
-                                return numero.toLocaleString(
-                                    "es-CO"
-                                );
-
-                            }
-
-                    }
-
-                }
-
-            },
-
-
-            plugins: [
-
-                ChartDataLabels,
-
-                totalPlugin
-
-            ]
-
-        });
+            }
+        );
 
 
     // =====================================================
     // RESIZE
     // =====================================================
-
-    /*
-     * Si cambia el tamaño de la pantalla,
-     * actualizamos el ancho del canvas.
-     */
 
     let resizeTimer;
 
@@ -1217,6 +877,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         const nuevoAncho =
                             contenedor.clientWidth;
+
+
+                        if (
+                            nuevoAncho <= 0
+                        ) {
+
+                            return;
+
+                        }
 
 
                         canvas.width =
@@ -1241,7 +910,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     console.log(
-        `✅ GRÁFICA CREADA: ${estadisticas.length} técnicos`
+        `✅ GRÁFICA CREADA: ${estadisticas.length} hallazgos`
     );
 
 });

@@ -1,0 +1,680 @@
+<div class="grafica-card resultado-tecnico-card">
+
+    <div class="resultado-tecnico-header">
+
+        <div>
+
+            <h2>
+                Resultado de Auditorías por Técnico
+            </h2>
+
+            <p class="grafica-descripcion">
+                Resumen de auditorías realizadas, porcentaje de error,
+                cumplimiento y días auditados.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- BOTONES DE VISTA -->
+    <!-- ============================================== -->
+
+    <div class="resultado-tecnico-controles">
+
+        <button
+            type="button"
+            id="btnVerTodosTecnicos"
+            class="btn-vista activo"
+        >
+            👥 Todos los técnicos
+        </button>
+
+        <button
+            type="button"
+            id="btnVerSinAuditorias"
+            class="btn-vista btn-sin-auditorias"
+        >
+            ⚠️ Técnicos sin auditorías
+            <span id="contadorSinAuditorias">
+                0
+            </span>
+        </button>
+
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- TABLA -->
+    <!-- ============================================== -->
+
+    <div class="tabla-responsive">
+
+        <table class="tabla-resultado-tecnico">
+
+            <thead>
+
+                <tr>
+
+                    <th>Técnico</th>
+
+                    <th>
+                        N° Auditorías
+                    </th>
+
+                    <th>
+                        % Error
+                    </th>
+
+                    <th>
+                        No Cumple
+                    </th>
+
+                    <th>
+                        Cumple
+                    </th>
+
+                    <th>
+                        Días Auditados
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tablaResultadoAuditoriasTecnico">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================= */
+
+.resultado-tecnico-card {
+
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.resultado-tecnico-header {
+
+    margin-bottom: 20px;
+
+}
+
+.resultado-tecnico-header h2 {
+
+    margin-top: 0;
+    margin-bottom: 6px;
+
+    color: #0f172a;
+
+}
+
+.resultado-tecnico-header p {
+
+    margin: 0;
+
+}
+
+
+/* =========================================================
+   RESUMEN DE TÉCNICOS
+   ========================================================= */
+
+.resumen-tecnicos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+
+}
+
+
+/* Tarjeta */
+
+.resumen-item {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    padding: 16px;
+
+    text-align: center;
+
+    box-sizing: border-box;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+
+}
+
+
+/* Hover */
+
+.resumen-item:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 4px 12px
+        rgba(15, 23, 42, 0.08);
+
+}
+
+
+/* Número */
+
+.resumen-item strong {
+
+    display: block;
+
+    margin-top: 6px;
+
+    font-size: 28px;
+
+    line-height: 1;
+
+    color: #172554;
+
+}
+
+
+/* Texto */
+
+.resumen-label {
+
+    display: block;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   TARJETA VERDE
+   ========================================================= */
+
+.resumen-verde {
+
+    background: #f0fdf4;
+
+    border-color: #bbf7d0;
+
+}
+
+.resumen-verde strong {
+
+    color: #16a34a;
+
+}
+
+
+/* =========================================================
+   TARJETA ROJA
+   ========================================================= */
+
+.resumen-rojo {
+
+    background: #fef2f2;
+
+    border-color: #fecaca;
+
+    cursor: pointer;
+
+}
+
+.resumen-rojo strong {
+
+    color: #dc2626;
+
+}
+
+.resumen-rojo:hover {
+
+    background: #fee2e2;
+
+    border-color: #fca5a5;
+
+}
+
+
+/* =========================================================
+   BOTONES DE VISTA
+   ========================================================= */
+
+.filtros-tabla-tecnicos {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+
+}
+
+
+/* Botón */
+
+.btn-vista-tecnicos {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 38px;
+
+    padding: 8px 15px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease,
+        transform .15s ease;
+
+}
+
+
+/* Hover */
+
+.btn-vista-tecnicos:hover {
+
+    background: #f8fafc;
+
+    border-color: #94a3b8;
+
+}
+
+
+/* Click */
+
+.btn-vista-tecnicos:active {
+
+    transform: scale(.98);
+
+}
+
+
+/* Botón activo */
+
+.btn-vista-tecnicos.activo {
+
+    background: #172554;
+
+    color: #ffffff;
+
+    border-color: #172554;
+
+}
+
+
+/* =========================================================
+   TABLA RESPONSIVE
+   ========================================================= */
+
+.tabla-responsive {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+}
+
+
+/* =========================================================
+   TABLA
+   ========================================================= */
+
+.tabla-resultado-tecnico {
+
+    width: 100%;
+
+    min-width: 750px;
+
+    border-collapse: collapse;
+
+    border-spacing: 0;
+
+}
+
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+
+.tabla-resultado-tecnico thead {
+
+    background: #172554;
+
+    color: #ffffff;
+
+}
+
+
+/* Celdas cabecera */
+
+.tabla-resultado-tecnico th {
+
+    padding: 13px 15px;
+
+    text-align: center;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    border-bottom: 2px solid #0f172a;
+
+}
+
+
+/* Primera columna */
+
+.tabla-resultado-tecnico th:first-child {
+
+    text-align: left;
+
+}
+
+
+/* =========================================================
+   CUERPO
+   ========================================================= */
+
+.tabla-resultado-tecnico td {
+
+    padding: 12px 15px;
+
+    text-align: center;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    background: #ffffff;
+
+}
+
+
+/* Primera columna */
+
+.tabla-resultado-tecnico td:first-child {
+
+    text-align: left;
+
+    font-weight: 600;
+
+    color: #0f172a;
+
+}
+
+
+/* Última fila */
+
+.tabla-resultado-tecnico tbody tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+
+/* Hover fila */
+
+.tabla-resultado-tecnico tbody tr:hover td {
+
+    background: #f8fafc;
+
+}
+
+
+/* =========================================================
+   PORCENTAJE DE ERROR
+   ========================================================= */
+
+.porcentaje-error {
+
+    color: #dc2626 !important;
+
+    font-weight: 700 !important;
+
+}
+
+
+/* =========================================================
+   CUMPLE
+   ========================================================= */
+
+.valor-cumple {
+
+    color: #16a34a !important;
+
+    font-weight: 700 !important;
+
+}
+
+
+/* =========================================================
+   NO CUMPLE
+   ========================================================= */
+
+.valor-no-cumple {
+
+    color: #dc2626 !important;
+
+    font-weight: 700 !important;
+
+}
+
+
+/* =========================================================
+   N/A
+   ========================================================= */
+
+.btn-na {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 52px;
+
+    padding: 6px 12px;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 6px;
+
+    background: #fef2f2;
+
+    color: #dc2626;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        transform .15s ease;
+
+}
+
+
+/* Hover N/A */
+
+.btn-na:hover {
+
+    background: #fee2e2;
+
+    border-color: #fca5a5;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* Click N/A */
+
+.btn-na:active {
+
+    transform: scale(.97);
+
+}
+
+
+/* =========================================================
+   ESTADO N/A EN FILA
+   ========================================================= */
+
+.fila-sin-auditorias td {
+
+    background: #fffafa;
+
+}
+
+
+/* =========================================================
+   MENSAJE SIN DATOS
+   ========================================================= */
+
+.sin-datos {
+
+    text-align: center !important;
+
+    padding: 35px 20px !important;
+
+    color: #64748b !important;
+
+    font-size: 14px;
+
+    background: #ffffff !important;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .resumen-tecnicos {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .resumen-tecnicos {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .filtros-tabla-tecnicos {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .btn-vista-tecnicos {
+
+        width: 100%;
+
+    }
+
+
+    .resultado-tecnico-card {
+
+        padding: 15px;
+
+    }
+
+
+    .tabla-responsive {
+
+        border-radius: 8px;
+
+    }
+
+}
+
+</style>

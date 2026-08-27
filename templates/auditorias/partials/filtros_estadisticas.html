@@ -84,21 +84,31 @@
 
 
             <div>
+
                 <label>Día</label>
 
                 <select name="dia">
 
-                    <option value="">Todos</option>
+                    <option value="">
+                        Todos
+                    </option>
 
-                    {% for dia in "123456789"|make_list %}
-                        <option value="{{ forloop.counter }}">
-                            {{ forloop.counter }}
+                    {% for dia in dias_estadisticas %}
+
+                        <option
+                            value="{{ dia }}"
+                            {% if filtros_estadisticas.dia == dia|stringformat:"s" %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ dia }}
                         </option>
+
                     {% endfor %}
 
                 </select>
-            </div>
 
+            </div>
 
             <div>
                 <label>Operación</label>
@@ -219,9 +229,46 @@
             </select>
         </div>
 
+        <div>
+
+            <label>Resultados auditorias</label>
+
+            <select
+                name="resultado"
+                id="filtroResultado"
+                class="select-filtro"
+            >
+
+                <option
+                    value=""
+                    {% if filtros_estadisticas.resultado == "" %}
+                        selected
+                    {% endif %}
+                >
+                    Todos
+                </option>
+
+                <option
+                    value="tecnicos"
+                    {% if filtros_estadisticas.resultado == "tecnicos" %}
+                        selected
+                    {% endif %}
+                >
+                    Resultado auditorías técnicos
+                </option>
+
+                <!--<option
+                    value="digitadores"
+                    {% if filtros_estadisticas.resultado == "digitadores" %}
+                        selected
+                    {% endif %}
+                >
+                    Resultado auditorías digitadores
+                </option>-->
+
+            </select>
 
         </div>
-
 
         <div class="filtros-botones">
 

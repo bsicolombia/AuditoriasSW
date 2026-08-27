@@ -34,32 +34,6 @@
 
             </div>
 
-            <div class="ultima-carga">
-
-                <div>
-
-                    <span class="ultima-carga-label">
-                        ↻ Última carga actualizada
-                    </span>
-
-                    {% if ultima_carga %}
-
-                        <strong class="ultima-carga-fecha">
-                            {{ ultima_carga }}
-                        </strong>
-
-                    {% else %}
-
-                        <strong class="ultima-carga-fecha sin-carga">
-                            Sin cargas realizadas
-                        </strong>
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
         </div>
 
 
@@ -71,7 +45,7 @@
 
 
             <!-- =================================================
-                 1. CARGA MASIVA
+                 1. CARGA MASIVA DE AUDITORÍAS
             ================================================== -->
 
             <section class="panel panel-carga">
@@ -85,7 +59,7 @@
                     <div>
 
                         <h2>
-                            Carga masiva
+                            Carga Auditorías
                         </h2>
 
                         <p>
@@ -96,6 +70,41 @@
 
                 </div>
 
+
+                <!-- =================================================
+                     ÚLTIMA CARGA
+                ================================================== -->
+
+                <div class="ultima-carga">
+
+                    <div>
+
+                        <span class="ultima-carga-label">
+                            ↻ Última carga actualizada
+                        </span>
+
+                        {% if ultima_carga %}
+
+                            <strong class="ultima-carga-fecha">
+                                {{ ultima_carga }}
+                            </strong>
+
+                        {% else %}
+
+                            <strong class="ultima-carga-fecha sin-carga">
+                                Sin cargas realizadas
+                            </strong>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     FORMULARIO
+                ================================================== -->
 
                 <div class="panel-body panel-body-scroll">
 
@@ -141,7 +150,6 @@
                                 Cancelar
                             </a>
 
-
                             <button
                                 type="submit"
                                 class="btn btn-subir"
@@ -159,26 +167,27 @@
             </section>
 
 
+
             <!-- =================================================
-                 2. RESULTADO DEL PROCESAMIENTO
+                 2. CARGA DE TÉCNICOS
             ================================================== -->
 
-            <section class="panel panel-proceso">
+            <section class="panel panel-carga">
 
                 <div class="panel-header">
 
-                    <div class="panel-icon icon-azul">
-                        ✓
+                    <div class="panel-icon">
+                        ↑
                     </div>
 
                     <div>
 
                         <h2>
-                            Resultado del procesamiento
+                            Carga Técnicos
                         </h2>
 
                         <p>
-                            Resumen de la carga realizada.
+                            Seleccione el archivo Excel de técnicos que desea procesar.
                         </p>
 
                     </div>
@@ -186,14 +195,300 @@
                 </div>
 
 
+                <!-- =================================================
+                     ÚLTIMA CARGA DE TÉCNICOS
+                ================================================== -->
+
+                <div class="ultima-carga">
+
+                    <div>
+
+                        <span class="ultima-carga-label">
+                            ↻ Última carga actualizada
+                        </span>
+
+                        {% if ultima_carga_tecnicos %}
+
+                            <strong class="ultima-carga-fecha">
+                                {{ ultima_carga_tecnicos }}
+                            </strong>
+
+                        {% else %}
+
+                            <strong class="ultima-carga-fecha sin-carga">
+                                Sin cargas realizadas
+                            </strong>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     FORMULARIO TÉCNICOS
+                ================================================== -->
+
                 <div class="panel-body panel-body-scroll">
 
-                    {% if report_generated %}
+                    <form
+                        method="POST"
+                        enctype="multipart/form-data"
+                        action="{% url 'tecnicos_crear' %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <div class="campo-archivo">
+
+                            <label for="{{ tecnico_form.xlsx_file.id_for_label }}">
+                                {{ tecnico_form.xlsx_file.label }}
+                            </label>
+
+                            <div class="archivo-input">
+
+                                <input
+                                    type="file"
+                                    name="{{ tecnico_form.xlsx_file.html_name }}"
+                                    id="{{ tecnico_form.xlsx_file.id_for_label }}"
+                                    accept=".xlsx"
+                                    required
+                                >
+
+                            </div>
+
+                            <small class="ayuda-archivo">
+                                Formato permitido: .xlsx
+                            </small>
+
+
+                            {% if tecnico_form.xlsx_file.errors %}
+
+                                <div class="errores-formulario">
+
+                                    {% for error in tecnico_form.xlsx_file.errors %}
+
+                                        <p>
+                                            {{ error }}
+                                        </p>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="botones">
+
+                            <a
+                                href="{% url 'carga' %}"
+                                class="btn btn-cancelar"
+                            >
+                                Cancelar
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-subir"
+                            >
+
+                                <span>↑</span>
+
+                                Subir y procesar
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 3. RESUMEN DE TÉCNICOS
+
+                 SOLO APARECE SI SE CARGARON TÉCNICOS
+            ================================================== -->
+
+            {% if tecnico_report_generated %}
+
+                <section class="panel panel-proceso">
+
+                    <div class="panel-header">
+
+                        <div class="panel-icon icon-azul">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Resumen de Técnicos
+                            </h2>
+
+                            <p>
+                                Información actual de los técnicos registrados.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="panel-body">
 
                         <div class="contadores">
 
 
-                            <!-- TOTAL -->
+                            <!-- =================================
+                                 TOTAL TÉCNICOS
+                            ================================== -->
+
+                            <div class="contador contador-total">
+
+                                <span class="contador-icon">
+                                    #
+                                </span>
+
+                                <div>
+
+                                    <span class="contador-titulo">
+                                        Total de técnicos
+                                    </span>
+
+                                    <strong class="contador-numero">
+                                        {{ tecnico_total_bd }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 SUPERVISORES
+                            ================================== -->
+
+                            <div class="contador contador-total">
+
+                                <span class="contador-icon">
+                                    👤
+                                </span>
+
+                                <div>
+
+                                    <span class="contador-titulo">
+                                        Supervisores
+                                    </span>
+
+                                    <strong class="contador-numero">
+                                        {{ tecnico_total_supervisores }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ======================================
+                             TÉCNICOS POR SUPERVISOR
+                        ======================================= -->
+
+                        <div class="resumen">
+
+                            <div class="resumen-titulo">
+                                Técnicos por supervisor
+                            </div>
+
+
+                            {% for item in tecnicos_por_supervisor %}
+
+                                <p>
+
+                                    <strong>
+                                        {{ item.supervisor }}
+                                    </strong>
+
+                                    —
+
+                                    {{ item.cantidad }}
+                                    técnicos
+
+                                </p>
+
+                            {% empty %}
+
+                                <p>
+                                    No hay técnicos registrados.
+                                </p>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+
+
+            <!-- =================================================
+                 4. RESULTADO DEL PROCESAMIENTO
+
+                 SOLO APARECE SI SE PROCESÓ UNA AUDITORÍA
+            ================================================== -->
+
+            {% if report_generated %}
+
+                <section class="panel panel-proceso">
+
+                    <div class="panel-header">
+
+                        <div class="panel-icon icon-azul">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Resultado del procesamiento
+                            </h2>
+
+                            <p>
+                                Resumen de la carga realizada.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="panel-body panel-body-scroll">
+
+
+                        <!-- ======================================
+                             CONTADORES
+                        ======================================= -->
+
+                        <div class="contadores">
+
+
+                            <!-- =================================
+                                 TOTAL
+                            ================================== -->
 
                             <div class="contador contador-total">
 
@@ -216,7 +511,9 @@
                             </div>
 
 
-                            <!-- EXITOSOS -->
+                            <!-- =================================
+                                 EXITOSOS
+                            ================================== -->
 
                             <div class="contador contador-exitos">
 
@@ -239,7 +536,9 @@
                             </div>
 
 
-                            <!-- ERRORES -->
+                            <!-- =================================
+                                 ERRORES
+                            ================================== -->
 
                             <div class="contador contador-errores">
 
@@ -264,13 +563,13 @@
 
                             </div>
 
-
                         </div>
 
 
-                        <!-- =================================================
+
+                        <!-- ======================================
                              RESUMEN
-                        ================================================== -->
+                        ======================================= -->
 
                         <div class="resumen">
 
@@ -336,9 +635,10 @@
                         </div>
 
 
-                        <!-- =================================================
+
+                        <!-- ======================================
                              BARRA DE PROGRESO
-                        ================================================== -->
+                        ======================================= -->
 
                         {% if total_rows > 0 %}
 
@@ -372,426 +672,435 @@
                         {% endif %}
 
 
-                    {% else %}
+                    </div>
 
-                        <div class="estado-vacio">
+                </section>
 
-                            <div class="estado-icon">
-                                ↑
-                            </div>
+            {% endif %}
 
-                            <h3>
-                                Sin procesamiento
-                            </h3>
+
+
+            <!-- =================================================
+                 5. REGISTROS CON ERRORES
+
+                 SOLO APARECE DESPUÉS DE CARGAR AUDITORÍAS
+            ================================================== -->
+
+            {% if report_generated %}
+
+                <section class="panel panel-errores">
+
+
+                    <!-- ==========================================
+                         HEADER
+                    =========================================== -->
+
+                    <div class="panel-header">
+
+                        <div class="panel-icon icon-rojo">
+                            !
+                        </div>
+
+
+                        <div class="panel-header-text">
+
+                            <h2>
+                                Errores cometidos por digitador
+                            </h2>
 
                             <p>
-                                Cargue un archivo Excel para comenzar.
+                                Revise y filtre todos los registros que presentan errores.
                             </p>
 
                         </div>
 
-                    {% endif %}
 
-                </div>
+                        {% if errors_records %}
 
-            </section>
+                            <span
+                                class="badge-error"
+                                id="contador-errores"
+                                data-total="{{ errors_records|length }}"
+                            >
+                                {{ errors_records|length }}
+                            </span>
 
-
-            <!-- =================================================
-                 3. REGISTROS CON ERRORES
-            ================================================== -->
-
-            <section class="panel panel-errores">
-
-
-                <!-- =================================================
-                     HEADER
-                ================================================== -->
-
-                <div class="panel-header">
-
-                    <div class="panel-icon icon-rojo">
-                        !
-                    </div>
-
-
-                    <div class="panel-header-text">
-
-                        <h2>
-                            Errores cometidos por digitador
-                        </h2>
-
-                        <p>
-                            Revise y filtre todos los registros que presentan errores.
-                        </p>
+                        {% endif %}
 
                     </div>
 
 
-                    <!-- =================================================
-                         CONTADOR DINÁMICO
-                    ================================================== -->
 
-                    {% if report_generated %}
+                    <!-- ==========================================
+                         FILTROS
+                    =========================================== -->
 
-                        <span
-                            class="badge-error"
-                            id="contador-errores"
-                            data-total="{{ errors_records|length }}"
-                        >
-                            {{ errors_records|length }}
-                        </span>
+                    {% if errors_records %}
 
-                    {% endif %}
-
-                </div>
+                        <div class="filtros-errores">
 
 
-                <!-- =================================================
-                     FILTROS
-                ================================================== -->
+                            <!-- DIGITADOR -->
 
-                {% if report_generated and errors_records %}
+                            <div class="filtro">
 
-                    <div class="filtros-errores">
+                                <label for="filtro-digitador">
+                                    Digitador
+                                </label>
 
+                                <select id="filtro-digitador">
 
-                        <!-- =================================================
-                             DIGITADOR
-                        ================================================== -->
+                                    <option value="">
+                                        Todos
+                                    </option>
 
-                        <div class="filtro">
+                                    {% for record in errors_records %}
 
-                            <label for="filtro-digitador">
-                                Digitador
-                            </label>
+                                        {% if record.data.nombre_auditor %}
 
-                            <select id="filtro-digitador">
+                                            <option
+                                                value="{{ record.data.nombre_auditor }}"
+                                            >
+                                                {{ record.data.nombre_auditor }}
+                                            </option>
 
-                                <option value="">
-                                    Todos
-                                </option>
-
-                                {% for record in errors_records %}
-
-                                    {% if record.data.nombre_auditor %}
-
-                                        <option
-                                            value="{{ record.data.nombre_auditor }}"
-                                        >
-                                            {{ record.data.nombre_auditor }}
-                                        </option>
-
-                                    {% endif %}
-
-                                {% endfor %}
-
-                            </select>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             TIPO DE ERROR
-                        ================================================== -->
-
-                        <div class="filtro">
-
-                            <label for="filtro-tipo-error">
-                                Tipo de error
-                            </label>
-
-                            <select id="filtro-tipo-error">
-
-                                <option value="">
-                                    Todos
-                                </option>
-
-                                {% for record in errors_records %}
-
-                                    {% for field, errors in record.errors.items %}
-
-                                        <option value="{{ field }}">
-                                            {{ field }}
-                                        </option>
+                                        {% endif %}
 
                                     {% endfor %}
 
-                                {% endfor %}
+                                </select>
 
-                            </select>
+                            </div>
+
+
+
+                            <!-- TIPO DE ERROR -->
+
+                            <div class="filtro">
+
+                                <label for="filtro-tipo-error">
+                                    Tipo de error
+                                </label>
+
+                                <select id="filtro-tipo-error">
+
+                                    <option value="">
+                                        Todos
+                                    </option>
+
+                                    {% for record in errors_records %}
+
+                                        {% for field, errors in record.errors.items %}
+
+                                            <option value="{{ field }}">
+                                                {{ field }}
+                                            </option>
+
+                                        {% endfor %}
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- TÉCNICO -->
+
+                            <div class="filtro">
+
+                                <label for="filtro-tecnico">
+                                    Técnico
+                                </label>
+
+                                <select id="filtro-tecnico">
+
+                                    <option value="">
+                                        Todos
+                                    </option>
+
+                                    {% for record in errors_records %}
+
+                                        {% if record.data.nombre_tecnico %}
+
+                                            <option
+                                                value="{{ record.data.nombre_tecnico }}"
+                                            >
+                                                {{ record.data.nombre_tecnico }}
+                                            </option>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- AÑO -->
+
+                            <div class="filtro">
+
+                                <label for="filtro-año">
+                                    Año
+                                </label>
+
+                                <select id="filtro-año">
+
+                                    <option value="">
+                                        Todos
+                                    </option>
+
+                                    {% for record in errors_records %}
+
+                                        {% if record.data.fecha %}
+
+                                            <option
+                                                value="{{ record.data.fecha|date:'Y' }}"
+                                            >
+                                                {{ record.data.fecha|date:'Y' }}
+                                            </option>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- MES -->
+
+                            <div class="filtro">
+
+                                <label for="filtro-mes">
+                                    Mes
+                                </label>
+
+                                <select id="filtro-mes">
+
+                                    <option value="">
+                                        Todos
+                                    </option>
+
+                                    <option value="01">Enero</option>
+                                    <option value="02">Febrero</option>
+                                    <option value="03">Marzo</option>
+                                    <option value="04">Abril</option>
+                                    <option value="05">Mayo</option>
+                                    <option value="06">Junio</option>
+                                    <option value="07">Julio</option>
+                                    <option value="08">Agosto</option>
+                                    <option value="09">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- DÍA -->
+
+                            <div class="filtro">
+
+                                <label for="filtro-dia">
+                                    Día
+                                </label>
+
+                                <select id="filtro-dia">
+
+                                    <option value="">
+                                        Todos
+                                    </option>
+
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- LIMPIAR -->
+
+                            <button
+                                type="button"
+                                id="btn-limpiar-filtros"
+                                class="btn btn-filtro-limpiar"
+                            >
+                                Limpiar filtros
+                            </button>
 
                         </div>
 
+                    {% endif %}
 
-                        <!-- =================================================
-                             TÉCNICO
-                        ================================================== -->
 
-                        <div class="filtro">
 
-                            <label for="filtro-tecnico">
-                                Técnico
-                            </label>
+                    <!-- ==========================================
+                         CUERPO DE ERRORES
+                    =========================================== -->
 
-                            <select id="filtro-tecnico">
+                    <div class="panel-body panel-body-scroll">
 
-                                <option value="">
-                                    Todos
-                                </option>
+                        {% if errors_records %}
+
+                            <div
+                                class="registros-container"
+                                id="registros-container"
+                            >
 
                                 {% for record in errors_records %}
 
-                                    {% if record.data.nombre_tecnico %}
+                                    <details
+                                        class="error-item"
 
-                                        <option
-                                            value="{{ record.data.nombre_tecnico }}"
-                                        >
-                                            {{ record.data.nombre_tecnico }}
-                                        </option>
+                                        data-digitador="{{ record.data.nombre_auditor|default:''|escape }}"
 
-                                    {% endif %}
+                                        data-tecnico="{{ record.data.nombre_tecnico|default:''|escape }}"
 
-                                {% endfor %}
+                                        data-fecha="{{ record.data.fecha|date:'Y-m-d' }}"
 
-                            </select>
-
-                        </div>
+                                        data-errores="{% for field, errors in record.errors.items %}{{ field|escape }}{% if not forloop.last %}|{% endif %}{% endfor %}"
+                                    >
 
 
-                        <!-- =================================================
-                             AÑO
-                        ================================================== -->
+                                        <!-- CABECERA -->
 
-                        <div class="filtro">
+                                        <summary class="error-header">
 
-                            <label for="filtro-año">
-                                Año
-                            </label>
+                                            <div class="error-resumen">
 
-                            <select id="filtro-año">
-
-                                <option value="">
-                                    Todos
-                                </option>
-
-                                {% for record in errors_records %}
-
-                                    {% if record.data.fecha %}
-
-                                        <option
-                                            value="{{ record.data.fecha|date:'Y' }}"
-                                        >
-                                            {{ record.data.fecha|date:'Y' }}
-                                        </option>
-
-                                    {% endif %}
-
-                                {% endfor %}
-
-                            </select>
-
-                        </div>
+                                                <span class="fila-error">
+                                                    Fila {{ record.row }}
+                                                </span>
 
 
-                        <!-- =================================================
-                             MES
-                        ================================================== -->
+                                                {% for field, errors in record.errors.items %}
 
-                        <div class="filtro">
+                                                    <span class="campo-error">
+                                                        {{ field }}
+                                                    </span>
 
-                            <label for="filtro-mes">
-                                Mes
-                            </label>
+                                                {% endfor %}
 
-                            <select id="filtro-mes">
-
-                                <option value="">
-                                    Todos
-                                </option>
-
-                                <option value="01">Enero</option>
-                                <option value="02">Febrero</option>
-                                <option value="03">Marzo</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Mayo</option>
-                                <option value="06">Junio</option>
-                                <option value="07">Julio</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Septiembre</option>
-                                <option value="10">Octubre</option>
-                                <option value="11">Noviembre</option>
-                                <option value="12">Diciembre</option>
-
-                            </select>
-
-                        </div>
+                                            </div>
 
 
-                        <!-- =================================================
-                             DÍA
-                        ================================================== -->
+                                            <span class="ver-detalle">
 
-                        <div class="filtro">
+                                                Detalles
 
-                            <label for="filtro-dia">
-                                Día
-                            </label>
+                                                <span class="flecha">
+                                                    ▾
+                                                </span>
 
-                            <select id="filtro-dia">
-
-                                <option value="">
-                                    Todos
-                                </option>
-
-                                <option value="01">01</option>
-                                <option value="02">02</option>
-                                <option value="03">03</option>
-                                <option value="04">04</option>
-                                <option value="05">05</option>
-                                <option value="06">06</option>
-                                <option value="07">07</option>
-                                <option value="08">08</option>
-                                <option value="09">09</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                                <option value="21">21</option>
-                                <option value="22">22</option>
-                                <option value="23">23</option>
-                                <option value="24">24</option>
-                                <option value="25">25</option>
-                                <option value="26">26</option>
-                                <option value="27">27</option>
-                                <option value="28">28</option>
-                                <option value="29">29</option>
-                                <option value="30">30</option>
-                                <option value="31">31</option>
-
-                            </select>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             LIMPIAR
-                        ================================================== -->
-
-                        <button
-                            type="button"
-                            id="btn-limpiar-filtros"
-                            class="btn btn-filtro-limpiar"
-                        >
-                            Limpiar filtros
-                        </button>
-
-                    </div>
-
-                {% endif %}
-
-
-                <!-- =================================================
-                     CUERPO DE ERRORES
-                ================================================== -->
-
-                <div class="panel-body panel-body-scroll">
-
-                    {% if report_generated and errors_records %}
-
-                        <div
-                            class="registros-container"
-                            id="registros-container"
-                        >
-
-                            {% for record in errors_records %}
-
-                                <details
-                                    class="error-item"
-
-                                    data-digitador="{{ record.data.nombre_auditor|default:''|escape }}"
-
-                                    data-tecnico="{{ record.data.nombre_tecnico|default:''|escape }}"
-
-                                    data-fecha="{{ record.data.fecha|date:'Y-m-d' }}"
-
-                                    data-errores="{% for field, errors in record.errors.items %}{{ field|escape }}{% if not forloop.last %}|{% endif %}{% endfor %}"
-                                >
-
-
-                                    <!-- =================================================
-                                         CABECERA
-                                    ================================================== -->
-
-                                    <summary class="error-header">
-
-                                        <div class="error-resumen">
-
-                                            <span class="fila-error">
-                                                Fila {{ record.row }}
                                             </span>
+
+                                        </summary>
+
+
+
+                                        <!-- DETALLE -->
+
+                                        <div class="error-content">
 
 
                                             {% for field, errors in record.errors.items %}
 
-                                                <span class="campo-error">
-                                                    {{ field }}
-                                                </span>
+                                                <div class="error-mensaje">
+
+                                                    <div class="error-campo-titulo">
+                                                        {{ field }}
+                                                    </div>
+
+
+                                                    {% for key, value in record.data.items %}
+
+                                                        {% if key == field %}
+
+                                                            <div class="valor-error">
+
+                                                                <span>
+                                                                    Valor:
+                                                                </span>
+
+                                                                <code>
+                                                                    {{ value }}
+                                                                </code>
+
+                                                            </div>
+
+                                                        {% endif %}
+
+                                                    {% endfor %}
+
+
+                                                    <p>
+                                                        {{ errors }}
+                                                    </p>
+
+                                                </div>
 
                                             {% endfor %}
 
-                                        </div>
 
 
-                                        <span class="ver-detalle">
+                                            <!-- DATOS DEL REGISTRO -->
 
-                                            Detalles
-
-                                            <span class="flecha">
-                                                ▾
-                                            </span>
-
-                                        </span>
-
-                                    </summary>
-
-
-                                    <!-- =================================================
-                                         DETALLE
-                                    ================================================== -->
-
-                                    <div class="error-content">
-
-
-                                        {% for field, errors in record.errors.items %}
-
-                                            <div class="error-mensaje">
-
-                                                <div class="error-campo-titulo">
-                                                    {{ field }}
-                                                </div>
-
+                                            <div class="datos-grid">
 
                                                 {% for key, value in record.data.items %}
 
-                                                    {% if key == field %}
+                                                    {% if value != "" and value != None %}
 
-                                                        <div class="valor-error">
+                                                        <div class="dato">
 
-                                                            <span>
-                                                                Valor:
+                                                            <span class="dato-label">
+                                                                {{ key }}
                                                             </span>
 
-                                                            <code>
+                                                            <span class="dato-valor">
                                                                 {{ value }}
-                                                            </code>
+                                                            </span>
 
                                                         </div>
 
@@ -799,337 +1108,277 @@
 
                                                 {% endfor %}
 
-
-                                                <p>
-                                                    {{ errors }}
-                                                </p>
-
                                             </div>
-
-                                        {% endfor %}
-
-
-                                        <!-- =================================================
-                                             DATOS DEL REGISTRO
-                                        ================================================== -->
-
-                                        <div class="datos-grid">
-
-                                            {% for key, value in record.data.items %}
-
-                                                {% if value != "" and value != None %}
-
-                                                    <div class="dato">
-
-                                                        <span class="dato-label">
-                                                            {{ key }}
-                                                        </span>
-
-                                                        <span class="dato-valor">
-                                                            {{ value }}
-                                                        </span>
-
-                                                    </div>
-
-                                                {% endif %}
-
-                                            {% endfor %}
 
                                         </div>
 
-                                    </div>
+                                    </details>
 
-                                </details>
+                                {% endfor %}
 
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- =================================================
-                             MENSAJE CUANDO FILTRO NO ENCUENTRA NADA
-                        ================================================== -->
-
-                        <div
-                            id="sin-resultados-filtro"
-                            class="estado-vacio"
-                            style="display: none;"
-                        >
-
-                            <div class="estado-icon">
-                                🔎
                             </div>
 
-                            <h3>
-                                No hay resultados
-                            </h3>
-
-                            <p>
-                                No existen errores que coincidan con los filtros seleccionados.
-                            </p>
-
-                        </div>
 
 
-                    {% elif report_generated %}
+                            <!-- SIN RESULTADOS -->
 
-                        <div class="estado-vacio estado-exitoso">
-
-                            <div class="estado-icon">
-                                ✓
-                            </div>
-
-                            <h3>
-                                Sin errores
-                            </h3>
-
-                            <p>
-                                Todos los registros fueron procesados correctamente.
-                            </p>
-
-                        </div>
-
-
-                    {% else %}
-
-                        <div class="estado-vacio">
-
-                            <div class="estado-icon">
-                                !
-                            </div>
-
-                            <h3>
-                                Sin información
-                            </h3>
-
-                            <p>
-                                Los errores aparecerán aquí después de procesar el archivo.
-                            </p>
-
-                        </div>
-
-                    {% endif %}
-
-
-                    <!-- =================================================
-                         PDF
-                    ================================================== -->
-
-                    {% if report_generated and errors_records %}
-
-                        <div class="acciones-pdf">
-
-                            <form
-                                method="POST"
-                                action="{% url 'reporte_errores_pdf' %}"
+                            <div
+                                id="sin-resultados-filtro"
+                                class="estado-vacio"
+                                style="display: none;"
                             >
 
-                                {% csrf_token %}
+                                <div class="estado-icon">
+                                    🔎
+                                </div>
 
-                                <textarea
-                                    name="errores_json"
-                                    hidden
-                                >{{ errores_json }}</textarea>
+                                <h3>
+                                    No hay resultados
+                                </h3>
+
+                                <p>
+                                    No existen errores que coincidan con los filtros seleccionados.
+                                </p>
+
+                            </div>
 
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-pdf"
+                        {% else %}
+
+                            <div class="estado-vacio estado-exitoso">
+
+                                <div class="estado-icon">
+                                    ✓
+                                </div>
+
+                                <h3>
+                                    Sin errores
+                                </h3>
+
+                                <p>
+                                    Todos los registros fueron procesados correctamente.
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ======================================
+                             PDF
+                        ======================================= -->
+
+                        {% if errors_records %}
+
+                            <div class="acciones-pdf">
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'reporte_errores_pdf' %}"
                                 >
-                                    ↓ Descargar errores PDF
-                                </button>
 
-                            </form>
+                                    {% csrf_token %}
 
-                        </div>
+                                    <textarea
+                                        name="errores_json"
+                                        hidden
+                                    >{{ errores_json }}</textarea>
 
-                    {% endif %}
 
-                </div>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-pdf"
+                                    >
+                                        ↓ Descargar errores PDF
+                                    </button>
 
-            </section>
+                                </form>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </section>
+
+            {% endif %}
+
 
 
             <!-- =================================================
-                 4. REGISTROS EXITOSOS
+                 6. REGISTROS EXITOSOS
+
+                 SOLO APARECE DESPUÉS DE CARGAR AUDITORÍAS
             ================================================== -->
 
-            <section class="panel panel-exitosos">
+            {% if report_generated %}
 
-                <div class="panel-header">
+                <section class="panel panel-exitosos">
 
-                    <div class="panel-icon icon-verde">
-                        ✓
+                    <div class="panel-header">
+
+                        <div class="panel-icon icon-verde">
+                            ✓
+                        </div>
+
+
+                        <div class="panel-header-text">
+
+                            <h2>
+                                Auditorías creadas
+                            </h2>
+
+                            <p>
+                                Registros procesados correctamente.
+                            </p>
+
+                        </div>
+
+
+                        {% if successful_count %}
+
+                            <span class="badge-success">
+                                {{ successful_count }}
+                            </span>
+
+                        {% endif %}
+
                     </div>
 
 
-                    <div class="panel-header-text">
 
-                        <h2>
-                            Auditorías creadas
-                        </h2>
+                    <div class="panel-body panel-body-scroll">
 
-                        <p>
-                            Registros procesados correctamente.
-                        </p>
+                        {% if successful_records %}
 
-                    </div>
+                            <div class="exitosos-container">
 
+                                <table class="tabla-exitosos">
 
-                    {% if successful_count %}
-
-                        <span class="badge-success">
-                            {{ successful_count }}
-                        </span>
-
-                    {% endif %}
-
-                </div>
-
-
-                <div class="panel-body panel-body-scroll">
-
-                    {% if report_generated and successful_records %}
-
-                        <div class="exitosos-container">
-
-                            <table class="tabla-exitosos">
-
-                                <thead>
-
-                                    <tr>
-
-                                        <th>
-                                            Fila
-                                        </th>
-
-                                        <th>
-                                            Auditor
-                                        </th>
-
-                                        <th>
-                                            Técnico
-                                        </th>
-
-                                        <th>
-                                            Operación
-                                        </th>
-
-                                        <th>
-                                            Resultado
-                                        </th>
-
-                                        <th>
-                                            Estado
-                                        </th>
-
-                                    </tr>
-
-                                </thead>
-
-
-                                <tbody>
-
-                                    {% for record in successful_records %}
+                                    <thead>
 
                                         <tr>
 
-                                            <td>
+                                            <th>
+                                                Fila
+                                            </th>
 
-                                                <span class="numero-fila">
-                                                    {{ record.row }}
-                                                </span>
+                                            <th>
+                                                Auditor
+                                            </th>
 
-                                            </td>
+                                            <th>
+                                                Técnico
+                                            </th>
 
+                                            <th>
+                                                Operación
+                                            </th>
 
-                                            <td>
-                                                {{ record.data.nombre_auditor }}
-                                            </td>
+                                            <th>
+                                                Resultado
+                                            </th>
 
-
-                                            <td>
-                                                {{ record.data.nombre_tecnico }}
-                                            </td>
-
-
-                                            <td>
-                                                {{ record.data.tipo_operacion }}
-                                            </td>
-
-
-                                            <td>
-                                                {{ record.data.resultado_auditoria }}
-                                            </td>
-
-
-                                            <td>
-
-                                                <span class="estado-creada">
-                                                    ✓ Creada
-                                                </span>
-
-                                            </td>
+                                            <th>
+                                                Estado
+                                            </th>
 
                                         </tr>
 
-                                    {% endfor %}
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
+                                    </thead>
 
 
-                    {% elif report_generated %}
+                                    <tbody>
 
-                        <div class="estado-vacio estado-advertencia">
+                                        {% for record in successful_records %}
 
-                            <div class="estado-icon">
-                                !
+                                            <tr>
+
+                                                <td>
+
+                                                    <span class="numero-fila">
+                                                        {{ record.row }}
+                                                    </span>
+
+                                                </td>
+
+
+                                                <td>
+                                                    {{ record.data.nombre_auditor }}
+                                                </td>
+
+
+                                                <td>
+                                                    {{ record.data.nombre_tecnico }}
+                                                </td>
+
+
+                                                <td>
+                                                    {{ record.data.tipo_operacion }}
+                                                </td>
+
+
+                                                <td>
+                                                    {{ record.data.resultado_auditoria }}
+                                                </td>
+
+
+                                                <td>
+
+                                                    <span class="estado-creada">
+                                                        ✓ Creada
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
                             </div>
 
-                            <h3>
-                                No hay registros exitosos
-                            </h3>
 
-                            <p>
-                                Ninguna auditoría fue creada correctamente.
-                            </p>
+                        {% else %}
 
-                        </div>
+                            <div class="estado-vacio estado-advertencia">
 
+                                <div class="estado-icon">
+                                    !
+                                </div>
 
-                    {% else %}
+                                <h3>
+                                    No hay registros exitosos
+                                </h3>
 
-                        <div class="estado-vacio">
+                                <p>
+                                    Ninguna auditoría fue creada correctamente.
+                                </p>
 
-                            <div class="estado-icon">
-                                ✓
                             </div>
 
-                            <h3>
-                                Sin registros
-                            </h3>
+                        {% endif %}
 
-                            <p>
-                                Las auditorías creadas aparecerán aquí.
-                            </p>
+                    </div>
 
-                        </div>
+                </section>
 
-                    {% endif %}
+            {% endif %}
 
-                </div>
 
-            </section>
 
         </div>
 
 
         <!-- =====================================================
              ADVERTENCIA SIN REGISTROS
+             
+             SOLO DESPUÉS DE PROCESAR UNA AUDITORÍA
         ====================================================== -->
 
         {% if report_generated and total_rows == 0 %}
@@ -1162,6 +1411,7 @@
 </div>
 
 
+
 <!-- ==========================================================
      JAVASCRIPT DE FILTROS
 ========================================================== -->
@@ -1170,16 +1420,29 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const filtroDigitador = document.getElementById("filtro-digitador");
-    const filtroTipoError = document.getElementById("filtro-tipo-error");
-    const filtroTecnico = document.getElementById("filtro-tecnico");
-    const filtroAño = document.getElementById("filtro-año");
-    const filtroMes = document.getElementById("filtro-mes");
-    const filtroDia = document.getElementById("filtro-dia");
+    const filtroDigitador =
+        document.getElementById("filtro-digitador");
 
-    const btnLimpiar = document.getElementById("btn-limpiar-filtros");
+    const filtroTipoError =
+        document.getElementById("filtro-tipo-error");
 
-    const contadorErrores = document.getElementById("contador-errores");
+    const filtroTecnico =
+        document.getElementById("filtro-tecnico");
+
+    const filtroAño =
+        document.getElementById("filtro-año");
+
+    const filtroMes =
+        document.getElementById("filtro-mes");
+
+    const filtroDia =
+        document.getElementById("filtro-dia");
+
+    const btnLimpiar =
+        document.getElementById("btn-limpiar-filtros");
+
+    const contadorErrores =
+        document.getElementById("contador-errores");
 
     const contadorErroresResumen =
         document.getElementById("contador-errores-resumen");
@@ -1189,6 +1452,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const sinResultados =
         document.getElementById("sin-resultados-filtro");
+
 
 
     /*
@@ -1235,10 +1499,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
     eliminarDuplicados(filtroDigitador);
     eliminarDuplicados(filtroTipoError);
     eliminarDuplicados(filtroTecnico);
     eliminarDuplicados(filtroAño);
+
 
 
     /*
@@ -1255,6 +1521,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .toLowerCase();
 
     }
+
 
 
     /*
@@ -1310,6 +1577,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let cantidadVisibles = 0;
 
 
+
         /*
          * ======================================================
          * RECORRER TODOS LOS ERRORES
@@ -1342,18 +1610,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
+
             /*
              * ==================================================
              * FECHA
              * ==================================================
-             *
-             * Se espera:
-             *
-             * YYYY-MM-DD
-             *
-             * Ejemplo:
-             *
-             * 2026-08-26
              */
 
             let registroAño = "";
@@ -1375,9 +1636,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
+
             /*
              * ==================================================
-             * COMPARAR DIGITADOR
+             * DIGITADOR
              * ==================================================
              */
 
@@ -1386,9 +1648,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 registroDigitador === digitador;
 
 
+
             /*
              * ==================================================
-             * COMPARAR TÉCNICO
+             * TÉCNICO
              * ==================================================
              */
 
@@ -1397,9 +1660,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 registroTecnico === tecnico;
 
 
+
             /*
              * ==================================================
-             * COMPARAR TIPO DE ERROR
+             * TIPO DE ERROR
              * ==================================================
              */
 
@@ -1421,9 +1685,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 listaErrores.includes(tipoError);
 
 
+
             /*
              * ==================================================
-             * COMPARAR AÑO
+             * AÑO
              * ==================================================
              */
 
@@ -1432,9 +1697,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 registroAño === año;
 
 
+
             /*
              * ==================================================
-             * COMPARAR MES
+             * MES
              * ==================================================
              */
 
@@ -1443,9 +1709,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 registroMes === mes;
 
 
+
             /*
              * ==================================================
-             * COMPARAR DÍA
+             * DÍA
              * ==================================================
              */
 
@@ -1454,12 +1721,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 registroDia === dia;
 
 
+
             /*
              * ==================================================
-             * RESULTADO FINAL
+             * RESULTADO
              * ==================================================
-             *
-             * Todos los filtros deben coincidir.
              */
 
             const mostrar =
@@ -1469,6 +1735,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 coincideAño &&
                 coincideMes &&
                 coincideDia;
+
 
 
             if (mostrar) {
@@ -1486,6 +1753,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
+
         /*
          * ======================================================
          * ACTUALIZAR BADGE
@@ -1500,12 +1768,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
+
         /*
          * ======================================================
-         * ACTUALIZAR CONTADOR DEL RESUMEN
-         *
-         * Este contador solamente representa el total real
-         * acumulado. No cambia con el filtro.
+         * CONTADOR TOTAL
          * ======================================================
          */
 
@@ -1522,9 +1788,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
+
         /*
          * ======================================================
-         * MOSTRAR / OCULTAR "SIN RESULTADOS"
+         * SIN RESULTADOS
          * ======================================================
          */
 
@@ -1543,6 +1810,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     }
+
 
 
     /*
@@ -1611,6 +1879,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
     /*
      * ==========================================================
      * LIMPIAR FILTROS
@@ -1653,6 +1922,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
     }
+
 
 
     /*

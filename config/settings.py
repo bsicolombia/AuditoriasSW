@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-t_0-=%m&$9%pxjp%$_-!&3(1^m)8j&tqd)jphrchy0m!)0lr3('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['172.10.11.157', 'AuditoriasSW.local', 'localhost', '127.0.0.1']
 
@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'auditorias'
+    'auditorias',
+    'carga',
 ]
 
 MIDDLEWARE = [

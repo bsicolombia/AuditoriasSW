@@ -799,72 +799,127 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 datalabels: {
 
-                    display:
-                        function (context) {
+                    /*
+                    * Mostrar siempre el valor.
+                    *
+                    * Ya no ocultamos valores 0 o 1.
+                    */
 
-                            const valor =
-                                Number(
-                                    context.raw
-                                ) || 0;
-
-
-                            return valor >= 2;
-
-                        },
+                    display: true,
 
 
-                    color:
-                        "#ffffff",
+                    /*
+                    * Barras grandes:
+                    * número blanco dentro de la barra.
+                    *
+                    * Barras pequeñas:
+                    * número oscuro fuera de la barra.
+                    */
 
+                    color: function (context) {
 
-                    anchor:
-                        "center",
+                        const valor =
+                            Number(context.raw) || 0;
 
-                    align:
-                        "center",
+                        if (valor < 8) {
 
+                            return "#334155";
 
-                    clamp:
-                        true,
+                        }
 
-                    clip:
-                        true,
-
-
-                    font: {
-
-                        size:
-                            9,
-
-                        weight:
-                            "700"
+                        return "#ffffff";
 
                     },
 
 
-                    formatter:
-                        function (value) {
+                    anchor: function (context) {
 
-                            const numero =
-                                Number(value) || 0;
+                        const valor =
+                            Number(context.raw) || 0;
 
+                        if (valor < 8) {
 
-                            if (
-                                numero < 2
-                            ) {
-
-                                return "";
-
-                            }
-
-
-                            return numero.toLocaleString(
-                                "es-CO"
-                            );
+                            return "end";
 
                         }
 
+                        return "center";
+
+                    },
+
+
+                    align: function (context) {
+
+                        const valor =
+                            Number(context.raw) || 0;
+
+                        if (valor < 8) {
+
+                            return "right";
+
+                        }
+
+                        return "center";
+
+                    },
+
+
+                    offset: function (context) {
+
+                        const valor =
+                            Number(context.raw) || 0;
+
+                        if (valor < 8) {
+
+                            return 5;
+
+                        }
+
+                        return 0;
+
+                    },
+
+
+                    /*
+                    * Permitir que los números
+                    * pequeños salgan de la barra.
+                    */
+
+                    clamp: true,
+
+                    clip: false,
+
+
+                    /*
+                    * Tamaño del número.
+                    */
+
+                    font: {
+
+                        size: 10,
+
+                        weight: "700"
+
+                    },
+
+
+                    /*
+                    * Valor mostrado.
+                    */
+
+                    formatter: function (value) {
+
+                        const numero =
+                            Number(value) || 0;
+
+                        return numero.toLocaleString(
+                            "es-CO"
+                        );
+
+                    }
+
                 }
+
 
             }
 

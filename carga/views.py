@@ -5,35 +5,97 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from openpyxl import load_workbook
 from xhtml2pdf import pisa
-from .forms import CsvUploadForm, AuditoriaForm
+from .forms import (
+    CsvUploadForm,
+    AuditoriaForm,
+    TecnicoForm,
+    TecnicoCargaForm,
+)
 from auditorias.models import Auditoria
-
+from .models import Tecnicos
 
 # ==========================================================
-# CARGA PRINCIPAL
+# CARGAS
+# ==========================================================
+# ==========================================================
+# CARGA
 # ==========================================================
 
 def carga(request):
 
-    form = CsvUploadForm()
+    context = {
 
-    ultima_carga = request.session.get(
-        "ultima_carga_auditorias"
-    )
+        # Formulario auditorías
+        "form": CsvUploadForm(),
+
+        # Formulario técnicos
+        "tecnico_form": TecnicoCargaForm(),
+
+        # ==================================================
+        # ÚLTIMA CARGA DE AUDITORÍAS
+        # ==================================================
+
+        "ultima_carga": request.session.get(
+            "ultima_carga_auditorias"
+        ),
+
+        # ==================================================
+        # ÚLTIMA CARGA DE TÉCNICOS
+        # ==================================================
+
+        "ultima_carga_tecnicos": request.session.get(
+            "ultima_carga_tecnicos"
+        ),
+
+        # ==================================================
+        # REPORTE DE TÉCNICOS
+        # ==================================================
+
+        "tecnico_report_generated": request.session.get(
+            "tecnico_report_generated",
+            False,
+        ),
+
+        "tecnico_total_rows": request.session.get(
+            "tecnico_total_rows",
+            0,
+        ),
+
+        "tecnico_created_count": request.session.get(
+            "tecnico_created_count",
+            0,
+        ),
+
+        "tecnico_updated_count": request.session.get(
+            "tecnico_updated_count",
+            0,
+        ),
+
+        "tecnico_existing_count": request.session.get(
+            "tecnico_existing_count",
+            0,
+        ),
+
+        "tecnico_error_count": request.session.get(
+            "tecnico_error_count",
+            0,
+        ),
+
+        "tecnico_errors": request.session.get(
+            "tecnico_errors",
+            [],
+        ),
+    }
 
     return render(
         request,
         "carga/carga.html",
-        {
-            "form": form,
-            "ultima_carga": ultima_carga,
-        }
+        context,
     )
-
 
 
 # ==========================================================
@@ -1519,6 +1581,582 @@ def auditoria_crear(request):
     )
 
 
+def tecnicos_crear(request):
+
+    if request.method != "POST":
+
+        return redirect("carga")
+
+
+    form = TecnicoCargaForm(request.POST, request.FILES)
+
+
+    if not form.is_valid():
+
+        context = {
+
+            "form": CsvUploadForm
+(),
+
+            "tecnico_form": form,
+
+            "ultima_carga": request.session.get(
+                "ultima_carga_auditorias"
+            ),
+
+            "ultima_carga_tecnicos": request.session.get(
+                "ultima_carga_tecnicos"
+            ),
+
+            "tecnico_report_generated": False,
+
+        }
+
+        return render(
+            request,
+            "carga/carga.html",
+            context,
+        )
+
+
+    archivo = form.cleaned_data["xlsx_file"]
+
+
+    # ======================================================
+    # VARIABLES DEL REPORTE
+    # ======================================================
+
+    total_rows = 0
+    created_count = 0
+    updated_count = 0
+    existing_count = 0
+    error_count = 0
+
+    errors = []
+
+
+    # ======================================================
+    # ABRIR EXCEL
+    # ======================================================
+
+    try:
+
+        workbook = load_workbook(
+            filename=archivo,
+            read_only=True,
+            data_only=True,
+        )
+
+        worksheet = workbook.active
+
+    except Exception as e:
+
+        messages.error(
+            request,
+            f"No fue posible abrir el archivo Excel: {e}",
+        )
+
+        return redirect("carga")
+
+
+    # ======================================================
+    # LEER ENCABEZADOS
+    # ======================================================
+
+    try:
+
+        headers = next(
+            worksheet.iter_rows(
+                min_row=1,
+                max_row=1,
+                values_only=True,
+            )
+        )
+
+    except StopIteration:
+
+        messages.error(
+            request,
+            "El archivo Excel está vacío.",
+        )
+
+        return redirect("carga")
+
+
+    # ======================================================
+    # NORMALIZAR ENCABEZADOS
+    # ======================================================
+
+    def normalizar_header(valor):
+
+        if valor is None:
+            return ""
+
+        texto = str(valor).strip().lower()
+
+        texto = (
+            texto
+            .replace("á", "a")
+            .replace("é", "e")
+            .replace("í", "i")
+            .replace("ó", "o")
+            .replace("ú", "u")
+            .replace("ñ", "n")
+        )
+
+        texto = re.sub(
+            r"[^a-z0-9]+",
+            "_",
+            texto,
+        )
+
+        return texto.strip("_")
+
+
+    header_map = {}
+
+    for indice, header in enumerate(headers):
+
+        nombre = normalizar_header(header)
+
+        if nombre:
+
+            header_map[nombre] = indice
+
+
+    # ======================================================
+    # COLUMNAS ESPERADAS
+    # ======================================================
+
+    columnas_supervisor = [
+        "supervisor",
+        "nombre_supervisor",
+    ]
+
+    columnas_cedula = [
+        "tecnico_cedula",
+        "cedula",
+        "cedula_tecnico",
+        "documento",
+        "documento_tecnico",
+        "numero_cedula",
+        "numero_de_cedula",
+    ]
+
+    columnas_nombre = [
+        "tecnico_apellido_nombres",
+        "apellido_nombres",
+        "nombre_tecnico",
+        "tecnico",
+        "nombres_apellidos",
+        "apellidos_y_nombres",
+        "apellidos_nombres",
+    ]
+
+    def buscar_columna(opciones):
+
+        for opcion in opciones:
+
+            if opcion in header_map:
+                return header_map[opcion]
+
+        return None
+
+
+    col_supervisor = buscar_columna(
+        columnas_supervisor
+    )
+
+    col_cedula = buscar_columna(
+        columnas_cedula
+    )
+
+    col_nombre = buscar_columna(
+        columnas_nombre
+    )
+
+
+    # ======================================================
+    # VALIDAR COLUMNAS
+    # ======================================================
+
+    columnas_faltantes = []
+
+
+    if col_supervisor is None:
+        columnas_faltantes.append("supervisor")
+
+
+    if col_cedula is None:
+        columnas_faltantes.append(
+            "tecnico_cedula / cédula"
+        )
+
+
+    if col_nombre is None:
+        columnas_faltantes.append(
+            "tecnico_apellido_nombres / nombre técnico"
+        )
+
+
+    if columnas_faltantes:
+
+        workbook.close()
+
+        messages.error(
+            request,
+            "El Excel no contiene las columnas requeridas: "
+            + ", ".join(columnas_faltantes),
+        )
+
+        return redirect("carga")
+
+
+    # ======================================================
+    # PROCESAR FILAS
+    # ======================================================
+
+    for numero_fila, fila in enumerate(
+        worksheet.iter_rows(
+            min_row=2,
+            values_only=True,
+        ),
+        start=2,
+    ):
+
+        # --------------------------------------------------
+        # IGNORAR FILAS COMPLETAMENTE VACÍAS
+        # --------------------------------------------------
+
+        if not any(
+            valor is not None and str(valor).strip() != ""
+            for valor in fila
+        ):
+
+            continue
+
+
+        total_rows += 1
+
+
+        try:
+
+            supervisor = fila[col_supervisor]
+            tecnico_cedula = fila[col_cedula]
+            tecnico_nombre = fila[col_nombre]
+
+
+            # ==============================================
+            # LIMPIAR DATOS
+            # ==============================================
+
+            supervisor = (
+                str(supervisor).strip()
+                if supervisor is not None
+                else ""
+            )
+
+
+            # ==============================================
+            # LIMPIAR CÉDULA
+            # ==============================================
+
+            if tecnico_cedula is None:
+
+                tecnico_cedula = ""
+
+            else:
+
+                if isinstance(
+                    tecnico_cedula,
+                    float
+                ):
+
+                    if tecnico_cedula.is_integer():
+
+                        tecnico_cedula = str(
+                            int(tecnico_cedula)
+                        )
+
+                    else:
+
+                        tecnico_cedula = str(
+                            tecnico_cedula
+                        )
+
+                else:
+
+                    tecnico_cedula = str(
+                        tecnico_cedula
+                    ).strip()
+
+
+            # ==============================================
+            # LIMPIAR NOMBRE
+            # ==============================================
+
+            tecnico_nombre = (
+                str(tecnico_nombre).strip()
+                if tecnico_nombre is not None
+                else ""
+            )
+
+
+            # ==============================================
+            # VALIDACIONES
+            # ==============================================
+
+            errores_fila = {}
+
+
+            if not supervisor:
+
+                errores_fila["supervisor"] = (
+                    "El supervisor es obligatorio."
+                )
+
+
+            if not tecnico_cedula:
+
+                errores_fila["tecnico_cedula"] = (
+                    "La cédula del técnico es obligatoria."
+                )
+
+
+            if not tecnico_nombre:
+
+                errores_fila[
+                    "tecnico_apellido_nombres"
+                ] = (
+                    "El nombre del técnico es obligatorio."
+                )
+
+
+            if errores_fila:
+
+                error_count += 1
+
+                errors.append(
+                    {
+                        "row": numero_fila,
+                        "data": {
+                            "supervisor": supervisor,
+                            "tecnico_cedula": tecnico_cedula,
+                            "tecnico_apellido_nombres": (
+                                tecnico_nombre
+                            ),
+                        },
+                        "errors": errores_fila,
+                    }
+                )
+
+                continue
+
+
+            # ==============================================
+            # GUARDAR EN BASE DE DATOS
+            # ==============================================
+
+            with transaction.atomic():
+
+                tecnico_existente = (
+                    Tecnicos.objects.filter(
+                        tecnico_cedula=tecnico_cedula
+                    ).first()
+                )
+
+
+                if tecnico_existente:
+
+                    # --------------------------------------
+                    # YA EXISTE
+                    # --------------------------------------
+
+                    # Si quieres que los repetidos se
+                    # ignoren completamente, cambia esta
+                    # parte por:
+                    #
+                    # existing_count += 1
+                    # continue
+
+                    cambio = False
+
+
+                    if (
+                        tecnico_existente.supervisor
+                        != supervisor
+                    ):
+
+                        tecnico_existente.supervisor = (
+                            supervisor
+                        )
+
+                        cambio = True
+
+
+                    if (
+                        tecnico_existente
+                        .tecnico_apellido_nombres
+                        != tecnico_nombre
+                    ):
+
+                        tecnico_existente.tecnico_apellido_nombres = (
+                            tecnico_nombre
+                        )
+
+                        cambio = True
+
+
+                    if cambio:
+
+                        tecnico_existente.save()
+
+                        updated_count += 1
+
+                    else:
+
+                        existing_count += 1
+
+
+                else:
+
+                    # --------------------------------------
+                    # CREAR TÉCNICO
+                    # --------------------------------------
+
+                    Tecnicos.objects.create(
+
+                        supervisor=supervisor,
+
+                        tecnico_cedula=tecnico_cedula,
+
+                        tecnico_apellido_nombres=(
+                            tecnico_nombre
+                        ),
+
+                    )
+
+                    created_count += 1
+
+
+        except Exception as e:
+
+            error_count += 1
+
+            errors.append(
+                {
+                    "row": numero_fila,
+
+                    "data": {
+                        "supervisor": (
+                            str(
+                                fila[col_supervisor]
+                            )
+                            if fila[col_supervisor]
+                            is not None
+                            else ""
+                        ),
+
+                        "tecnico_cedula": (
+                            str(
+                                fila[col_cedula]
+                            )
+                            if fila[col_cedula]
+                            is not None
+                            else ""
+                        ),
+
+                        "tecnico_apellido_nombres": (
+                            str(
+                                fila[col_nombre]
+                            )
+                            if fila[col_nombre]
+                            is not None
+                            else ""
+                        ),
+                    },
+
+                    "errors": {
+                        "general": str(e),
+                    },
+                }
+            )
+
+
+    workbook.close()
+
+
+    # ======================================================
+    # FECHA DE ÚLTIMA CARGA
+    # ======================================================
+
+    ahora = timezone.localtime()
+
+    ultima_carga = ahora.strftime(
+        "%d/%m/%Y %H:%M:%S"
+    )
+
+
+    # ======================================================
+    # GUARDAR RESULTADO EN SESIÓN
+    # ======================================================
+
+    request.session["ultima_carga_tecnicos"] = (
+        ultima_carga
+    )
+
+    request.session["tecnico_report_generated"] = True
+
+    request.session["tecnico_total_rows"] = total_rows
+
+    request.session["tecnico_created_count"] = (
+        created_count
+    )
+
+    request.session["tecnico_updated_count"] = (
+        updated_count
+    )
+
+    request.session["tecnico_existing_count"] = (
+        existing_count
+    )
+
+    request.session["tecnico_error_count"] = (
+        error_count
+    )
+
+    request.session["tecnico_errors"] = errors
+
+
+    # ======================================================
+    # MENSAJE GENERAL
+    # ======================================================
+
+    if error_count == 0:
+
+        messages.success(
+            request,
+            (
+                f"Carga de técnicos completada. "
+                f"{created_count} creados, "
+                f"{updated_count} actualizados y "
+                f"{existing_count} sin cambios."
+            ),
+        )
+
+    else:
+
+        messages.warning(
+            request,
+            (
+                f"Carga completada con "
+                f"{error_count} errores. "
+                f"{created_count} técnicos creados."
+            ),
+        )
+
+
+    return redirect("carga")
 
 # ==========================================================
 # GENERAR PDF DE ERRORES

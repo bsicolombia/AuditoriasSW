@@ -36,6 +36,7 @@ def obtener_filtros(request):
         "tecnico": request.GET.get("tecnico", ""),
         "auditor": request.GET.get("auditor", ""),
         "hallazgo": request.GET.get("hallazgo", ""),
+        "resultado": request.GET.get("resultado", ""),
 
     }
 
@@ -79,7 +80,12 @@ def aplicar_filtros(queryset, filtros):
         queryset = queryset.filter(
             hallazgo=filtros["hallazgo"]
         )
-
+        
+    if filtros["resultado"] in ["cumple", "no_cumple"]:
+        queryset = queryset.filter(
+            resultado_auditoria=filtros["resultado"]
+        )
+        
     return queryset
 
 
@@ -632,6 +638,263 @@ def obtener_errores_detallados_por_tecnico(queryset):
 
     return resultado
 
+def obtener_resultado_auditorias_tecnico(queryset):
+    """
+    Devuelve TODOS los técnicos disponibles y los cruza
+    contra las auditorías que cumplen los filtros.
+
+    Si un técnico no tiene auditorías:
+        tiene_auditorias = False
+        total = 0
+        porcentaje_error = 0
+        no_cumple = 0
+        cumple = 0
+        dias_auditados = 0
+
+    Si tiene auditorías:
+        se calculan normalmente sus estadísticas.
+    """
+
+    # ============================================================
+    # 1. OBTENER TODOS LOS TÉCNICOS
+    # ============================================================
+
+    todos_los_tecnicos = (
+        Auditoria.objects
+        .exclude(nombre_tecnico__isnull=True)
+        .exclude(nombre_tecnico__exact="")
+        .values_list("nombre_tecnico", flat=True)
+        .distinct()
+        .order_by("nombre_tecnico")
+    )
+
+    # ============================================================
+    # 2. ESTADÍSTICAS SOBRE EL QUERYSET FILTRADO
+    # ============================================================
+
+    datos = (
+        queryset
+        .values("nombre_tecnico")
+        .annotate(
+            total=Count("id"),
+
+            no_cumple=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria="no_cumple"
+                )
+            ),
+
+            cumple=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria="cumple"
+                )
+            ),
+
+            dias_auditados=Count(
+                "fecha",
+                distinct=True
+            ),
+        )
+    )
+
+    # ============================================================
+    # 3. CREAR DICCIONARIO DE RESULTADOS
+    # ============================================================
+
+    estadisticas = {}
+
+    for item in datos:
+
+        tecnico = texto_seguro(
+            item.get("nombre_tecnico"),
+            "Sin técnico"
+        )
+
+        total = item["total"] or 0
+        no_cumple = item["no_cumple"] or 0
+        cumple = item["cumple"] or 0
+        dias_auditados = item["dias_auditados"] or 0
+
+        porcentaje_error = (
+            (no_cumple / total) * 100
+            if total > 0
+            else 0
+        )
+
+        estadisticas[tecnico] = {
+            "tecnico": tecnico,
+            "total": total,
+            "porcentaje_error": round(
+                porcentaje_error,
+                2
+            ),
+            "no_cumple": no_cumple,
+            "cumple": cumple,
+            "dias_auditados": dias_auditados,
+            "tiene_auditorias": True,
+        }
+
+    # ============================================================
+    # 4. AGREGAR TODOS LOS TÉCNICOS
+    # ============================================================
+
+    resultado = []
+
+    for nombre in todos_los_tecnicos:
+
+        tecnico = texto_seguro(
+            nombre,
+            "Sin técnico"
+        )
+
+        # --------------------------------------------------------
+        # TIENE AUDITORÍAS DENTRO DE LOS FILTROS
+        # --------------------------------------------------------
+
+        if tecnico in estadisticas:
+
+            resultado.append(
+                estadisticas[tecnico]
+            )
+
+        # --------------------------------------------------------
+        # NO TIENE AUDITORÍAS DENTRO DE LOS FILTROS
+        # --------------------------------------------------------
+
+        else:
+
+            resultado.append({
+                "tecnico": tecnico,
+
+                "total": 0,
+
+                "porcentaje_error": 0,
+
+                "no_cumple": 0,
+
+                "cumple": 0,
+
+                "dias_auditados": 0,
+
+                "tiene_auditorias": False,
+            })
+
+    # ============================================================
+    # 5. ORDENAR
+    # ============================================================
+
+    resultado.sort(
+        key=lambda x: (
+            not x["tiene_auditorias"],
+            -x["porcentaje_error"],
+            x["tecnico"].lower()
+        )
+    )
+
+    return resultado
+
+# ============================================================
+# RESULTADO DE AUDITORÍAS POR DIGITADOR
+# ============================================================
+
+def obtener_resultado_auditorias_digitador(queryset):
+    """
+    Resumen de auditorías realizadas por digitador.
+
+    Columnas:
+        Digitador
+        Técnicos auditados
+        Auditorías realizadas
+        % No Cumple
+        No Cumplen
+        Cumplen
+
+    Orden:
+        Mayor % No Cumple -> menor % No Cumple
+    """
+
+    datos = (
+        queryset
+        .values("nombre_auditor")
+        .annotate(
+            auditorias_realizadas=Count("id"),
+
+            no_cumplen=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria="no_cumple"
+                )
+            ),
+
+            cumplen=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria="cumple"
+                )
+            ),
+
+            tecnicos_auditados=Count(
+                "nombre_tecnico",
+                distinct=True
+            ),
+        )
+    )
+
+    resultado = []
+
+    for item in datos:
+
+        digitador = texto_seguro(
+            item.get("nombre_auditor"),
+            "Sin digitador"
+        )
+
+        total = item["auditorias_realizadas"] or 0
+        no_cumplen = item["no_cumplen"] or 0
+        cumplen = item["cumplen"] or 0
+        tecnicos = item["tecnicos_auditados"] or 0
+
+        if total > 0:
+
+            porcentaje_no_cumple = (
+                no_cumplen / total
+            ) * 100
+
+        else:
+
+            porcentaje_no_cumple = 0
+
+        resultado.append({
+            "digitador": digitador,
+
+            "tecnicos_auditados": tecnicos,
+
+            "auditorias_realizadas": total,
+
+            "porcentaje_no_cumple": round(
+                porcentaje_no_cumple,
+                2
+            ),
+
+            "no_cumplen": no_cumplen,
+
+            "cumplen": cumplen,
+        })
+
+    # ========================================================
+    # ORDENAR POR % NO CUMPLE
+    # ========================================================
+
+    resultado.sort(
+        key=lambda x: x["porcentaje_no_cumple"],
+        reverse=True
+    )
+
+    return resultado
+
+
 # ============================================================
 # CONTEXT PROCESSOR PRINCIPAL
 # ============================================================
@@ -725,5 +988,14 @@ def estadisticas_auditorias(request):
         "Errores_Por_Tecnicos": obtener_errores_por_tecnico(
             queryset
         ),
+        
+        "Resultado_Auditorias_Tecnico": obtener_resultado_auditorias_tecnico(
+            queryset
+        ),
+        
+        "Resultado_Auditorias_Digitador":
+        obtener_resultado_auditorias_digitador(
+            queryset
+        ), 
 
     }

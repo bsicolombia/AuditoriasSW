@@ -19,11 +19,17 @@
     width: 100%;
     box-sizing: border-box;
 
-    border: 2px solid #000;
-    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    padding: 20px;
-    margin-bottom: 20px;
+    gap: 15px;
+
+    border: 2px solid #000;
+    border-radius: 12px;
+
+    padding: 10px 16px;
+    margin-bottom: 15px;
 
     background-color: #ffffff;
 }

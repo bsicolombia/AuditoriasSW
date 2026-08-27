@@ -1,0 +1,182 @@
+<div class="grafica-card resultado-digitador-card">
+
+    <div class="resultado-tecnico-header">
+
+        <h2>
+            Resultado de Auditorías por Digitador
+        </h2>
+
+        <p class="grafica-descripcion">
+            Resumen de técnicos auditados, auditorías realizadas,
+            porcentaje de no cumplimiento y resultados.
+        </p>
+
+    </div>
+
+
+    <div class="tabla-responsive">
+
+        <table class="tabla-resultado-digitador">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Digitador
+                    </th>
+
+                    <th>
+                        Técnicos auditados
+                    </th>
+
+                    <th>
+                        Auditorías realizadas
+                    </th>
+
+                    <th>
+                        % No Cumple
+                    </th>
+
+                    <th>
+                        No Cumplen
+                    </th>
+
+                    <th>
+                        Cumplen
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tablaResultadoAuditoriasDigitador">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.resultado-digitador-card {
+
+    width: 100%;
+
+}
+
+
+.tabla-resultado-digitador {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 850px;
+
+}
+
+
+.tabla-resultado-digitador thead {
+
+    background: #172554;
+
+    color: white;
+
+}
+
+
+.tabla-resultado-digitador th {
+
+    padding: 13px 15px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+
+}
+
+
+.tabla-resultado-digitador th:first-child {
+
+    text-align: left;
+
+}
+
+
+.tabla-resultado-digitador td {
+
+    padding: 12px 15px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    text-align: center;
+
+    color: #334155;
+
+}
+
+
+.tabla-resultado-digitador td:first-child {
+
+    text-align: left;
+
+    font-weight: 600;
+
+    color: #0f172a;
+
+}
+
+
+.tabla-resultado-digitador tbody tr:hover {
+
+    background: #f8fafc;
+
+}
+
+
+.porcentaje-no-cumple {
+
+    color: #dc2626 !important;
+
+    font-weight: 700;
+
+}
+
+
+.valor-no-cumple {
+
+    color: #dc2626 !important;
+
+    font-weight: 700;
+
+}
+
+
+.valor-cumple {
+
+    color: #16a34a !important;
+
+    font-weight: 700;
+
+}
+
+
+.sin-datos {
+
+    text-align: center !important;
+
+    padding: 30px !important;
+
+    color: #64748b !important;
+
+}
+
+</style>

@@ -750,79 +750,52 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 datalabels: {
 
-                    display:
-                        function (context) {
-
-                            const valor =
-                                Number(
-                                    context.raw
-                                ) || 0;
+                    // Mostrar SIEMPRE el número
+                    display: true,
 
 
-                            /*
-                             * Mostrar únicamente
-                             * valores >= 5.
-                             */
-
-                            return valor >= 5;
-
-                        },
+                    // Color del número
+                    color: "#ffffff",
 
 
-                    color:
-                        "#ffffff",
+                    // Número en el centro de la barra
+                    anchor: "center",
+
+                    align: "center",
 
 
-                    anchor:
-                        "center",
+                    // Evita que el número se salga
+                    // de la barra
+                    clamp: true,
+
+                    clip: true,
 
 
-                    align:
-                        "center",
-
-
-                    clamp:
-                        true,
-
-
-                    clip:
-                        true,
-
-
+                    // Tamaño del número
                     font: {
 
-                        size:
-                            9,
+                        size: 10,
 
-                        weight:
-                            "700"
+                        weight: "700"
 
                     },
 
 
-                    formatter:
-                        function (value) {
+                    // Formato del número
+                    formatter: function (value) {
 
-                            const numero =
-                                Number(value) || 0;
+                        const numero =
+                            Number(value) || 0;
 
+                        return numero.toLocaleString(
+                            "es-CO"
+                        );
 
-                            if (
-                                numero < 5
-                            ) {
-
-                                return "";
-
-                            }
-
-
-                            return numero.toLocaleString(
-                                "es-CO"
-                            );
-
-                        }
+                    }
 
                 }
+
+
 
             }
 

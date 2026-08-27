@@ -54,6 +54,25 @@ Estadísticas
 
     </div>
 
+    <div
+        class="grafica-full resultado-auditorias-tecnico-container"
+        style="display: none;"
+    >
+
+        {% include "auditorias/partials/resultado_auditorias_tecnico.html" %}
+
+    </div>
+
+    <div
+        class="grafica-full resultado-auditorias-digitador-container"
+        style="display: none;"
+    >
+
+        {% include "auditorias/partials/resultado_auditorias_digitador.html" %}
+
+    </div>
+
+
 </div>
 
 
@@ -96,6 +115,9 @@ Estadísticas
 
 {{ Errores_Detallados_Tecnico|json_script:"datos-Errores-Detallados-Tecnico" }}
 
+{{ Resultado_Auditorias_Tecnico|json_script:"datos-Resultado-Auditorias-Tecnico" }}
+
+{{ Resultado_Auditorias_Digitador|json_script:"datos-Resultado-Auditorias-Digitador" }}
 
 <!-- ================================================= -->
 <!-- LIBRERÍAS -->
@@ -124,8 +146,193 @@ Estadísticas
 <script src="{% static 'js/errores_tecnico.js' %}"></script>
 <script src="{% static 'js/cantidad_hallazgos.js' %}"></script>
 <script src="{% static 'js/auditorias_digitador.js' %}"></script>
+<script src="{% static 'js/resultado_auditorias_tecnico.js' %}"></script>
+<script src="{% static 'js/resultado_auditorias_digitador.js' %}"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const filtroResultado = document.getElementById(
+        "filtroResultado"
+    );
 
 
+    const tablaTecnicos = document.querySelector(
+        ".resultado-auditorias-tecnico-container"
+    );
+
+
+    const tablaDigitadores = document.querySelector(
+        ".resultado-auditorias-digitador-container"
+    );
+
+
+    const grid = document.querySelector(
+        ".estadisticas-grid"
+    );
+
+
+    if (
+        !filtroResultado ||
+        !grid
+    ) {
+        return;
+    }
+
+
+    // =========================================================
+    // ELEMENTOS NORMALES
+    // =========================================================
+
+    const elementosEstadisticas =
+        Array.from(
+            grid.children
+        ).filter(function (elemento) {
+
+            return (
+                !elemento.classList.contains(
+                    "resultado-auditorias-tecnico-container"
+                )
+                &&
+                !elemento.classList.contains(
+                    "resultado-auditorias-digitador-container"
+                )
+            );
+
+        });
+
+
+    // =========================================================
+    // MOSTRAR VISTA
+    // =========================================================
+
+    function mostrarVista() {
+
+        const valor =
+            filtroResultado.value;
+
+
+        // -----------------------------------------------------
+        // RESULTADO TÉCNICOS
+        // -----------------------------------------------------
+
+        if (valor === "tecnicos") {
+
+            elementosEstadisticas.forEach(
+                function (elemento) {
+
+                    elemento.style.display = "none";
+
+                }
+            );
+
+
+            if (tablaTecnicos) {
+
+                tablaTecnicos.style.display =
+                    "block";
+
+            }
+
+
+            if (tablaDigitadores) {
+
+                tablaDigitadores.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+        // -----------------------------------------------------
+        // RESULTADO DIGITADORES
+        // -----------------------------------------------------
+
+        else if (valor === "digitadores") {
+
+            elementosEstadisticas.forEach(
+                function (elemento) {
+
+                    elemento.style.display = "none";
+
+                }
+            );
+
+
+            if (tablaTecnicos) {
+
+                tablaTecnicos.style.display =
+                    "none";
+
+            }
+
+
+            if (tablaDigitadores) {
+
+                tablaDigitadores.style.display =
+                    "block";
+
+            }
+
+        }
+
+
+        // -----------------------------------------------------
+        // TODAS LAS GRÁFICAS
+        // -----------------------------------------------------
+
+        else {
+
+            elementosEstadisticas.forEach(
+                function (elemento) {
+
+                    elemento.style.display = "";
+
+                }
+            );
+
+
+            if (tablaTecnicos) {
+
+                tablaTecnicos.style.display =
+                    "none";
+
+            }
+
+
+            if (tablaDigitadores) {
+
+                tablaDigitadores.style.display =
+                    "none";
+
+            }
+
+        }
+
+    }
+
+
+    // =========================================================
+    // CAMBIO DEL SELECT
+    // =========================================================
+
+    filtroResultado.addEventListener(
+        "change",
+        mostrarVista
+    );
+
+
+    // =========================================================
+    // ESTADO INICIAL
+    // =========================================================
+
+    mostrarVista();
+
+});
+
+</script>
 
 
 <!-- ================================================= -->

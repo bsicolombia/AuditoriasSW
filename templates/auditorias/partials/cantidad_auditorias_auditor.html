@@ -1,0 +1,101 @@
+<div class="grafica-card grafica-card-auditor">
+
+    <h2>Auditorías por auditor</h2>
+
+    <p class="grafica-descripcion">
+        Cantidad de auditorías realizadas por cada auditor.
+    </p>
+
+    <div class="grafica-scroll-auditor">
+
+        <div class="grafica-canvas-auditor">
+
+            <canvas id="graficaCantidadAuditoriasAuditor"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.grafica-card-auditor {
+
+    width: 100%;
+    min-width: 0;
+
+}
+
+
+.grafica-scroll-auditor {
+
+    width: 100%;
+
+    height: 520px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    position: relative;
+
+    box-sizing: border-box;
+
+    padding-right: 8px;
+
+}
+
+
+.grafica-canvas-auditor {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 500px;
+
+}
+
+
+.grafica-canvas-auditor canvas {
+
+    display: block;
+
+    width: 100% !important;
+
+}
+
+
+.grafica-scroll-auditor::-webkit-scrollbar {
+
+    width: 8px;
+
+}
+
+
+.grafica-scroll-auditor::-webkit-scrollbar-track {
+
+    background: #f1f5f9;
+
+    border-radius: 10px;
+
+}
+
+
+.grafica-scroll-auditor::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+
+    border-radius: 10px;
+
+}
+
+
+.grafica-scroll-auditor::-webkit-scrollbar-thumb:hover {
+
+    background: #94a3b8;
+
+}
+
+</style>

@@ -13,6 +13,65 @@
                 cumplimiento y días auditados.
             </p>
 
+            <div class="resumen-comparacion">
+
+                <div class="resumen-comparacion-item">
+
+                    <span>
+                        Técnicos a cargo
+                    </span>
+
+                    <strong id="totalTecnicos">
+                        0
+                    </strong>
+
+                </div>
+
+                <div class="resumen-comparacion-item">
+
+                    <span>
+                        Técnicos auditados
+                    </span>
+
+                    <strong
+                        id="totalTecnicosAuditados"
+                        class="verde"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+                <div class="resumen-comparacion-item">
+
+                    <span>
+                        Técnicos sin auditoría
+                    </span>
+
+                    <strong
+                        id="totalTecnicosSinAuditoria"
+                        class="rojo"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+                <div class="resumen-comparacion-item">
+
+                    <span>
+                        Cobertura
+                    </span>
+
+                    <strong id="porcentajeCobertura">
+                        0%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
         </div>
 
     </div>
@@ -58,7 +117,11 @@
 
                 <tr>
 
+                    <th>Supervisor</th>
+
                     <th>Técnico</th>
+
+                    <th>Cédula</th>
 
                     <th>
                         N° Auditorías
@@ -85,7 +148,6 @@
             </thead>
 
             <tbody id="tablaResultadoAuditoriasTecnico">
-
             </tbody>
 
         </table>
@@ -595,12 +657,11 @@
    ESTADO N/A EN FILA
    ========================================================= */
 
-.fila-sin-auditorias td {
+.fila-sin-auditoria td {
 
     background: #fffafa;
 
 }
-
 
 /* =========================================================
    MENSAJE SIN DATOS

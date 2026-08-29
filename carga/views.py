@@ -1,26 +1,32 @@
 from datetime import datetime, date
 import json
 import re
-from django.utils import timezone
+
+from django.apps import apps
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
-from openpyxl import load_workbook
+from django.utils import timezone
+
+from openpyxl import load_workbook, Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.table import Table, TableStyleInfo
 from xhtml2pdf import pisa
+
 from .forms import (
     CsvUploadForm,
     AuditoriaForm,
     TecnicoForm,
     TecnicoCargaForm,
 )
+
 from auditorias.models import Auditoria
 from .models import Tecnicos
 
-# ==========================================================
-# CARGAS
-# ==========================================================
 # ==========================================================
 # CARGA
 # ==========================================================
@@ -1595,8 +1601,7 @@ def tecnicos_crear(request):
 
         context = {
 
-            "form": CsvUploadForm
-(),
+            "form": CsvUploadForm(),
 
             "tecnico_form": form,
 
@@ -2242,5 +2247,1113 @@ def generar_pdf_errores(request):
             "Error al generar el PDF.",
             status=500
         )
+
+    return response
+
+
+def exportar_excel_completo(request):
+
+    # ==========================================================
+    # 1. OBTENER TODA LA BASE DE DATOS
+    # ==========================================================
+
+    auditorias = Auditoria.objects.all()
+
+    tecnicos = Tecnicos.objects.all()
+
+    # ==========================================================
+    # 2. CREAR LIBRO DE EXCEL
+    # ==========================================================
+
+    wb = Workbook()
+
+    # Primera hoja
+    ws_estadisticas = wb.active
+    ws_estadisticas.title = "Estadísticas"
+
+    # Segunda hoja
+    ws_auditorias = wb.create_sheet(
+        "BD Auditorías"
+    )
+
+    # Tercera hoja
+    ws_tecnicos = wb.create_sheet(
+        "BD Técnicos"
+    )
+
+    # ==========================================================
+    # 3. COLORES Y ESTILOS
+    # ==========================================================
+
+    COLOR_TITULO = "1F2937"
+    COLOR_HEADER = "D9EAF7"
+    COLOR_BORDE = "7F8C8D"
+
+    borde = Border(
+        left=Side(
+            style="thin",
+            color=COLOR_BORDE
+        ),
+        right=Side(
+            style="thin",
+            color=COLOR_BORDE
+        ),
+        top=Side(
+            style="thin",
+            color=COLOR_BORDE
+        ),
+        bottom=Side(
+            style="thin",
+            color=COLOR_BORDE
+        )
+    )
+
+    # ==========================================================
+    # 4. AJUSTAR COLUMNAS
+    # ==========================================================
+
+    def ajustar_columnas(ws, ancho_maximo=45):
+
+        for columna in range(
+            1,
+            ws.max_column + 1
+        ):
+
+            letra = get_column_letter(
+                columna
+            )
+
+            maximo = 0
+
+            for celda in ws[letra]:
+
+                if celda.value is not None:
+
+                    longitud = len(
+                        str(celda.value)
+                    )
+
+                    maximo = max(
+                        maximo,
+                        longitud
+                    )
+
+            ws.column_dimensions[
+                letra
+            ].width = min(
+                maximo + 2,
+                ancho_maximo
+            )
+
+    # ==========================================================
+    # 5. HOJA ESTADÍSTICAS
+    # ==========================================================
+
+    ws = ws_estadisticas
+
+    ws.merge_cells("A1:B1")
+
+    ws["A1"] = "ESTADÍSTICAS DE AUDITORÍAS"
+
+    ws["A1"].font = Font(
+        bold=True,
+        color="FFFFFF",
+        size=14
+    )
+
+    ws["A1"].fill = PatternFill(
+        "solid",
+        fgColor=COLOR_TITULO
+    )
+
+    ws["A1"].alignment = Alignment(
+        horizontal="center"
+    )
+
+    # ==========================================================
+    # ENCABEZADOS
+    # ==========================================================
+
+    ws["A3"] = "Estadística"
+    ws["B3"] = "Cantidad"
+
+    for celda in ws[3]:
+
+        celda.font = Font(
+            bold=True
+        )
+
+        celda.fill = PatternFill(
+            "solid",
+            fgColor=COLOR_HEADER
+        )
+
+        celda.border = borde
+
+        celda.alignment = Alignment(
+            horizontal="center"
+        )
+
+    # ==========================================================
+    # ESTADÍSTICAS GENERALES
+    # ==========================================================
+
+    total_auditorias = auditorias.count()
+
+    cumplen = auditorias.filter(
+        resultado_auditoria="cumple"
+    ).count()
+
+    no_cumplen = auditorias.filter(
+        resultado_auditoria="no_cumple"
+    ).count()
+
+    suspensiones = auditorias.filter(
+        tipo_operacion="DC00"
+    ).count()
+
+    reconexiones = auditorias.filter(
+        tipo_operacion="RC00"
+    ).count()
+
+    zvcl = auditorias.filter(
+        tipo_operacion="ZVCL"
+    ).count()
+
+    tecnicos_count = (
+        auditorias
+        .exclude(
+            nombre_tecnico__isnull=True
+        )
+        .exclude(
+            nombre_tecnico=""
+        )
+        .values(
+            "nombre_tecnico"
+        )
+        .distinct()
+        .count()
+    )
+
+    digitadores_count = (
+        auditorias
+        .exclude(
+            nombre_auditor__isnull=True
+        )
+        .exclude(
+            nombre_auditor=""
+        )
+        .values(
+            "nombre_auditor"
+        )
+        .distinct()
+        .count()
+    )
+
+    # ==========================================================
+    # RESUMEN
+    # ==========================================================
+
+    resumen = [
+
+        [
+            "Total auditorías",
+            total_auditorias
+        ],
+
+        [
+            "Cumplen",
+            cumplen
+        ],
+
+        [
+            "No cumplen",
+            no_cumplen
+        ],
+
+        [
+            "Suspensiones",
+            suspensiones
+        ],
+
+        [
+            "Reconexiones",
+            reconexiones
+        ],
+
+        [
+            "ZVCL",
+            zvcl
+        ],
+
+        [
+            "Técnicos",
+            tecnicos_count
+        ],
+
+        [
+            "Digitadores",
+            digitadores_count
+        ],
+
+    ]
+
+    fila = 4
+
+    for nombre, cantidad in resumen:
+
+        ws.cell(
+            fila,
+            1
+        ).value = nombre
+
+        ws.cell(
+            fila,
+            2
+        ).value = cantidad
+
+        ws.cell(
+            fila,
+            1
+        ).border = borde
+
+        ws.cell(
+            fila,
+            2
+        ).border = borde
+
+        ws.cell(
+            fila,
+            2
+        ).alignment = Alignment(
+            horizontal="center"
+        )
+
+        fila += 1
+
+    # ==========================================================
+    # TABLA RESUMEN
+    # ==========================================================
+
+    tabla_resumen = Table(
+        displayName="TablaResumen",
+        ref=f"A3:B{fila - 1}"
+    )
+
+    tabla_resumen.tableStyleInfo = (
+        TableStyleInfo(
+            name="TableStyleMedium2",
+            showFirstColumn=False,
+            showLastColumn=False,
+            showRowStripes=True,
+            showColumnStripes=False
+        )
+    )
+
+    ws.add_table(
+        tabla_resumen
+    )
+
+    # ==========================================================
+    # 6. AUDITORÍAS POR TÉCNICO
+    # ==========================================================
+
+    fila_tecnico = 14
+
+    ws.merge_cells(
+        start_row=fila_tecnico,
+        start_column=1,
+        end_row=fila_tecnico,
+        end_column=2
+    )
+
+    ws.cell(
+        fila_tecnico,
+        1
+    ).value = "AUDITORÍAS POR TÉCNICO"
+
+    ws.cell(
+        fila_tecnico,
+        1
+    ).font = Font(
+        bold=True,
+        color="FFFFFF"
+    )
+
+    ws.cell(
+        fila_tecnico,
+        1
+    ).fill = PatternFill(
+        "solid",
+        fgColor=COLOR_TITULO
+    )
+
+    ws.cell(
+        fila_tecnico,
+        1
+    ).alignment = Alignment(
+        horizontal="center"
+    )
+
+    ws.cell(
+        fila_tecnico + 1,
+        1
+    ).value = "Técnico"
+
+    ws.cell(
+        fila_tecnico + 1,
+        2
+    ).value = "Cantidad"
+
+    for columna in range(1, 3):
+
+        celda = ws.cell(
+            fila_tecnico + 1,
+            columna
+        )
+
+        celda.font = Font(
+            bold=True
+        )
+
+        celda.fill = PatternFill(
+            "solid",
+            fgColor=COLOR_HEADER
+        )
+
+        celda.border = borde
+
+    estadisticas_tecnicos = (
+        auditorias
+        .exclude(
+            nombre_tecnico__isnull=True
+        )
+        .exclude(
+            nombre_tecnico=""
+        )
+        .values(
+            "nombre_tecnico"
+        )
+        .annotate(
+            total=Count("id")
+        )
+        .order_by("-total")
+    )
+
+    fila_actual = fila_tecnico + 2
+
+    for tecnico in estadisticas_tecnicos:
+
+        ws.cell(
+            fila_actual,
+            1
+        ).value = tecnico[
+            "nombre_tecnico"
+        ]
+
+        ws.cell(
+            fila_actual,
+            2
+        ).value = tecnico[
+            "total"
+        ]
+
+        ws.cell(
+            fila_actual,
+            1
+        ).border = borde
+
+        ws.cell(
+            fila_actual,
+            2
+        ).border = borde
+
+        fila_actual += 1
+
+    # ==========================================================
+    # 7. HALLAZGOS
+    # ==========================================================
+
+    columna_hallazgo = 4
+
+    ws.merge_cells(
+        start_row=fila_tecnico,
+        start_column=columna_hallazgo,
+        end_row=fila_tecnico,
+        end_column=columna_hallazgo + 1
+    )
+
+    ws.cell(
+        fila_tecnico,
+        columna_hallazgo
+    ).value = "HALLAZGOS ENCONTRADOS"
+
+    ws.cell(
+        fila_tecnico,
+        columna_hallazgo
+    ).font = Font(
+        bold=True,
+        color="FFFFFF"
+    )
+
+    ws.cell(
+        fila_tecnico,
+        columna_hallazgo
+    ).fill = PatternFill(
+        "solid",
+        fgColor=COLOR_TITULO
+    )
+
+    ws.cell(
+        fila_tecnico,
+        columna_hallazgo
+    ).alignment = Alignment(
+        horizontal="center"
+    )
+
+    ws.cell(
+        fila_tecnico + 1,
+        columna_hallazgo
+    ).value = "Hallazgo"
+
+    ws.cell(
+        fila_tecnico + 1,
+        columna_hallazgo + 1
+    ).value = "Cantidad"
+
+    for columna in range(
+        columna_hallazgo,
+        columna_hallazgo + 2
+    ):
+
+        celda = ws.cell(
+            fila_tecnico + 1,
+            columna
+        )
+
+        celda.font = Font(
+            bold=True
+        )
+
+        celda.fill = PatternFill(
+            "solid",
+            fgColor=COLOR_HEADER
+        )
+
+        celda.border = borde
+
+    hallazgos = (
+        auditorias
+        .filter(
+            resultado_auditoria="no_cumple"
+        )
+        .exclude(
+            hallazgo__isnull=True
+        )
+        .exclude(
+            hallazgo=""
+        )
+        .values(
+            "hallazgo"
+        )
+        .annotate(
+            total=Count("id")
+        )
+        .order_by("-total")
+    )
+
+    fila_actual_hallazgo = (
+        fila_tecnico + 2
+    )
+
+    for hallazgo in hallazgos:
+
+        ws.cell(
+            fila_actual_hallazgo,
+            columna_hallazgo
+        ).value = hallazgo[
+            "hallazgo"
+        ]
+
+        ws.cell(
+            fila_actual_hallazgo,
+            columna_hallazgo + 1
+        ).value = hallazgo[
+            "total"
+        ]
+
+        ws.cell(
+            fila_actual_hallazgo,
+            columna_hallazgo
+        ).border = borde
+
+        ws.cell(
+            fila_actual_hallazgo,
+            columna_hallazgo + 1
+        ).border = borde
+
+        fila_actual_hallazgo += 1
+
+    # ==========================================================
+    # 8. ESTADÍSTICAS POR TIPO DE OPERACIÓN
+    # ==========================================================
+
+    columna_operacion = 7
+
+    ws.merge_cells(
+        start_row=14,
+        start_column=columna_operacion,
+        end_row=14,
+        end_column=columna_operacion + 1
+    )
+
+    ws.cell(
+        14,
+        columna_operacion
+    ).value = "TIPO DE OPERACIÓN"
+
+    ws.cell(
+        14,
+        columna_operacion
+    ).font = Font(
+        bold=True,
+        color="FFFFFF"
+    )
+
+    ws.cell(
+        14,
+        columna_operacion
+    ).fill = PatternFill(
+        "solid",
+        fgColor=COLOR_TITULO
+    )
+
+    ws.cell(
+        14,
+        columna_operacion
+    ).alignment = Alignment(
+        horizontal="center"
+    )
+
+    ws.cell(
+        15,
+        columna_operacion
+    ).value = "Operación"
+
+    ws.cell(
+        15,
+        columna_operacion + 1
+    ).value = "Cantidad"
+
+    for columna in range(
+        columna_operacion,
+        columna_operacion + 2
+    ):
+
+        celda = ws.cell(
+            15,
+            columna
+        )
+
+        celda.font = Font(
+            bold=True
+        )
+
+        celda.fill = PatternFill(
+            "solid",
+            fgColor=COLOR_HEADER
+        )
+
+        celda.border = borde
+
+    operaciones = (
+        auditorias
+        .values(
+            "tipo_operacion"
+        )
+        .annotate(
+            total=Count("id")
+        )
+        .order_by("-total")
+    )
+
+    fila_operacion = 16
+
+    for operacion in operaciones:
+
+        ws.cell(
+            fila_operacion,
+            columna_operacion
+        ).value = operacion[
+            "tipo_operacion"
+        ]
+
+        ws.cell(
+            fila_operacion,
+            columna_operacion + 1
+        ).value = operacion[
+            "total"
+        ]
+
+        ws.cell(
+            fila_operacion,
+            columna_operacion
+        ).border = borde
+
+        ws.cell(
+            fila_operacion,
+            columna_operacion + 1
+        ).border = borde
+
+        fila_operacion += 1
+
+    # ==========================================================
+    # 9. ESTADÍSTICAS POR AUDITOR
+    # ==========================================================
+
+    columna_auditor = 10
+
+    ws.merge_cells(
+        start_row=14,
+        start_column=columna_auditor,
+        end_row=14,
+        end_column=columna_auditor + 1
+    )
+
+    ws.cell(
+        14,
+        columna_auditor
+    ).value = "AUDITORÍAS POR AUDITOR"
+
+    ws.cell(
+        14,
+        columna_auditor
+    ).font = Font(
+        bold=True,
+        color="FFFFFF"
+    )
+
+    ws.cell(
+        14,
+        columna_auditor
+    ).fill = PatternFill(
+        "solid",
+        fgColor=COLOR_TITULO
+    )
+
+    ws.cell(
+        14,
+        columna_auditor
+    ).alignment = Alignment(
+        horizontal="center"
+    )
+
+    ws.cell(
+        15,
+        columna_auditor
+    ).value = "Auditor"
+
+    ws.cell(
+        15,
+        columna_auditor + 1
+    ).value = "Cantidad"
+
+    for columna in range(
+        columna_auditor,
+        columna_auditor + 2
+    ):
+
+        celda = ws.cell(
+            15,
+            columna
+        )
+
+        celda.font = Font(
+            bold=True
+        )
+
+        celda.fill = PatternFill(
+            "solid",
+            fgColor=COLOR_HEADER
+        )
+
+        celda.border = borde
+
+    estadisticas_auditores = (
+        auditorias
+        .exclude(
+            nombre_auditor__isnull=True
+        )
+        .exclude(
+            nombre_auditor=""
+        )
+        .values(
+            "nombre_auditor"
+        )
+        .annotate(
+            total=Count("id")
+        )
+        .order_by("-total")
+    )
+
+    fila_auditor = 16
+
+    for auditor in estadisticas_auditores:
+
+        ws.cell(
+            fila_auditor,
+            columna_auditor
+        ).value = auditor[
+            "nombre_auditor"
+        ]
+
+        ws.cell(
+            fila_auditor,
+            columna_auditor + 1
+        ).value = auditor[
+            "total"
+        ]
+
+        ws.cell(
+            fila_auditor,
+            columna_auditor
+        ).border = borde
+
+        ws.cell(
+            fila_auditor,
+            columna_auditor + 1
+        ).border = borde
+
+        fila_auditor += 1
+
+    ajustar_columnas(
+        ws,
+        45
+    )
+
+    ws.freeze_panes = "A3"
+
+    # ==========================================================
+    # 10. HOJA BD AUDITORÍAS
+    # ==========================================================
+
+    ws = ws_auditorias
+
+    encabezados_auditoria = [
+
+        "ID",
+        "Fecha",
+        "Nombre Auditor",
+        "Número Cédula",
+        "Aplicativo",
+        "Fecha Operación",
+        "Nombre Técnico",
+        "Número Cuenta Contrato",
+        "Número Orden",
+        "Tipo Operación",
+        "Resultado Auditoría",
+        "Observación",
+        "Tipo Hallazgo",
+        "Hallazgo",
+
+    ]
+
+    for columna, encabezado in enumerate(
+        encabezados_auditoria,
+        start=1
+    ):
+
+        celda = ws.cell(
+            1,
+            columna
+        )
+
+        celda.value = encabezado
+
+        celda.font = Font(
+            bold=True
+        )
+
+        celda.fill = PatternFill(
+            "solid",
+            fgColor=COLOR_HEADER
+        )
+
+        celda.border = borde
+
+        celda.alignment = Alignment(
+            horizontal="center",
+            vertical="center"
+        )
+
+    # ==========================================================
+    # TODAS LAS AUDITORÍAS
+    # ==========================================================
+
+    fila = 2
+
+    for auditoria in auditorias:
+
+        datos = [
+
+            auditoria.id,
+            auditoria.fecha,
+            auditoria.nombre_auditor,
+            auditoria.numero_cedula,
+            auditoria.aplicativo,
+            auditoria.fecha_operacion,
+            auditoria.nombre_tecnico,
+            auditoria.numero_cuenta_contrato,
+            auditoria.numero_orden,
+            auditoria.tipo_operacion,
+            auditoria.resultado_auditoria,
+            auditoria.observacion,
+            auditoria.tipo_hallazgo,
+            auditoria.hallazgo,
+
+        ]
+
+        for columna, valor in enumerate(
+            datos,
+            start=1
+        ):
+
+            celda = ws.cell(
+                fila,
+                columna
+            )
+
+            celda.value = valor
+
+            celda.border = borde
+
+            celda.alignment = Alignment(
+                vertical="top",
+                wrap_text=True
+            )
+
+            if hasattr(
+                valor,
+                "strftime"
+            ):
+
+                celda.number_format = (
+                    "dd/mm/yyyy"
+                )
+
+        fila += 1
+
+    # ==========================================================
+    # TABLA AUDITORÍAS
+    # ==========================================================
+
+    if fila > 2:
+
+        ultima_columna = get_column_letter(
+            len(encabezados_auditoria)
+        )
+
+        tabla = Table(
+            displayName="TablaBDAuditorias",
+            ref=(
+                f"A1:{ultima_columna}{fila - 1}"
+            )
+        )
+
+        tabla.tableStyleInfo = (
+            TableStyleInfo(
+                name="TableStyleMedium2",
+                showFirstColumn=False,
+                showLastColumn=False,
+                showRowStripes=True,
+                showColumnStripes=False
+            )
+        )
+
+        ws.add_table(
+            tabla
+        )
+
+    ws.freeze_panes = "A2"
+
+    ajustar_columnas(
+        ws,
+        40
+    )
+
+    # ==========================================================
+    # 11. HOJA BD TÉCNICOS
+    # ==========================================================
+
+    ws = ws_tecnicos
+
+    campos = [
+        campo
+        for campo in Tecnicos._meta.fields
+        if campo.name != "id"
+    ]
+
+    encabezados_tecnicos = ["ID"]
+
+    encabezados_tecnicos.extend(
+        campo.verbose_name.title()
+        for campo in campos
+    )
+
+    # ==========================================================
+    # ENCABEZADOS
+    # ==========================================================
+
+    for columna, encabezado in enumerate(
+        encabezados_tecnicos,
+        start=1
+    ):
+
+        celda = ws.cell(
+            1,
+            columna
+        )
+
+        celda.value = encabezado
+
+        celda.font = Font(
+            bold=True
+        )
+
+        celda.fill = PatternFill(
+            "solid",
+            fgColor=COLOR_HEADER
+        )
+
+        celda.border = borde
+
+        celda.alignment = Alignment(
+            horizontal="center",
+            vertical="center"
+        )
+
+    # ==========================================================
+    # TODOS LOS TÉCNICOS
+    # ==========================================================
+
+    fila = 2
+
+    for tecnico in tecnicos:
+
+        valores = [
+            tecnico.id
+        ]
+
+        valores.extend(
+            getattr(
+                tecnico,
+                campo.name
+            )
+            for campo in campos
+        )
+
+        for columna, valor in enumerate(
+            valores,
+            start=1
+        ):
+
+            celda = ws.cell(
+                fila,
+                columna
+            )
+
+            celda.value = valor
+
+            celda.border = borde
+
+            celda.alignment = Alignment(
+                vertical="top",
+                wrap_text=True
+            )
+
+            if hasattr(
+                valor,
+                "strftime"
+            ):
+
+                celda.number_format = (
+                    "dd/mm/yyyy"
+                )
+
+        fila += 1
+
+    # ==========================================================
+    # TABLA TÉCNICOS
+    # ==========================================================
+
+    if fila > 2:
+
+        ultima_columna = get_column_letter(
+            len(encabezados_tecnicos)
+        )
+
+        tabla = Table(
+            displayName="TablaBDTecnicos",
+            ref=(
+                f"A1:{ultima_columna}{fila - 1}"
+            )
+        )
+
+        tabla.tableStyleInfo = (
+            TableStyleInfo(
+                name="TableStyleMedium2",
+                showFirstColumn=False,
+                showLastColumn=False,
+                showRowStripes=True,
+                showColumnStripes=False
+            )
+        )
+
+        ws.add_table(
+            tabla
+        )
+
+    ws.freeze_panes = "A2"
+
+    ajustar_columnas(
+        ws,
+        40
+    )
+
+    # ==========================================================
+    # 12. CONFIGURACIÓN DE IMPRESIÓN
+    # ==========================================================
+
+    for hoja in wb.worksheets:
+
+        hoja.page_setup.orientation = (
+            "landscape"
+        )
+
+        hoja.page_setup.fitToWidth = 1
+
+        hoja.page_setup.fitToHeight = 0
+
+        hoja.sheet_properties.pageSetUpPr.fitToPage = True
+
+    # ==========================================================
+    # 13. DESCARGAR EXCEL
+    # ==========================================================
+
+    response = HttpResponse(
+        content_type=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        )
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+        'attachment; '
+        'filename="Reporte_Completo_Auditorias.xlsx"'
+    )
+
+    wb.save(response)
 
     return response

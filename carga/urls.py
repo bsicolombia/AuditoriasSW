@@ -5,6 +5,6 @@ urlpatterns = [
     path("", views.carga, name="carga"),
     path("auditoria-crear/",views.auditoria_crear,name="auditoria_crear"),
     path("errores/pdf/",views.generar_pdf_errores,name="reporte_errores_pdf"),
-    path("tecnicos/crear/",views.tecnicos_crear,name="tecnicos_crear",)
-    
+    path("tecnicos/crear/",views.tecnicos_crear,name="tecnicos_crear"),
+    path("exportar-estadisticas/",views.exportar_excel_completo,name="exportar-estadisticas"),
 ]

@@ -16,9 +16,13 @@ AuditoriasSW
     <div class="dashboard-header">
         <h1>Sistema de Auditorías</h1>
         <p>Bienvenido al panel principal</p>
-    </div>
 
+        
+    </div>
+    <h3>EJECUCION DE AUDITORIAS:</h3>
     <div class="stats-container">
+
+        
 
         <div class="stats">
             <h2>Suspenciones: {{ Suspensiones }}</h2>
@@ -42,7 +46,7 @@ AuditoriasSW
         <div class="bottom-cards">
 
             <a href="{% url 'carga' %}" class="menu-card principal">
-                <img src="{% static 'img/carta.png' %}" alt="Carga de auditorías">
+                <img src="{% static 'img/carga.png' %}" alt="Carga de auditorías">
                 <div class="card-text">
                     <h2>Cargar</h2>
                     <p>Registrar una nueva auditoría</p>

@@ -12,13 +12,8 @@ Estadísticas
 <div class="estadisticas-header">
 
     <h1>
-        Estadísticas de Auditorías
+        ESTADISTICAS DE AUDITORIAS
     </h1>
-
-    <p>
-        Análisis de cumplimiento, hallazgos,
-        técnicos y digitadores.
-    </p>
 
 </div>
 
@@ -36,23 +31,74 @@ Estadísticas
 
 <div class="estadisticas-grid">
 
-    {% include "auditorias/partials/operaciones.html" %}
+
+    <!-- ================================================= -->
+    <!-- CUMPLE / NO CUMPLE -->
+    <!-- ================================================= -->
 
     {% include "auditorias/partials/no_cumplen.html" %}
 
-    {% include "auditorias/partials/auditorias_dia.html" %}
+
+    <!-- ================================================= -->
+    <!-- OPERACIONES -->
+    <!-- ================================================= -->
+
+    {% include "auditorias/partials/operaciones.html" %}
+
+
+    <!-- ================================================= -->
+    <!-- HALLAZGOS POR TÉCNICO -->
+    <!-- ================================================= -->
 
     {% include "auditorias/partials/hallazgos_tecnico.html" %}
 
+
+    <!-- ================================================= -->
+    <!-- ERRORES POR TÉCNICO -->
+    <!-- ================================================= -->
+
     {% include "auditorias/partials/errores_tecnico.html" %}
 
+
+    <!-- ================================================= -->
+    <!-- CANTIDAD DE HALLAZGOS -->
+    <!-- ================================================= -->
+
     {% include "auditorias/partials/cantidad_hallazgos.html" %}
+
+
+    <!-- ================================================= -->
+    <!-- AUDITORÍAS POR DÍA -->
+    <!-- ================================================= -->
+
+    {% include "auditorias/partials/auditorias_dia.html" %}
+
+
+    <!-- ================================================= -->
+    <!-- AUDITORÍAS POR DIGITADOR -->
+    <!-- ================================================= -->
 
     <div class="grafica-full">
 
         {% include "auditorias/partials/auditorias_digitador.html" %}
 
     </div>
+
+
+    <!-- ================================================= -->
+    <!-- CANTIDAD DE AUDITORÍAS POR AUDITOR -->
+    <!-- ================================================= -->
+
+    <div class="grafica-full">
+
+        {% include "auditorias/partials/cantidad_auditorias_auditor.html" %}
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- RESULTADO AUDITORÍAS POR TÉCNICO -->
+    <!-- ================================================= -->
 
     <div
         class="grafica-full resultado-auditorias-tecnico-container"
@@ -63,6 +109,11 @@ Estadísticas
 
     </div>
 
+
+    <!-- ================================================= -->
+    <!-- RESULTADO AUDITORÍAS POR DIGITADOR -->
+    <!-- ================================================= -->
+
     <div
         class="grafica-full resultado-auditorias-digitador-container"
         style="display: none;"
@@ -71,6 +122,13 @@ Estadísticas
         {% include "auditorias/partials/resultado_auditorias_digitador.html" %}
 
     </div>
+
+    <div class="grafica-full">
+
+        {% include "auditorias/partials/cantidad_auditorias_auditor.html" %}
+
+    </div>
+
 
 
 </div>
@@ -119,6 +177,8 @@ Estadísticas
 
 {{ Resultado_Auditorias_Digitador|json_script:"datos-Resultado-Auditorias-Digitador" }}
 
+{{ Cantidad_Auditorias_Auditor|json_script:"datos-Cantidad-Auditorias-Auditor" }}
+
 <!-- ================================================= -->
 <!-- LIBRERÍAS -->
 <!-- ================================================= -->
@@ -136,201 +196,291 @@ Estadísticas
 
 
 <!-- ================================================= -->
-<!-- JS -->
+<!-- JAVASCRIPT -->
 <!-- ================================================= -->
 
 <script src="{% static 'js/operaciones.js' %}"></script>
+
 <script src="{% static 'js/auditorias_dia.js' %}"></script>
+
 <script src="{% static 'js/no_cumplen.js' %}"></script>
+
 <script src="{% static 'js/hallazgos_tecnico.js' %}"></script>
+
 <script src="{% static 'js/errores_tecnico.js' %}"></script>
+
 <script src="{% static 'js/cantidad_hallazgos.js' %}"></script>
+
 <script src="{% static 'js/auditorias_digitador.js' %}"></script>
+
+<script src="{% static 'js/cantidad_auditorias_auditor.js' %}"></script>
+
 <script src="{% static 'js/resultado_auditorias_tecnico.js' %}"></script>
+
 <script src="{% static 'js/resultado_auditorias_digitador.js' %}"></script>
+
+<script src="{% static 'js/cantidad_auditorias_auditor.js' %}"></script>
+
+
+<!-- ================================================= -->
+<!-- CONTROL DE VISTAS -->
+<!-- ================================================= -->
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const filtroResultado = document.getElementById(
-        "filtroResultado"
-    );
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
 
-    const tablaTecnicos = document.querySelector(
-        ".resultado-auditorias-tecnico-container"
-    );
+        console.log(
+            "=== ESTADÍSTICAS DE AUDITORÍAS ==="
+        );
 
 
-    const tablaDigitadores = document.querySelector(
-        ".resultado-auditorias-digitador-container"
-    );
+        // =====================================================
+        // FILTRO RESULTADO
+        // =====================================================
+
+        const filtroResultado =
+            document.getElementById(
+                "filtroResultado"
+            );
 
 
-    const grid = document.querySelector(
-        ".estadisticas-grid"
-    );
+        // =====================================================
+        // CONTENEDORES ESPECIALES
+        // =====================================================
+
+        const tablaTecnicos =
+            document.querySelector(
+                ".resultado-auditorias-tecnico-container"
+            );
 
 
-    if (
-        !filtroResultado ||
-        !grid
-    ) {
-        return;
+        const tablaDigitadores =
+            document.querySelector(
+                ".resultado-auditorias-digitador-container"
+            );
+
+
+        // =====================================================
+        // GRID
+        // =====================================================
+
+        const grid =
+            document.querySelector(
+                ".estadisticas-grid"
+            );
+
+
+        if (!grid) {
+
+            console.error(
+                "❌ No se encontró .estadisticas-grid"
+            );
+
+            return;
+
+        }
+
+
+        // =====================================================
+        // ELEMENTOS NORMALES
+        // =====================================================
+
+        const elementosEstadisticas =
+            Array.from(
+                grid.children
+            ).filter(
+                function (elemento) {
+
+                    return (
+                        !elemento.classList.contains(
+                            "resultado-auditorias-tecnico-container"
+                        )
+                        &&
+                        !elemento.classList.contains(
+                            "resultado-auditorias-digitador-container"
+                        )
+                    );
+
+                }
+            );
+
+
+        // =====================================================
+        // MOSTRAR VISTA
+        // =====================================================
+
+        function mostrarVista() {
+
+
+            /*
+             * Si el filtro no existe,
+             * mostramos todas las estadísticas.
+             */
+
+            if (!filtroResultado) {
+
+                elementosEstadisticas.forEach(
+                    function (elemento) {
+
+                        elemento.style.display =
+                            "";
+
+                    }
+                );
+
+                return;
+
+            }
+
+
+            const valor =
+                filtroResultado.value;
+
+
+            console.log(
+                "Filtro resultado:",
+                valor
+            );
+
+
+            // =================================================
+            // RESULTADO POR TÉCNICOS
+            // =================================================
+
+            if (valor === "tecnicos") {
+
+
+                elementosEstadisticas.forEach(
+                    function (elemento) {
+
+                        elemento.style.display =
+                            "none";
+
+                    }
+                );
+
+
+                if (tablaTecnicos) {
+
+                    tablaTecnicos.style.display =
+                        "block";
+
+                }
+
+
+                if (tablaDigitadores) {
+
+                    tablaDigitadores.style.display =
+                        "none";
+
+                }
+
+            }
+
+
+            // =================================================
+            // RESULTADO POR DIGITADORES
+            // =================================================
+
+            else if (valor === "digitadores") {
+
+
+                elementosEstadisticas.forEach(
+                    function (elemento) {
+
+                        elemento.style.display =
+                            "none";
+
+                    }
+                );
+
+
+                if (tablaTecnicos) {
+
+                    tablaTecnicos.style.display =
+                        "none";
+
+                }
+
+
+                if (tablaDigitadores) {
+
+                    tablaDigitadores.style.display =
+                        "block";
+
+                }
+
+            }
+
+
+            // =================================================
+            // TODAS LAS ESTADÍSTICAS
+            // =================================================
+
+            else {
+
+
+                elementosEstadisticas.forEach(
+                    function (elemento) {
+
+                        elemento.style.display =
+                            "";
+
+                    }
+                );
+
+
+                if (tablaTecnicos) {
+
+                    tablaTecnicos.style.display =
+                        "none";
+
+                }
+
+
+                if (tablaDigitadores) {
+
+                    tablaDigitadores.style.display =
+                        "none";
+
+                }
+
+            }
+
+        }
+
+
+        // =====================================================
+        // CAMBIO DEL FILTRO
+        // =====================================================
+
+        if (filtroResultado) {
+
+            filtroResultado.addEventListener(
+                "change",
+                mostrarVista
+            );
+
+        }
+
+
+        // =====================================================
+        // ESTADO INICIAL
+        // =====================================================
+
+        mostrarVista();
+
+
+        console.log(
+            "✅ Control de vistas cargado"
+        );
+
     }
-
-
-    // =========================================================
-    // ELEMENTOS NORMALES
-    // =========================================================
-
-    const elementosEstadisticas =
-        Array.from(
-            grid.children
-        ).filter(function (elemento) {
-
-            return (
-                !elemento.classList.contains(
-                    "resultado-auditorias-tecnico-container"
-                )
-                &&
-                !elemento.classList.contains(
-                    "resultado-auditorias-digitador-container"
-                )
-            );
-
-        });
-
-
-    // =========================================================
-    // MOSTRAR VISTA
-    // =========================================================
-
-    function mostrarVista() {
-
-        const valor =
-            filtroResultado.value;
-
-
-        // -----------------------------------------------------
-        // RESULTADO TÉCNICOS
-        // -----------------------------------------------------
-
-        if (valor === "tecnicos") {
-
-            elementosEstadisticas.forEach(
-                function (elemento) {
-
-                    elemento.style.display = "none";
-
-                }
-            );
-
-
-            if (tablaTecnicos) {
-
-                tablaTecnicos.style.display =
-                    "block";
-
-            }
-
-
-            if (tablaDigitadores) {
-
-                tablaDigitadores.style.display =
-                    "none";
-
-            }
-
-        }
-
-
-        // -----------------------------------------------------
-        // RESULTADO DIGITADORES
-        // -----------------------------------------------------
-
-        else if (valor === "digitadores") {
-
-            elementosEstadisticas.forEach(
-                function (elemento) {
-
-                    elemento.style.display = "none";
-
-                }
-            );
-
-
-            if (tablaTecnicos) {
-
-                tablaTecnicos.style.display =
-                    "none";
-
-            }
-
-
-            if (tablaDigitadores) {
-
-                tablaDigitadores.style.display =
-                    "block";
-
-            }
-
-        }
-
-
-        // -----------------------------------------------------
-        // TODAS LAS GRÁFICAS
-        // -----------------------------------------------------
-
-        else {
-
-            elementosEstadisticas.forEach(
-                function (elemento) {
-
-                    elemento.style.display = "";
-
-                }
-            );
-
-
-            if (tablaTecnicos) {
-
-                tablaTecnicos.style.display =
-                    "none";
-
-            }
-
-
-            if (tablaDigitadores) {
-
-                tablaDigitadores.style.display =
-                    "none";
-
-            }
-
-        }
-
-    }
-
-
-    // =========================================================
-    // CAMBIO DEL SELECT
-    // =========================================================
-
-    filtroResultado.addEventListener(
-        "change",
-        mostrarVista
-    );
-
-
-    // =========================================================
-    // ESTADO INICIAL
-    // =========================================================
-
-    mostrarVista();
-
-});
+);
 
 </script>
 
@@ -340,6 +490,11 @@ document.addEventListener("DOMContentLoaded", function () {
 <!-- ================================================= -->
 
 <style>
+
+
+/* =========================================================
+   GRID PRINCIPAL
+   ========================================================= */
 
 .estadisticas-grid {
 
@@ -354,13 +509,20 @@ document.addEventListener("DOMContentLoaded", function () {
     margin-top: 25px;
 
     align-items: start;
+
 }
 
+
+/* =========================================================
+   TARJETAS
+   ========================================================= */
 
 .grafica-card {
 
     min-width: 0;
 
+    width: 100%;
+
     background: #ffffff;
 
     border-radius: 14px;
@@ -373,205 +535,345 @@ document.addEventListener("DOMContentLoaded", function () {
         0 2px 10px
         rgba(15, 23, 42, 0.06);
 
-    border: 1px solid #e2e8f0;
+    border:
+        1px solid
+        #e2e8f0;
+
 }
 
+
+/* =========================================================
+   TÍTULOS
+   ========================================================= */
 
 .grafica-card h2 {
 
     margin-top: 0;
 
-    color: #0f172a;
+    color:
+        #0f172a;
 
 }
 
+
+/* =========================================================
+   DESCRIPCIONES
+   ========================================================= */
 
 .grafica-descripcion {
 
-    color: #64748b;
+    color:
+        #64748b;
 
-    font-size: 14px;
+    font-size:
+        14px;
 
 }
 
+
+/* =========================================================
+   CONTENEDOR GENERAL DE CHART
+   ========================================================= */
 
 .chart-container {
 
-    position: relative;
+    position:
+        relative;
 
-    width: 100%;
+    width:
+        100%;
 
-    min-height: 350px;
+    min-height:
+        350px;
+
 }
 
 
+/* =========================================================
+   GRÁFICAS GRANDES
+   ========================================================= */
+
 .chart-grande {
 
-    min-height: 450px;
+    min-height:
+        450px;
+
 }
 
 
 .chart-digitadores {
 
-    min-height: 500px;
+    min-height:
+        500px;
+
 }
 
+
+/* =========================================================
+   GRÁFICA FULL WIDTH
+   ========================================================= */
 
 .grafica-full {
 
-    grid-column: 1 / -1;
+    grid-column:
+        1 / -1;
 
-    width: 100%;
+    width:
+        100%;
+
+    min-width:
+        0;
 
 }
 
 
+/* =========================================================
+   FILTROS
+   ========================================================= */
+
 .filtros-card {
 
-    background: #ffffff;
+    background:
+        #ffffff;
 
-    border: 1px solid #e2e8f0;
+    border:
+        1px solid
+        #e2e8f0;
 
-    border-radius: 14px;
+    border-radius:
+        14px;
 
-    padding: 20px;
+    padding:
+        20px;
 
-    margin-top: 20px;
+    margin-top:
+        20px;
 
     box-shadow:
         0 2px 10px
         rgba(15, 23, 42, 0.06);
+
 }
 
+
+/* =========================================================
+   GRID DE FILTROS
+   ========================================================= */
 
 .filtros-grid {
 
-    display: grid;
+    display:
+        grid;
 
     grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
 
-    gap: 15px;
+    gap:
+        15px;
+
 }
 
+
+/* =========================================================
+   LABELS
+   ========================================================= */
 
 .filtros-grid label {
 
-    display: block;
+    display:
+        block;
 
-    font-weight: 600;
+    font-weight:
+        600;
 
-    margin-bottom: 6px;
+    margin-bottom:
+        6px;
 
-    color: #334155;
+    color:
+        #334155;
+
 }
 
+
+/* =========================================================
+   SELECT
+   ========================================================= */
 
 .filtros-grid select {
 
-    width: 100%;
+    width:
+        100%;
 
-    padding: 10px;
+    padding:
+        10px;
 
-    border: 1px solid #cbd5e1;
+    border:
+        1px solid
+        #cbd5e1;
 
-    border-radius: 8px;
+    border-radius:
+        8px;
 
-    box-sizing: border-box;
+    box-sizing:
+        border-box;
+
 }
 
+
+/* =========================================================
+   BOTONES FILTROS
+   ========================================================= */
 
 .filtros-botones {
 
-    margin-top: 20px;
+    margin-top:
+        20px;
 
-    display: flex;
+    display:
+        flex;
 
-    gap: 10px;
+    gap:
+        10px;
+
 }
 
+
+/* =========================================================
+   BOTÓN FILTRAR
+   ========================================================= */
 
 .btn-filtrar {
 
-    border: none;
+    border:
+        none;
 
-    padding: 11px 18px;
+    padding:
+        11px 18px;
 
-    border-radius: 8px;
+    border-radius:
+        8px;
 
-    background: #172554;
+    background:
+        #172554;
 
-    color: white;
+    color:
+        white;
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
-    font-weight: 600;
+    font-weight:
+        600;
+
 }
 
+
+/* =========================================================
+   BOTÓN LIMPIAR
+   ========================================================= */
 
 .btn-limpiar {
 
-    display: inline-block;
+    display:
+        inline-block;
 
-    padding: 11px 18px;
+    padding:
+        11px 18px;
 
-    border-radius: 8px;
+    border-radius:
+        8px;
 
-    background: #e2e8f0;
+    background:
+        #e2e8f0;
 
-    color: #334155;
+    color:
+        #334155;
 
-    text-decoration: none;
+    text-decoration:
+        none;
 
-    font-weight: 600;
+    font-weight:
+        600;
+
 }
 
 
+/* =========================================================
+   EXPORTAR
+   ========================================================= */
+
 .exportar-container {
 
-    margin-top: 25px;
+    margin-top:
+        25px;
 
-    margin-bottom: 30px;
+    margin-bottom:
+        30px;
+
 }
 
 
 .btn-exportar {
 
-    display: inline-block;
+    display:
+        inline-block;
 
-    padding: 11px 18px;
+    padding:
+        11px 18px;
 
-    background: #16a34a;
+    background:
+        #16a34a;
 
-    color: white;
+    color:
+        white;
 
-    text-decoration: none;
+    text-decoration:
+        none;
 
-    border-radius: 8px;
+    border-radius:
+        8px;
 
-    font-weight: 600;
+    font-weight:
+        600;
 
     box-shadow:
         0 2px 6px
         rgba(0, 0, 0, .10);
+
 }
 
 
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
 @media (max-width: 900px) {
+
 
     .estadisticas-grid {
 
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
+
     }
+
 
     .grafica-full {
 
-        grid-column: auto;
+        grid-column:
+            auto;
+
     }
+
 
     .filtros-grid {
 
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
+
     }
 
 }
@@ -579,13 +881,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 @media (max-width: 600px) {
 
+
     .grafica-card {
 
-        padding: 15px;
+        padding:
+            15px;
+
     }
+
 
 }
 
 </style>
+
 
 {% endblock %}

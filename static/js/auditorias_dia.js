@@ -75,8 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
     datos.sort(function (a, b) {
 
         return (
-            new Date(a.fecha) -
-            new Date(b.fecha)
+            new Date(b.fecha) -
+            new Date(a.fecha)
         );
 
     });

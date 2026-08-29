@@ -69,39 +69,68 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // ORDENAR POR FECHA
+    // ORDENAR
+    // MÁS RECIENTE → MÁS ANTIGUA
     // =====================================================
 
     datos.sort(function (a, b) {
 
-        const fechaA =
-            new Date(a.fecha);
-
-        const fechaB =
-            new Date(b.fecha);
+        const fechaA = a.fecha || "";
+        const fechaB = b.fecha || "";
 
 
-        if (
-            fechaA - fechaB !== 0
-        ) {
+        // -------------------------------------------------
+        // FECHA DESCENDENTE
+        // -------------------------------------------------
 
-            return fechaA - fechaB;
+        if (fechaA !== fechaB) {
+
+            return (
+                new Date(fechaB) -
+                new Date(fechaA)
+            );
 
         }
 
 
-        return String(
-            a.auditor || ""
-        ).localeCompare(
-            String(b.auditor || ""),
-            "es"
+        // -------------------------------------------------
+        // SI LA FECHA ES IGUAL
+        // ORDENAR DIGITADOR A → Z
+        // -------------------------------------------------
+
+        const auditorA =
+            a.auditor ||
+            "Sin digitador";
+
+        const auditorB =
+            b.auditor ||
+            "Sin digitador";
+
+
+        return auditorA.localeCompare(
+            auditorB,
+            "es",
+            {
+                sensitivity: "base"
+            }
         );
 
     });
 
 
     // =====================================================
-    // PREPARAR DATOS
+    // VERIFICAR ORDEN
+    // =====================================================
+
+    console.log(
+        "📅 Datos ordenados de más reciente a más antigua:"
+    );
+
+    console.table(datos);
+
+
+    // =====================================================
+    // LABELS
     // =====================================================
 
     const labels =
@@ -121,6 +150,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
+    // =====================================================
+    // CUMPLE
+    // =====================================================
+
     const cumple =
         datos.map(function (item) {
 
@@ -130,6 +163,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
 
+
+    // =====================================================
+    // NO CUMPLE
+    // =====================================================
 
     const noCumple =
         datos.map(function (item) {
@@ -141,19 +178,21 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
+    // =====================================================
+    // TOTAL
+    // =====================================================
+
     const total =
         datos.map(function (item, index) {
 
             const valor =
                 Number(item.total) || 0;
 
-
             if (valor > 0) {
 
                 return valor;
 
             }
-
 
             return (
                 cumple[index] +
@@ -181,20 +220,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
     // ALTURA
     // =====================================================
-
-    /*
-     * Antes:
-     *
-     * 125px por registro
-     *
-     * Era demasiado grande.
-     *
-     * Ahora:
-     *
-     * 62px por registro.
-     *
-     * Los registros quedan mucho más juntos.
-     */
 
     const alturaPorRegistro = 62;
 
@@ -510,13 +535,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     afterFit:
                         function (scale) {
 
-                            /*
-                             * Espacio para:
-                             *
-                             * Fecha
-                             * Digitador
-                             */
-
                             scale.width =
                                 210;
 
@@ -799,127 +817,126 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 datalabels: {
 
-                    /*
-                    * Mostrar siempre el valor.
-                    *
-                    * Ya no ocultamos valores 0 o 1.
-                    */
-
-                    display: true,
+                    display:
+                        true,
 
 
-                    /*
-                    * Barras grandes:
-                    * número blanco dentro de la barra.
-                    *
-                    * Barras pequeñas:
-                    * número oscuro fuera de la barra.
-                    */
+                    color:
+                        function (context) {
 
-                    color: function (context) {
-
-                        const valor =
-                            Number(context.raw) || 0;
-
-                        if (valor < 8) {
-
-                            return "#334155";
-
-                        }
-
-                        return "#ffffff";
-
-                    },
+                            const valor =
+                                Number(
+                                    context.raw
+                                ) || 0;
 
 
-                    anchor: function (context) {
+                            if (valor < 8) {
 
-                        const valor =
-                            Number(context.raw) || 0;
+                                return "#334155";
 
-                        if (valor < 8) {
-
-                            return "end";
-
-                        }
-
-                        return "center";
-
-                    },
+                            }
 
 
-                    align: function (context) {
+                            return "#ffffff";
 
-                        const valor =
-                            Number(context.raw) || 0;
-
-                        if (valor < 8) {
-
-                            return "right";
-
-                        }
-
-                        return "center";
-
-                    },
+                        },
 
 
-                    offset: function (context) {
+                    anchor:
+                        function (context) {
 
-                        const valor =
-                            Number(context.raw) || 0;
-
-                        if (valor < 8) {
-
-                            return 5;
-
-                        }
-
-                        return 0;
-
-                    },
+                            const valor =
+                                Number(
+                                    context.raw
+                                ) || 0;
 
 
-                    /*
-                    * Permitir que los números
-                    * pequeños salgan de la barra.
-                    */
+                            if (valor < 8) {
 
-                    clamp: true,
+                                return "end";
 
-                    clip: false,
+                            }
 
 
-                    /*
-                    * Tamaño del número.
-                    */
+                            return "center";
+
+                        },
+
+
+                    align:
+                        function (context) {
+
+                            const valor =
+                                Number(
+                                    context.raw
+                                ) || 0;
+
+
+                            if (valor < 8) {
+
+                                return "right";
+
+                            }
+
+
+                            return "center";
+
+                        },
+
+
+                    offset:
+                        function (context) {
+
+                            const valor =
+                                Number(
+                                    context.raw
+                                ) || 0;
+
+
+                            if (valor < 8) {
+
+                                return 5;
+
+                            }
+
+
+                            return 0;
+
+                        },
+
+
+                    clamp:
+                        true,
+
+                    clip:
+                        false,
+
 
                     font: {
 
-                        size: 10,
+                        size:
+                            10,
 
-                        weight: "700"
+                        weight:
+                            "700"
 
                     },
 
 
-                    /*
-                    * Valor mostrado.
-                    */
+                    formatter:
+                        function (value) {
 
-                    formatter: function (value) {
+                            const numero =
+                                Number(value) || 0;
 
-                        const numero =
-                            Number(value) || 0;
 
-                        return numero.toLocaleString(
-                            "es-CO"
-                        );
+                            return numero.toLocaleString(
+                                "es-CO"
+                            );
 
-                    }
+                        }
 
                 }
-
 
             }
 

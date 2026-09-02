@@ -1,0 +1,688 @@
+<div class="grafica-card tabla-errores-tecnico-card">
+
+    <h2>
+        Errores por Técnico
+    </h2>
+
+    <p class="grafica-descripcion">
+        Cantidad de errores encontrados por técnico y por hallazgo.
+    </p>
+
+    <div class="tabla-responsive tabla-responsive-errores-tecnico">
+
+        <table
+            id="tablaErroresTecnico"
+            class="tabla-estadisticas"
+        >
+
+            <thead id="tablaErroresTecnicoHead">
+            </thead>
+
+            <tbody id="tablaErroresTecnicoBody">
+            </tbody>
+
+            <tfoot id="tablaErroresTecnicoFoot">
+            </tfoot>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   TARJETA
+   ========================================================= */
+
+.tabla-errores-tecnico-card {
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
+
+.tabla-errores-tecnico-card h2 {
+
+    margin: 0 0 6px 0;
+
+    color: #0f172a;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   DESCRIPCIÓN
+   ========================================================= */
+
+.tabla-errores-tecnico-card .grafica-descripcion {
+
+    margin: 0 0 18px 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   CONTENEDOR SCROLL
+   ========================================================= */
+
+.tabla-responsive-errores-tecnico {
+
+    position: relative;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    max-height: 500px;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #94a3b8
+        #f1f5f9;
+
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.tabla-responsive-errores-tecnico::-webkit-scrollbar {
+
+    width: 9px;
+    height: 9px;
+
+}
+
+
+.tabla-responsive-errores-tecnico::-webkit-scrollbar-track {
+
+    background: #f1f5f9;
+
+}
+
+
+.tabla-responsive-errores-tecnico::-webkit-scrollbar-thumb {
+
+    background: #94a3b8;
+
+    border-radius: 10px;
+
+}
+
+
+.tabla-responsive-errores-tecnico::-webkit-scrollbar-thumb:hover {
+
+    background: #64748b;
+
+}
+
+
+/* =========================================================
+   TABLA
+   ========================================================= */
+
+#tablaErroresTecnico {
+
+    width: max-content;
+
+    min-width: 700px;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    background: #ffffff;
+
+    font-size: 13px;
+
+    table-layout: fixed;
+
+}
+
+
+/* =========================================================
+   COLUMNA TÉCNICO
+   ANCHO ÚNICO PARA TODA LA COLUMNA
+   ========================================================= */
+
+#tablaErroresTecnico th:first-child,
+#tablaErroresTecnico td:first-child {
+
+    width: 240px;
+
+    min-width: 240px;
+
+    max-width: 240px;
+
+}
+
+
+/* =========================================================
+   ENCABEZADOS
+   ========================================================= */
+
+#tablaErroresTecnico thead th {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 20;
+
+    background: #0f172a;
+
+    color: #ffffff;
+
+    padding: 10px 8px;
+
+    text-align: center;
+
+    font-weight: 700;
+
+    border-right:
+        1px solid
+        rgba(255, 255, 255, 0.15);
+
+    border-bottom:
+        1px solid
+        #0f172a;
+
+    vertical-align: middle;
+
+    line-height: 1.2;
+
+}
+
+
+/* =========================================================
+   ENCABEZADO TÉCNICO
+   ========================================================= */
+
+#tablaErroresTecnico thead th:first-child {
+
+    position: sticky;
+
+    top: 0;
+
+    left: 0;
+
+    z-index: 50;
+
+    width: 240px;
+
+    min-width: 240px;
+
+    max-width: 240px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    font-size: 15px;
+
+    padding-left: 12px;
+
+    background: #0f172a;
+
+    box-shadow:
+        3px 0 5px
+        rgba(15, 23, 42, 0.15);
+
+}
+
+
+/* =========================================================
+   HALLAZGOS
+   ========================================================= */
+
+#tablaErroresTecnico thead th:not(:first-child) {
+
+    width: 90px;
+
+    min-width: 80px;
+
+    max-width: 90px;
+
+    white-space: normal;
+
+    word-break: normal;
+
+    overflow-wrap: break-word;
+
+    height: 42px;
+
+}
+
+
+/* =========================================================
+   CELDAS DEL BODY
+   ========================================================= */
+
+#tablaErroresTecnico tbody td {
+
+    padding: 9px 8px;
+
+    border-bottom:
+        1px solid
+        #e2e8f0;
+
+    border-right:
+        1px solid
+        #f1f5f9;
+
+    text-align: center;
+
+    color: #334155;
+
+    vertical-align: middle;
+
+}
+
+
+/* =========================================================
+   CELDAS DE HALLAZGOS
+   ========================================================= */
+
+#tablaErroresTecnico tbody td:not(:first-child) {
+
+    width: 90px;
+
+    min-width: 80px;
+
+    max-width: 90px;
+
+    text-align: center;
+
+}
+
+
+/* =========================================================
+   NOMBRE DEL TÉCNICO
+   COLUMNA FIJA
+   ========================================================= */
+
+#tablaErroresTecnico tbody td.nombre-tecnico {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 30;
+
+    width: 240px;
+
+    min-width: 240px;
+
+    max-width: 240px;
+
+    box-sizing: border-box;
+
+    text-align: left;
+
+    font-weight: 600;
+
+    color: #0f172a;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    background: #ffffff;
+
+    box-shadow:
+        3px 0 5px
+        rgba(15, 23, 42, 0.08);
+
+}
+
+
+/* =========================================================
+   FILAS ALTERNAS
+   ========================================================= */
+
+#tablaErroresTecnico tbody tr:nth-child(even) {
+
+    background: #f8fafc;
+
+}
+
+
+/* =========================================================
+   FONDO DE LA COLUMNA FIJA
+   EN FILAS ALTERNAS
+   ========================================================= */
+
+#tablaErroresTecnico tbody tr:nth-child(even)
+td.nombre-tecnico {
+
+    background: #f8fafc;
+
+}
+
+
+/* =========================================================
+   HOVER DE TODA LA FILA
+   ========================================================= */
+
+#tablaErroresTecnico tbody tr:hover td {
+
+    background: #eff6ff;
+
+}
+
+
+/* =========================================================
+   HOVER DE LA COLUMNA TÉCNICO
+   ========================================================= */
+
+#tablaErroresTecnico tbody tr:hover
+td.nombre-tecnico {
+
+    background: #eff6ff;
+
+}
+
+
+/* =========================================================
+   CELDAS CON ERROR
+   ========================================================= */
+
+#tablaErroresTecnico .celda-error {
+
+    background: #fee2e2 !important;
+
+    color: #b91c1c !important;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   TOTAL DEL TÉCNICO
+   ========================================================= */
+
+#tablaErroresTecnico .celda-total {
+
+    background: #fef3c7 !important;
+
+    color: #92400e !important;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+#tablaErroresTecnico tfoot td {
+
+    padding: 10px 8px;
+
+    background: #e2e8f0;
+
+    color: #0f172a;
+
+    font-weight: 800;
+
+    text-align: center;
+
+    border-top:
+        2px solid
+        #94a3b8;
+
+    vertical-align: middle;
+
+}
+
+
+/* =========================================================
+   TOTAL - COLUMNA FIJA
+   ========================================================= */
+
+#tablaErroresTecnico tfoot td.nombre-total {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 35;
+
+    width: 240px;
+
+    min-width: 240px;
+
+    max-width: 240px;
+
+    box-sizing: border-box;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    background: #e2e8f0 !important;
+
+    box-shadow:
+        3px 0 5px
+        rgba(15, 23, 42, 0.08);
+
+}
+
+
+/* =========================================================
+   TOTAL GENERAL
+   ========================================================= */
+
+#tablaErroresTecnico .celda-total-general {
+
+    background: #16a34a !important;
+
+    color: #ffffff !important;
+
+    font-size: 15px;
+
+    font-weight: 900;
+
+}
+
+
+/* =========================================================
+   SIN DATOS
+   ========================================================= */
+
+#tablaErroresTecnico .tabla-sin-datos {
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-weight: 600;
+
+    background: #f8fafc;
+
+}
+
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .tabla-errores-tecnico-card {
+
+        padding: 12px;
+
+    }
+
+
+    #tablaErroresTecnico {
+
+        font-size: 12px;
+
+        min-width: 650px;
+
+    }
+
+
+    #tablaErroresTecnico thead th {
+
+        padding: 7px 5px;
+
+    }
+
+
+    #tablaErroresTecnico tbody td,
+    #tablaErroresTecnico tfoot td {
+
+        padding: 8px 6px;
+
+    }
+
+
+    /* -----------------------------------------------------
+       TÉCNICO EN MÓVIL
+       ----------------------------------------------------- */
+
+    #tablaErroresTecnico th:first-child,
+    #tablaErroresTecnico td:first-child {
+
+        width: 200px;
+
+        min-width: 200px;
+
+        max-width: 200px;
+
+    }
+
+
+    #tablaErroresTecnico thead th:first-child {
+
+        width: 200px;
+
+        min-width: 200px;
+
+        max-width: 200px;
+
+        font-size: 14px;
+
+        padding-left: 10px;
+
+    }
+
+
+    #tablaErroresTecnico tbody td.nombre-tecnico {
+
+        width: 200px;
+
+        min-width: 200px;
+
+        max-width: 200px;
+
+    }
+
+
+    #tablaErroresTecnico tfoot td.nombre-total {
+
+        width: 200px;
+
+        min-width: 200px;
+
+        max-width: 200px;
+
+    }
+
+
+    /* -----------------------------------------------------
+       HALLAZGOS EN MÓVIL
+       ----------------------------------------------------- */
+
+    #tablaErroresTecnico thead th:not(:first-child) {
+
+        width: 75px;
+
+        min-width: 65px;
+
+        max-width: 75px;
+
+        white-space: normal;
+
+        overflow-wrap: break-word;
+
+        line-height: 1.15;
+
+    }
+
+
+    #tablaErroresTecnico tbody td:not(:first-child) {
+
+        width: 75px;
+
+        min-width: 65px;
+
+        max-width: 75px;
+
+    }
+
+
+    /* -----------------------------------------------------
+       CONTENEDOR
+       ----------------------------------------------------- */
+
+    .tabla-responsive-errores-tecnico {
+
+        max-height: 450px;
+
+    }
+
+}
+
+</style>

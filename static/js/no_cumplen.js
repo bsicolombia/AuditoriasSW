@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         backgroundColor: [
 
-                            "#172554", // Total
+                            "#1e3a8a", // Total
 
                             "#22c55e", // Cumple
 
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         hoverBackgroundColor: [
 
-                            "#1e3a8a",
+                            "#2b458d",
 
                             "#16a34a",
 

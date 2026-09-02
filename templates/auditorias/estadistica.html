@@ -18,6 +18,11 @@ Estadísticas
 </div>
 
 
+<h4>
+    Seleccionar Consulta
+</h4>
+
+
 <!-- ================================================= -->
 <!-- FILTROS -->
 <!-- ================================================= -->
@@ -33,105 +38,94 @@ Estadísticas
 
 
     <!-- ================================================= -->
-    <!-- CUMPLE / NO CUMPLE -->
+    <!-- ESTADÍSTICAS NORMALES -->
     <!-- ================================================= -->
 
     {% include "auditorias/partials/no_cumplen.html" %}
 
-
-    <!-- ================================================= -->
-    <!-- OPERACIONES -->
-    <!-- ================================================= -->
-
     {% include "auditorias/partials/operaciones.html" %}
-
-
-    <!-- ================================================= -->
-    <!-- HALLAZGOS POR TÉCNICO -->
-    <!-- ================================================= -->
 
     {% include "auditorias/partials/hallazgos_tecnico.html" %}
 
-
-    <!-- ================================================= -->
-    <!-- ERRORES POR TÉCNICO -->
-    <!-- ================================================= -->
-
     {% include "auditorias/partials/errores_tecnico.html" %}
-
-
-    <!-- ================================================= -->
-    <!-- CANTIDAD DE HALLAZGOS -->
-    <!-- ================================================= -->
 
     {% include "auditorias/partials/cantidad_hallazgos.html" %}
 
-
-    <!-- ================================================= -->
-    <!-- AUDITORÍAS POR DÍA -->
-    <!-- ================================================= -->
+    {% include "auditorias/partials/cantidad_auditorias_auditor.html" %}
 
     {% include "auditorias/partials/auditorias_dia.html" %}
 
-
-    <!-- ================================================= -->
-    <!-- AUDITORÍAS POR DIGITADOR -->
-    <!-- ================================================= -->
-
-    <div class="grafica-full">
-
-        {% include "auditorias/partials/auditorias_digitador.html" %}
-
-    </div>
+    {% include "auditorias/partials/auditorias_digitador.html" %}
 
 
     <!-- ================================================= -->
-    <!-- CANTIDAD DE AUDITORÍAS POR AUDITOR -->
-    <!-- ================================================= -->
-
-    <div class="grafica-full">
-
-        {% include "auditorias/partials/cantidad_auditorias_auditor.html" %}
-
-    </div>
-
-
-    <!-- ================================================= -->
-    <!-- RESULTADO AUDITORÍAS POR TÉCNICO -->
+    <!-- RESULTADOS POR TÉCNICO -->
     <!-- ================================================= -->
 
     <div
-        class="grafica-full resultado-auditorias-tecnico-container"
+        class="resultado-auditorias-tecnico-container"
         style="display: none;"
     >
 
-        {% include "auditorias/partials/resultado_auditorias_tecnico.html" %}
+
+        <!-- ================================================= -->
+        <!-- RESULTADO AUDITORÍAS POR TÉCNICO -->
+        <!-- ================================================= -->
+
+        <div class="tabla-scroll tabla-resultado-tecnico">
+
+            {% include "auditorias/partials/resultado_auditorias_tecnico.html" %}
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ERRORES POR TÉCNICO -->
+        <!-- ================================================= -->
+
+        <div class="tabla-scroll tabla-errores-tecnico">
+
+            {% include "auditorias/partials/tabla_Errores_tecnico.html" %}
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- RESULTADO DIARIO POR TÉCNICO -->
+        <!-- ================================================= -->
+
+        <div class="tabla-scroll tabla-resultado-diario-tecnico">
+
+            {% include "auditorias/partials/resultado_diario_tecnico.html" %}
+
+        </div>
+
 
     </div>
 
 
     <!-- ================================================= -->
-    <!-- RESULTADO AUDITORÍAS POR DIGITADOR -->
+    <!-- RESULTADOS POR DIGITADOR -->
     <!-- ================================================= -->
 
     <div
-        class="grafica-full resultado-auditorias-digitador-container"
+        class="resultado-auditorias-digitador-container"
         style="display: none;"
     >
 
-        {% include "auditorias/partials/resultado_auditorias_digitador.html" %}
+
+        <div class="tabla-scroll tabla-resultado-digitador">
+
+            {% include "auditorias/partials/resultado_auditorias_digitador.html" %}
+
+        </div>
+
 
     </div>
-
-    <div class="grafica-full">
-
-        {% include "auditorias/partials/cantidad_auditorias_auditor.html" %}
-
-    </div>
-
 
 
 </div>
+
 
 
 <!-- ================================================= -->
@@ -149,6 +143,7 @@ Estadísticas
     </a>
 
 </div>
+
 
 
 <!-- ================================================= -->
@@ -179,6 +174,10 @@ Estadísticas
 
 {{ Cantidad_Auditorias_Auditor|json_script:"datos-Cantidad-Auditorias-Auditor" }}
 
+{{ Resultado_Diario_Tecnico|json_script:"datos-Resultado-Diario-Tecnico" }}
+
+
+
 <!-- ================================================= -->
 <!-- LIBRERÍAS -->
 <!-- ================================================= -->
@@ -193,6 +192,7 @@ Estadísticas
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
 
 
 <!-- ================================================= -->
@@ -219,7 +219,10 @@ Estadísticas
 
 <script src="{% static 'js/resultado_auditorias_digitador.js' %}"></script>
 
-<script src="{% static 'js/cantidad_auditorias_auditor.js' %}"></script>
+<script src="{% static 'js/errores_detallados_tecnico.js' %}"></script>
+
+<script src="{% static 'js/resultado_diario_tecnico.js' %}"></script>
+
 
 
 <!-- ================================================= -->
@@ -232,15 +235,14 @@ document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-
         console.log(
             "=== ESTADÍSTICAS DE AUDITORÍAS ==="
         );
 
 
-        // =====================================================
-        // FILTRO RESULTADO
-        // =====================================================
+        /* =====================================================
+           FILTRO
+           ===================================================== */
 
         const filtroResultado =
             document.getElementById(
@@ -248,9 +250,9 @@ document.addEventListener(
             );
 
 
-        // =====================================================
-        // CONTENEDORES ESPECIALES
-        // =====================================================
+        /* =====================================================
+           CONTENEDOR TÉCNICOS
+           ===================================================== */
 
         const tablaTecnicos =
             document.querySelector(
@@ -258,15 +260,19 @@ document.addEventListener(
             );
 
 
+        /* =====================================================
+           CONTENEDOR DIGITADORES
+           ===================================================== */
+
         const tablaDigitadores =
             document.querySelector(
                 ".resultado-auditorias-digitador-container"
             );
 
 
-        // =====================================================
-        // GRID
-        // =====================================================
+        /* =====================================================
+           GRID
+           ===================================================== */
 
         const grid =
             document.querySelector(
@@ -285,9 +291,9 @@ document.addEventListener(
         }
 
 
-        // =====================================================
-        // ELEMENTOS NORMALES
-        // =====================================================
+        /* =====================================================
+           ESTADÍSTICAS NORMALES
+           ===================================================== */
 
         const elementosEstadisticas =
             Array.from(
@@ -309,16 +315,15 @@ document.addEventListener(
             );
 
 
-        // =====================================================
-        // MOSTRAR VISTA
-        // =====================================================
+        /* =====================================================
+           MOSTRAR VISTA
+           ===================================================== */
 
         function mostrarVista() {
 
-
             /*
-             * Si el filtro no existe,
-             * mostramos todas las estadísticas.
+             * Si no existe filtro,
+             * mostramos estadísticas normales.
              */
 
             if (!filtroResultado) {
@@ -326,11 +331,22 @@ document.addEventListener(
                 elementosEstadisticas.forEach(
                     function (elemento) {
 
-                        elemento.style.display =
-                            "";
+                        elemento.style.display = "";
 
                     }
                 );
+
+                if (tablaTecnicos) {
+
+                    tablaTecnicos.style.display = "none";
+
+                }
+
+                if (tablaDigitadores) {
+
+                    tablaDigitadores.style.display = "none";
+
+                }
 
                 return;
 
@@ -347,18 +363,16 @@ document.addEventListener(
             );
 
 
-            // =================================================
-            // RESULTADO POR TÉCNICOS
-            // =================================================
+            /* =================================================
+               TÉCNICOS
+               ================================================= */
 
             if (valor === "tecnicos") {
 
-
                 elementosEstadisticas.forEach(
                     function (elemento) {
 
-                        elemento.style.display =
-                            "none";
+                        elemento.style.display = "none";
 
                     }
                 );
@@ -366,34 +380,30 @@ document.addEventListener(
 
                 if (tablaTecnicos) {
 
-                    tablaTecnicos.style.display =
-                        "block";
+                    tablaTecnicos.style.display = "block";
 
                 }
 
 
                 if (tablaDigitadores) {
 
-                    tablaDigitadores.style.display =
-                        "none";
+                    tablaDigitadores.style.display = "none";
 
                 }
 
             }
 
 
-            // =================================================
-            // RESULTADO POR DIGITADORES
-            // =================================================
+            /* =================================================
+               DIGITADORES
+               ================================================= */
 
             else if (valor === "digitadores") {
 
-
                 elementosEstadisticas.forEach(
                     function (elemento) {
 
-                        elemento.style.display =
-                            "none";
+                        elemento.style.display = "none";
 
                     }
                 );
@@ -401,34 +411,30 @@ document.addEventListener(
 
                 if (tablaTecnicos) {
 
-                    tablaTecnicos.style.display =
-                        "none";
+                    tablaTecnicos.style.display = "none";
 
                 }
 
 
                 if (tablaDigitadores) {
 
-                    tablaDigitadores.style.display =
-                        "block";
+                    tablaDigitadores.style.display = "block";
 
                 }
 
             }
 
 
-            // =================================================
-            // TODAS LAS ESTADÍSTICAS
-            // =================================================
+            /* =================================================
+               TODAS
+               ================================================= */
 
             else {
-
 
                 elementosEstadisticas.forEach(
                     function (elemento) {
 
-                        elemento.style.display =
-                            "";
+                        elemento.style.display = "";
 
                     }
                 );
@@ -436,16 +442,14 @@ document.addEventListener(
 
                 if (tablaTecnicos) {
 
-                    tablaTecnicos.style.display =
-                        "none";
+                    tablaTecnicos.style.display = "none";
 
                 }
 
 
                 if (tablaDigitadores) {
 
-                    tablaDigitadores.style.display =
-                        "none";
+                    tablaDigitadores.style.display = "none";
 
                 }
 
@@ -454,9 +458,9 @@ document.addEventListener(
         }
 
 
-        // =====================================================
-        // CAMBIO DEL FILTRO
-        // =====================================================
+        /* =====================================================
+           CAMBIO FILTRO
+           ===================================================== */
 
         if (filtroResultado) {
 
@@ -468,9 +472,9 @@ document.addEventListener(
         }
 
 
-        // =====================================================
-        // ESTADO INICIAL
-        // =====================================================
+        /* =====================================================
+           ESTADO INICIAL
+           ===================================================== */
 
         mostrarVista();
 
@@ -483,6 +487,7 @@ document.addEventListener(
 );
 
 </script>
+
 
 
 <!-- ================================================= -->
@@ -523,6 +528,8 @@ document.addEventListener(
 
     width: 100%;
 
+    max-width: 100%;
+
     background: #ffffff;
 
     border-radius: 14px;
@@ -550,8 +557,7 @@ document.addEventListener(
 
     margin-top: 0;
 
-    color:
-        #0f172a;
+    color: #0f172a;
 
 }
 
@@ -562,67 +568,137 @@ document.addEventListener(
 
 .grafica-descripcion {
 
-    color:
-        #64748b;
+    color: #64748b;
 
-    font-size:
-        14px;
+    font-size: 14px;
 
 }
 
 
 /* =========================================================
-   CONTENEDOR GENERAL DE CHART
+   CHART
    ========================================================= */
 
 .chart-container {
 
-    position:
-        relative;
+    position: relative;
 
-    width:
-        100%;
+    width: 100%;
 
-    min-height:
-        350px;
+    min-height: 350px;
 
 }
 
 
-/* =========================================================
-   GRÁFICAS GRANDES
-   ========================================================= */
-
 .chart-grande {
 
-    min-height:
-        450px;
+    min-height: 450px;
 
 }
 
 
 .chart-digitadores {
 
-    min-height:
-        500px;
+    min-height: 500px;
 
 }
 
 
 /* =========================================================
-   GRÁFICA FULL WIDTH
+   CONTENEDORES RESULTADOS
    ========================================================= */
 
-.grafica-full {
+.resultado-auditorias-tecnico-container,
+.resultado-auditorias-digitador-container {
 
-    grid-column:
-        1 / -1;
+    min-width: 0;
 
-    width:
-        100%;
+    width: 100%;
 
-    min-width:
-        0;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+.resultado-auditorias-tecnico-container,
+.resultado-auditorias-digitador-container {
+
+    grid-column: 1 / -1;
+
+}
+
+
+/* =========================================================
+   TABLAS
+   ========================================================= */
+
+.tabla-scroll {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+.tabla-errores-tecnico {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+.tabla-errores-tecnico
+.tabla-responsive {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   RESULTADO DIARIO
+   ========================================================= */
+
+.tabla-resultado-diario-tecnico {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    margin-top: 25px;
+
+}
+
+
+.tabla-resultado-diario-tecnico
+.grafica-card {
+
+    width: 100%;
+
+    max-width: 100%;
 
 }
 
@@ -633,46 +709,64 @@ document.addEventListener(
 
 .filtros-card {
 
-    background:
-        #ffffff;
+    background: #ffffff;
 
-    border:
-        1px solid
-        #e2e8f0;
+    border: 1px solid #e2e8f0;
 
-    border-radius:
-        14px;
+    border-radius: 10px;
 
-    padding:
-        20px;
+    padding: 12px 15px;
 
-    margin-top:
-        20px;
+    margin-top: 0;
 
     box-shadow:
-        0 2px 10px
-        rgba(15, 23, 42, 0.06);
+        0 2px 8px
+        rgba(15, 23, 42, 0.05);
+
+}
+
+
+.estadisticas-header {
+
+    text-align: center;
+
+    margin-top: 0;
+
+    padding-top: 0;
+
+}
+
+
+.estadisticas-header h1 {
+
+    margin-top: -20px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.estadisticas-header + h4 {
+
+    margin-top: 0;
+
+    margin-bottom: 5px;
 
 }
 
 
 /* =========================================================
-   GRID DE FILTROS
+   GRID FILTROS
    ========================================================= */
 
 .filtros-grid {
 
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
-        repeat(
-            3,
-            minmax(0, 1fr)
-        );
+        repeat(4, minmax(0, 1fr));
 
-    gap:
-        15px;
+    gap: 8px 10px;
 
 }
 
@@ -683,17 +777,15 @@ document.addEventListener(
 
 .filtros-grid label {
 
-    display:
-        block;
+    display: block;
 
-    font-weight:
-        600;
+    font-weight: 600;
 
-    margin-bottom:
-        6px;
+    font-size: 12px;
 
-    color:
-        #334155;
+    margin-bottom: 3px;
+
+    color: #475569;
 
 }
 
@@ -704,99 +796,86 @@ document.addEventListener(
 
 .filtros-grid select {
 
-    width:
-        100%;
+    width: 100%;
 
-    padding:
-        10px;
+    height: 34px;
 
-    border:
-        1px solid
-        #cbd5e1;
+    padding: 5px 8px;
 
-    border-radius:
-        8px;
+    border: 1px solid #cbd5e1;
 
-    box-sizing:
-        border-box;
+    border-radius: 6px;
+
+    box-sizing: border-box;
+
+    font-size: 12px;
+
+    background: #ffffff;
 
 }
 
 
 /* =========================================================
-   BOTONES FILTROS
+   BOTONES
    ========================================================= */
 
 .filtros-botones {
 
-    margin-top:
-        20px;
+    margin-top: 10px;
 
-    display:
-        flex;
+    display: flex;
 
-    gap:
-        10px;
+    gap: 7px;
 
 }
 
-
-/* =========================================================
-   BOTÓN FILTRAR
-   ========================================================= */
 
 .btn-filtrar {
 
-    border:
-        none;
+    border: none;
 
-    padding:
-        11px 18px;
+    height: 34px;
 
-    border-radius:
-        8px;
+    padding: 5px 14px;
 
-    background:
-        #172554;
+    border-radius: 6px;
 
-    color:
-        white;
+    background: #2f8cc2;
 
-    cursor:
-        pointer;
+    color: white;
 
-    font-weight:
-        600;
+    cursor: pointer;
+
+    font-size: 12px;
+
+    font-weight: 600;
 
 }
 
 
-/* =========================================================
-   BOTÓN LIMPIAR
-   ========================================================= */
-
 .btn-limpiar {
 
-    display:
-        inline-block;
+    display: inline-flex;
 
-    padding:
-        11px 18px;
+    align-items: center;
 
-    border-radius:
-        8px;
+    height: 34px;
 
-    background:
-        #e2e8f0;
+    padding: 5px 14px;
 
-    color:
-        #334155;
+    border-radius: 6px;
 
-    text-decoration:
-        none;
+    background: #f3ad5c;
 
-    font-weight:
-        600;
+    color: #000000;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    box-sizing: border-box;
 
 }
 
@@ -807,37 +886,28 @@ document.addEventListener(
 
 .exportar-container {
 
-    margin-top:
-        25px;
+    margin-top: 25px;
 
-    margin-bottom:
-        30px;
+    margin-bottom: 30px;
 
 }
 
 
 .btn-exportar {
 
-    display:
-        inline-block;
+    display: inline-block;
 
-    padding:
-        11px 18px;
+    padding: 11px 18px;
 
-    background:
-        #16a34a;
+    background: #16a34a;
 
-    color:
-        white;
+    color: white;
 
-    text-decoration:
-        none;
+    text-decoration: none;
 
-    border-radius:
-        8px;
+    border-radius: 8px;
 
-    font-weight:
-        600;
+    font-weight: 600;
 
     box-shadow:
         0 2px 6px
@@ -847,48 +917,40 @@ document.addEventListener(
 
 
 /* =========================================================
-   MÓVIL
+   RESPONSIVE
    ========================================================= */
 
-@media (max-width: 900px) {
-
-
-    .estadisticas-grid {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .grafica-full {
-
-        grid-column:
-            auto;
-
-    }
-
+@media (max-width: 1000px) {
 
     .filtros-grid {
 
         grid-template-columns:
-            1fr;
+            repeat(3, minmax(0, 1fr));
 
     }
 
 }
 
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
 
+    .filtros-grid {
 
-    .grafica-card {
-
-        padding:
-            15px;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
 
     }
 
+}
+
+
+@media (max-width: 450px) {
+
+    .filtros-grid {
+
+        grid-template-columns: 1fr;
+
+    }
 
 }
 

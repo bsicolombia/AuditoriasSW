@@ -1,8 +1,10 @@
-# auditorias/context_processors.py
 from django.db.models import Count, Q
 from .models import Auditoria
 from carga.models import Tecnicos
+from django.utils import timezone
 import re
+import unicodedata
+
 
 # ============================================================
 # FUNCIONES AUXILIARES
@@ -10,8 +12,10 @@ import re
 
 def texto_seguro(valor, defecto=""):
     """
-    Convierte None en un texto seguro para JavaScript.
-    Evita que lleguen null/undefined a los .localeCompare().
+    Convierte cualquier valor en texto limpio.
+
+    None -> ""
+    "   Hola   " -> "Hola"
     """
     if valor is None:
         return defecto
@@ -19,95 +23,935 @@ def texto_seguro(valor, defecto=""):
     return str(valor).strip()
 
 
+def normalizar_texto(valor):
+    """
+    Normaliza nombres para poder compararlos.
+
+    Ejemplo:
+
+        "Acosta Leiva Duvan Esteban"
+        " ACOSTA LEIVA DUVAN ESTEBAN "
+        "Acosta  Leiva Duvan Esteban"
+
+    terminan siendo equivalentes.
+    """
+
+    if valor is None:
+        return ""
+
+    valor = str(valor).strip().lower()
+
+    # Quitar tildes
+    valor = unicodedata.normalize(
+        "NFKD",
+        valor
+    )
+
+    valor = "".join(
+        caracter
+        for caracter in valor
+        if not unicodedata.combining(caracter)
+    )
+
+    # Espacios múltiples
+    valor = re.sub(
+        r"\s+",
+        " ",
+        valor
+    )
+
+    return valor.strip()
+
+
+def normalizar_cedula(valor):
+    """
+    Deja únicamente números.
+
+    Ejemplos:
+
+        79.765.301 -> 79765301
+        79 765 301 -> 79765301
+        79-765-301 -> 79765301
+        "79765301 " -> 79765301
+    """
+
+    if valor is None:
+        return ""
+
+    return re.sub(
+        r"\D",
+        "",
+        str(valor).strip()
+    )
+
+
+def extraer_cedula_nombre_tecnico(nombre):
+    """
+    Extrae la cédula que viene al final del nombre.
+
+    Soporta:
+
+        Acosta Leiva Duvan Esteban-1234643864
+
+        Acosta Leiva Duvan Esteban -1234643864
+
+        Acosta Leiva Duvan Esteban - 1234643864
+
+        Acosta Leiva Duvan Esteban 1234643864
+    """
+
+    if not nombre:
+        return ""
+
+    nombre = str(nombre).strip()
+
+    # Caso normal:
+    # nombre - 123456789
+    coincidencia = re.search(
+        r"(?:-\s*)?(\d{6,15})\s*$",
+        nombre
+    )
+
+    if coincidencia:
+
+        return normalizar_cedula(
+            coincidencia.group(1)
+        )
+
+    return ""
+
+
+def obtener_nombre_sin_cedula(nombre):
+    """
+    Quita la cédula del final del nombre.
+
+    Ejemplo:
+
+        Acosta Leiva Duvan Esteban-1234643864
+
+    devuelve:
+
+        Acosta Leiva Duvan Esteban
+    """
+
+    if not nombre:
+        return ""
+
+    nombre = str(nombre).strip()
+
+    nombre = re.sub(
+        r"\s*-\s*\d{6,15}\s*$",
+        "",
+        nombre
+    )
+
+    nombre = re.sub(
+        r"\s+\d{6,15}\s*$",
+        "",
+        nombre
+    )
+
+    return nombre.strip()
+
+
+def obtener_cedula_auditoria(auditoria):
+    """
+    Obtiene la cédula del técnico desde un registro de Auditoria.
+
+    IMPORTANTE:
+
+    numero_cedula parece ser la cédula del AUDITOR,
+    por eso NO se debe usar como cédula del técnico.
+
+    La cédula del técnico está al final de nombre_tecnico.
+    """
+
+    nombre_tecnico = texto_seguro(
+        auditoria.get(
+            "nombre_tecnico"
+        )
+    )
+
+    cedula = extraer_cedula_nombre_tecnico(
+        nombre_tecnico
+    )
+
+    return cedula
+
+
+def obtener_nombre_tecnico_auditoria(auditoria):
+    """
+    Obtiene el nombre del técnico sin la cédula.
+    """
+
+    nombre = texto_seguro(
+        auditoria.get(
+            "nombre_tecnico"
+        )
+    )
+
+    return obtener_nombre_sin_cedula(
+        nombre
+    )
+
+
 # ============================================================
-# FILTROS GENERALES
+# FECHA ACTUAL
+# ============================================================
+
+ahora = timezone.localtime()
+
+anio_actual = str(
+    ahora.year
+)
+
+mes_actual = str(
+    ahora.month
+)
+
+
+# ============================================================
+# FILTROS
 # ============================================================
 
 def obtener_filtros(request):
-    """
-    Obtiene los filtros enviados por GET.
-    """
-    return {
-        "anio": request.GET.get("anio", ""),
-        "mes": request.GET.get("mes", ""),
-        "dia": request.GET.get("dia", ""),
-        "tipo_operacion": request.GET.get("tipo_operacion", ""),
-        "tecnico": request.GET.get("tecnico", ""),
-        "auditor": request.GET.get("auditor", ""),
-        "hallazgo": request.GET.get("hallazgo", ""),
-        "resultado": request.GET.get("resultado", ""),
-        "supervisor": request.GET.get("supervisor", ""),
+
+    filtros = {
+
+        "anio":
+            texto_seguro(
+                request.GET.get(
+                    "anio",
+                    ""
+                )
+            ),
+
+        "mes":
+            texto_seguro(
+                request.GET.get(
+                    "mes",
+                    ""
+                )
+            ),
+
+        "dia":
+            texto_seguro(
+                request.GET.get(
+                    "dia",
+                    ""
+                )
+            ),
+
+        "tipo_operacion":
+            texto_seguro(
+                request.GET.get(
+                    "tipo_operacion",
+                    ""
+                )
+            ),
+
+        "tecnico":
+            texto_seguro(
+                request.GET.get(
+                    "tecnico",
+                    ""
+                )
+            ),
+
+        "auditor":
+            texto_seguro(
+                request.GET.get(
+                    "auditor",
+                    ""
+                )
+            ),
+
+        "hallazgo":
+            texto_seguro(
+                request.GET.get(
+                    "hallazgo",
+                    ""
+                )
+            ),
+
+        "resultado":
+            texto_seguro(
+                request.GET.get(
+                    "resultado",
+                    ""
+                )
+            ),
+
+        "supervisor":
+            texto_seguro(
+                request.GET.get(
+                    "supervisor",
+                    ""
+                )
+            ),
     }
 
+    # ========================================================
+    # SEGURIDAD
+    # ========================================================
+    #
+    # Si el frontend manda accidentalmente:
+    #
+    # resultado=tecnicos
+    #
+    # NO debemos dejar el queryset en cero.
+    #
+    # También protegemos contra:
+    #
+    # undefined
+    # null
+    # N/A
+    # na
+    # tecnico
+    # tecnicos
+    #
+    # ========================================================
+
+    resultado_invalido = (
+        filtros["resultado"]
+        .strip()
+        .lower()
+        in (
+            "",
+            "undefined",
+            "null",
+            "n/a",
+            "na",
+            "tecnico",
+            "tecnicos",
+            "todos",
+        )
+    )
+
+    if resultado_invalido:
+
+        filtros["resultado"] = ""
+
+    # ========================================================
+    # DEBUG
+    # ========================================================
+
+    print("\n")
+    print("=" * 100)
+    print("DEBUG - FILTROS RECIBIDOS")
+    print("=" * 100)
+
+    for nombre, valor in filtros.items():
+
+        print(
+            f"{nombre}: {repr(valor)}"
+        )
+
+    print("=" * 100)
+    print("\n")
+
+    return filtros
+
+
+# ============================================================
+# APLICAR FILTROS
+# ============================================================
+
 def aplicar_filtros(queryset, filtros):
-    """
-    Aplica los filtros generales a un QuerySet de Auditoria.
-    """
 
-    if filtros["anio"]:
+    print("\n")
+    print("=" * 100)
+    print("DEBUG - APLICAR FILTROS")
+    print("=" * 100)
+
+    print(
+        "Auditorías inicialmente:",
+        queryset.count()
+    )
+
+    # ========================================================
+    # AÑO
+    # ========================================================
+
+    anio = filtros.get(
+        "anio"
+    )
+
+    if anio:
+
+        if str(anio).isdigit():
+
+            queryset = queryset.filter(
+                fecha__year=int(anio)
+            )
+
+            print(
+                "Después de AÑO:",
+                anio,
+                "=>",
+                queryset.count()
+            )
+
+    # ========================================================
+    # MES
+    # ========================================================
+
+    mes = filtros.get(
+        "mes"
+    )
+
+    if mes:
+
+        if str(mes).isdigit():
+
+            queryset = queryset.filter(
+                fecha__month=int(mes)
+            )
+
+            print(
+                "Después de MES:",
+                mes,
+                "=>",
+                queryset.count()
+            )
+
+    # ========================================================
+    # DÍA
+    # ========================================================
+
+    dia = filtros.get(
+        "dia"
+    )
+
+    if dia:
+
+        if str(dia).isdigit():
+
+            queryset = queryset.filter(
+                fecha__day=int(dia)
+            )
+
+            print(
+                "Después de DÍA:",
+                dia,
+                "=>",
+                queryset.count()
+            )
+
+    # ========================================================
+    # TIPO DE OPERACIÓN
+    # ========================================================
+
+    tipo_operacion = texto_seguro(
+        filtros.get(
+            "tipo_operacion"
+        )
+    )
+
+    if tipo_operacion:
+
         queryset = queryset.filter(
-            fecha__year=filtros["anio"]
+            tipo_operacion__iexact=tipo_operacion
         )
 
-    if filtros["mes"]:
-        queryset = queryset.filter(
-            fecha__month=filtros["mes"]
+        print(
+            "Después de OPERACIÓN:",
+            repr(tipo_operacion),
+            "=>",
+            queryset.count()
         )
 
-    if filtros["dia"]:
-        queryset = queryset.filter(
-            fecha__day=filtros["dia"]
+    # ========================================================
+    # TÉCNICO
+    # ========================================================
+
+    tecnico_seleccionado = texto_seguro(
+        filtros.get(
+            "tecnico"
+        )
+    )
+
+    if tecnico_seleccionado:
+
+        print("\n")
+        print("-" * 100)
+        print("BUSCANDO TÉCNICO")
+        print("-" * 100)
+
+        print(
+            "Técnico seleccionado:",
+            repr(tecnico_seleccionado)
         )
 
-    if filtros["tipo_operacion"]:
-        queryset = queryset.filter(
-            tipo_operacion=filtros["tipo_operacion"]
+        nombre_tecnico_normalizado = (
+            normalizar_texto(
+                tecnico_seleccionado
+            )
         )
 
-    if filtros["tecnico"]:
-        queryset = queryset.filter(
-            nombre_tecnico=filtros["tecnico"]
+        print(
+            "Nombre normalizado:",
+            repr(
+                nombre_tecnico_normalizado
+            )
         )
 
-    if filtros["auditor"]:
-        queryset = queryset.filter(
-            nombre_auditor=filtros["auditor"]
+        # ----------------------------------------------------
+        # BUSCAR TÉCNICO EN TABLA TECNICOS
+        # ----------------------------------------------------
+
+        tecnicos_bd = list(
+            Tecnicos.objects
+            .exclude(
+                tecnico_apellido_nombres__isnull=True
+            )
+            .exclude(
+                tecnico_apellido_nombres__exact=""
+            )
+            .values(
+                "tecnico_cedula",
+                "tecnico_apellido_nombres"
+            )
         )
 
-    if filtros["hallazgo"]:
-        queryset = queryset.filter(
-            hallazgo=filtros["hallazgo"]
+        cedulas_tecnico = set()
+
+        nombres_tecnico = set()
+
+        for tecnico_bd in tecnicos_bd:
+
+            nombre_bd = texto_seguro(
+                tecnico_bd.get(
+                    "tecnico_apellido_nombres"
+                )
+            )
+
+            cedula_bd = normalizar_cedula(
+                tecnico_bd.get(
+                    "tecnico_cedula"
+                )
+            )
+
+            nombre_bd_normalizado = (
+                normalizar_texto(
+                    nombre_bd
+                )
+            )
+
+            if (
+                nombre_bd_normalizado
+                == nombre_tecnico_normalizado
+            ):
+
+                nombres_tecnico.add(
+                    nombre_bd_normalizado
+                )
+
+                if cedula_bd:
+
+                    cedulas_tecnico.add(
+                        cedula_bd
+                    )
+
+        print(
+            "Cédulas encontradas:",
+            sorted(
+                cedulas_tecnico
+            )
         )
 
-    if filtros["resultado"] in ["cumple", "no_cumple"]:
-        queryset = queryset.filter(
-            resultado_auditoria=filtros["resultado"]
+        print(
+            "Nombres normalizados:",
+            sorted(
+                nombres_tecnico
+            )
         )
 
-    # =========================================================
-    # FILTRO POR SUPERVISOR
-    # =========================================================
+        # ----------------------------------------------------
+        # BUSCAR AUDITORÍAS
+        # ----------------------------------------------------
 
-    if filtros["resultado"] in ["cumple", "no_cumple"]:
-        queryset = queryset.filter(
-            resultado_auditoria=filtros["resultado"]
+        ids_tecnico = []
+
+        auditorias = (
+            queryset
+            .values(
+                "id",
+                "nombre_tecnico"
+            )
         )
+
+        for auditoria in auditorias:
+
+            nombre_auditoria = (
+                texto_seguro(
+                    auditoria.get(
+                        "nombre_tecnico"
+                    )
+                )
+            )
+
+            # -----------------------------------------------
+            # CÉDULA AL FINAL DEL NOMBRE
+            # -----------------------------------------------
+
+            cedula_auditoria = (
+                extraer_cedula_nombre_tecnico(
+                    nombre_auditoria
+                )
+            )
+
+            # -----------------------------------------------
+            # NOMBRE SIN CÉDULA
+            # -----------------------------------------------
+
+            nombre_auditoria_limpio = (
+                obtener_nombre_sin_cedula(
+                    nombre_auditoria
+                )
+            )
+
+            nombre_auditoria_normalizado = (
+                normalizar_texto(
+                    nombre_auditoria_limpio
+                )
+            )
+
+            # -----------------------------------------------
+            # MATCH POR CÉDULA
+            # -----------------------------------------------
+
+            match_cedula = (
+
+                cedula_auditoria
+                and cedula_auditoria
+                in cedulas_tecnico
+            )
+
+            # -----------------------------------------------
+            # MATCH POR NOMBRE
+            # -----------------------------------------------
+
+            match_nombre = (
+
+                nombre_auditoria_normalizado
+                == nombre_tecnico_normalizado
+            )
+
+            if match_cedula or match_nombre:
+
+                ids_tecnico.append(
+                    auditoria["id"]
+                )
+
+        # ----------------------------------------------------
+        # QUITAR DUPLICADOS
+        # ----------------------------------------------------
+
+        ids_tecnico = list(
+            dict.fromkeys(
+                ids_tecnico
+            )
+        )
+
+        print(
+            "Auditorías encontradas para técnico:",
+            len(ids_tecnico)
+        )
+
+        print(
+            "Primeros IDs:",
+            ids_tecnico[:30]
+        )
+
+        queryset = queryset.filter(
+            id__in=ids_tecnico
+        )
+
+        print(
+            "Después de TÉCNICO:",
+            repr(tecnico_seleccionado),
+            "=>",
+            queryset.count()
+        )
+
+        print("-" * 100)
+
+    # ========================================================
+    # AUDITOR
+    # ========================================================
+
+    auditor = texto_seguro(
+        filtros.get(
+            "auditor"
+        )
+    )
+
+    if auditor:
+
+        queryset = queryset.filter(
+            nombre_auditor__iexact=auditor
+        )
+
+        print(
+            "Después de AUDITOR:",
+            repr(auditor),
+            "=>",
+            queryset.count()
+        )
+
+    # ========================================================
+    # HALLAZGO
+    # ========================================================
+
+    hallazgo = texto_seguro(
+        filtros.get(
+            "hallazgo"
+        )
+    )
+
+    if hallazgo:
+
+        queryset = queryset.filter(
+            hallazgo__iexact=hallazgo
+        )
+
+        print(
+            "Después de HALLAZGO:",
+            repr(hallazgo),
+            "=>",
+            queryset.count()
+        )
+
+    # ========================================================
+    # RESULTADO
+    # ========================================================
+
+    resultado = texto_seguro(
+        filtros.get(
+            "resultado"
+        )
+    ).lower()
+
+    # SOLO permitimos estos dos valores.
+    #
+    # Si llega "tecnicos" por error del frontend,
+    # simplemente NO se aplica el filtro.
+
+    resultados_validos = {
+        "cumple",
+        "no_cumple",
+    }
+
+    if resultado in resultados_validos:
+
+        queryset = queryset.filter(
+            resultado_auditoria__iexact=resultado
+        )
+
+        print(
+            "Después de RESULTADO:",
+            repr(resultado),
+            "=>",
+            queryset.count()
+        )
+
+    elif resultado:
+
+        print(
+            "RESULTADO IGNORADO POR SER INVÁLIDO:",
+            repr(resultado)
+        )
+
+    # ========================================================
+    # SUPERVISOR
+    # ========================================================
+
+    supervisor = texto_seguro(
+        filtros.get(
+            "supervisor"
+        )
+    )
+
+    if supervisor:
+
+        print("\n")
+        print("-" * 100)
+        print("DEBUG - FILTRO SUPERVISOR")
+        print("-" * 100)
+
+        print(
+            "Supervisor seleccionado:",
+            repr(supervisor)
+        )
+
+        tecnicos_supervisor = list(
+            Tecnicos.objects
+            .filter(
+                supervisor__iexact=supervisor
+            )
+            .exclude(
+                tecnico_cedula__isnull=True
+            )
+            .exclude(
+                tecnico_cedula__exact=""
+            )
+            .values(
+                "tecnico_cedula",
+                "tecnico_apellido_nombres"
+            )
+        )
+
+        cedulas_supervisor = set()
+
+        nombres_supervisor = set()
+
+        for item in tecnicos_supervisor:
+
+            cedula = normalizar_cedula(
+                item.get(
+                    "tecnico_cedula"
+                )
+            )
+
+            nombre = texto_seguro(
+                item.get(
+                    "tecnico_apellido_nombres"
+                )
+            )
+
+            if cedula:
+
+                cedulas_supervisor.add(
+                    cedula
+                )
+
+            if nombre:
+
+                nombres_supervisor.add(
+                    normalizar_texto(
+                        nombre
+                    )
+                )
+
+        print(
+            "Técnicos supervisor:",
+            len(
+                tecnicos_supervisor
+            )
+        )
+
+        print(
+            "Cédulas supervisor:",
+            list(
+                cedulas_supervisor
+            )[:30]
+        )
+
+        ids_supervisor = []
+
+        auditorias_supervisor = (
+            queryset
+            .values(
+                "id",
+                "nombre_tecnico"
+            )
+        )
+
+        for auditoria in auditorias_supervisor:
+
+            nombre = texto_seguro(
+                auditoria.get(
+                    "nombre_tecnico"
+                )
+            )
+
+            cedula = (
+                extraer_cedula_nombre_tecnico(
+                    nombre
+                )
+            )
+
+            nombre_limpio = (
+                obtener_nombre_sin_cedula(
+                    nombre
+                )
+            )
+
+            nombre_normalizado = (
+                normalizar_texto(
+                    nombre_limpio
+                )
+            )
+
+            if (
+
+                cedula
+                and cedula in cedulas_supervisor
+
+            ) or (
+
+                nombre_normalizado
+                and nombre_normalizado
+                in nombres_supervisor
+
+            ):
+
+                ids_supervisor.append(
+                    auditoria["id"]
+                )
+
+        ids_supervisor = list(
+            dict.fromkeys(
+                ids_supervisor
+            )
+        )
+
+        queryset = queryset.filter(
+            id__in=ids_supervisor
+        )
+
+        print(
+            "Auditorías coincidentes con supervisor:",
+            len(ids_supervisor)
+        )
+
+        print(
+            "Queryset FINAL después SUPERVISOR:",
+            queryset.count()
+        )
+
+        print("-" * 100)
+
+    # ========================================================
+    # RESULTADO FINAL
+    # ========================================================
+
+    print(
+        "QUERYSET FINAL:",
+        queryset.count()
+    )
+
+    print("=" * 100)
+    print("\n")
 
     return queryset
 
 
 # ============================================================
-# OPCIONES PARA LOS FILTROS
+# OPCIONES DE FILTROS
 # ============================================================
+
 def obtener_opciones_filtros():
-    """
-    Obtiene las opciones disponibles para los select.
-    """
 
     tecnicos = (
         Tecnicos.objects
-        .exclude(tecnico_apellido_nombres__isnull=True)
-        .exclude(tecnico_apellido_nombres__exact="")
+        .exclude(
+            tecnico_apellido_nombres__isnull=True
+        )
+        .exclude(
+            tecnico_apellido_nombres__exact=""
+        )
         .values_list(
             "tecnico_apellido_nombres",
             flat=True
@@ -120,8 +964,12 @@ def obtener_opciones_filtros():
 
     auditores = (
         Auditoria.objects
-        .exclude(nombre_auditor__isnull=True)
-        .exclude(nombre_auditor__exact="")
+        .exclude(
+            nombre_auditor__isnull=True
+        )
+        .exclude(
+            nombre_auditor__exact=""
+        )
         .values_list(
             "nombre_auditor",
             flat=True
@@ -134,19 +982,27 @@ def obtener_opciones_filtros():
 
     hallazgos = (
         Auditoria.objects
-        .exclude(hallazgo__isnull=True)
-        .exclude(hallazgo__exact="")
+        .exclude(
+            hallazgo__isnull=True
+        )
+        .exclude(
+            hallazgo__exact=""
+        )
         .values_list(
             "hallazgo",
             flat=True
         )
         .distinct()
-        .order_by("hallazgo")
+        .order_by(
+            "hallazgo"
+        )
     )
 
     anios = (
         Auditoria.objects
-        .exclude(fecha__isnull=True)
+        .exclude(
+            fecha__isnull=True
+        )
         .dates(
             "fecha",
             "year",
@@ -154,42 +1010,44 @@ def obtener_opciones_filtros():
         )
     )
 
-    # =========================================================
-    # SUPERVISORES
-    # =========================================================
-
     supervisores = (
         Tecnicos.objects
-        .exclude(supervisor__isnull=True)
-        .exclude(supervisor__exact="")
+        .exclude(
+            supervisor__isnull=True
+        )
+        .exclude(
+            supervisor__exact=""
+        )
         .values_list(
             "supervisor",
             flat=True
         )
         .distinct()
-        .order_by("supervisor")
+        .order_by(
+            "supervisor"
+        )
     )
 
     return {
 
         "tecnicos_estadisticas": [
-            texto_seguro(tecnico)
-            for tecnico in tecnicos
+            texto_seguro(t)
+            for t in tecnicos
         ],
 
         "auditores_estadisticas": [
-            texto_seguro(auditor)
-            for auditor in auditores
+            texto_seguro(a)
+            for a in auditores
         ],
 
         "hallazgos_estadisticas": [
-            texto_seguro(hallazgo)
-            for hallazgo in hallazgos
+            texto_seguro(h)
+            for h in hallazgos
         ],
 
         "supervisores_estadisticas": [
-            texto_seguro(supervisor)
-            for supervisor in supervisores
+            texto_seguro(s)
+            for s in supervisores
         ],
 
         "anios_estadisticas": [
@@ -197,48 +1055,59 @@ def obtener_opciones_filtros():
             for fecha in anios
         ],
 
-        "dias_estadisticas": list(range(1, 32)),
+        "dias_estadisticas":
+            list(range(1, 32)),
     }
+
 
 # ============================================================
 # 1. ESTADÍSTICA POR OPERACIÓN
 # ============================================================
 
 def obtener_datos_operaciones(queryset):
-    """
-    Estadísticas por tipo de operación.
-    """
 
     resultados = (
         queryset
-        .values("tipo_operacion")
+        .values(
+            "tipo_operacion"
+        )
         .annotate(
+
             cumple=Count(
                 "id",
-                filter=Q(resultado_auditoria="cumple")
+                filter=Q(
+                    resultado_auditoria__iexact="cumple"
+                )
             ),
+
             no_cumple=Count(
                 "id",
-                filter=Q(resultado_auditoria="no_cumple")
+                filter=Q(
+                    resultado_auditoria__iexact="no_cumple"
+                )
             ),
+
             total=Count("id"),
         )
-        .order_by("tipo_operacion")
+        .order_by(
+            "tipo_operacion"
+        )
     )
 
-    
-
     operaciones_base = {
+
         "DC00": {
             "cumple": 0,
             "no_cumple": 0,
             "total": 0,
         },
+
         "RC00": {
             "cumple": 0,
             "no_cumple": 0,
             "total": 0,
         },
+
         "ZVCL": {
             "cumple": 0,
             "no_cumple": 0,
@@ -249,105 +1118,144 @@ def obtener_datos_operaciones(queryset):
     for item in resultados:
 
         tipo = texto_seguro(
-            item.get("tipo_operacion")
+            item.get(
+                "tipo_operacion"
+            )
         ).upper()
 
         if tipo in operaciones_base:
 
             operaciones_base[tipo] = {
-                "cumple": item["cumple"],
-                "no_cumple": item["no_cumple"],
-                "total": item["total"],
+
+                "cumple":
+                    item["cumple"],
+
+                "no_cumple":
+                    item["no_cumple"],
+
+                "total":
+                    item["total"],
             }
 
     resultado = []
 
-    for operacion, valores in operaciones_base.items():
+    for operacion, valores in (
+        operaciones_base.items()
+    ):
 
         resultado.append({
-            "operacion": operacion,
-            "cumple": valores["cumple"],
-            "no_cumple": valores["no_cumple"],
-            "total": valores["total"],
-        })
 
+            "operacion":
+                operacion,
+
+            "cumple":
+                valores["cumple"],
+
+            "no_cumple":
+                valores["no_cumple"],
+
+            "total":
+                valores["total"],
+        })
 
     return resultado
 
-
-    
 
 # ============================================================
 # 2. AUDITORÍAS POR DÍA
 # ============================================================
 
 def obtener_auditorias_dia(queryset):
-    """
-    Cantidad de auditorías realizadas por día.
-    """
 
     datos = (
         queryset
-        .exclude(fecha__isnull=True)
-        .values("fecha")
+        .exclude(
+            fecha__isnull=True
+        )
+        .values(
+            "fecha"
+        )
         .annotate(
+
             cumple=Count(
                 "id",
-                filter=Q(resultado_auditoria="cumple")
+                filter=Q(
+                    resultado_auditoria__iexact="cumple"
+                )
             ),
+
             no_cumple=Count(
                 "id",
-                filter=Q(resultado_auditoria="no_cumple")
+                filter=Q(
+                    resultado_auditoria__iexact="no_cumple"
+                )
             ),
+
             total=Count("id"),
         )
-        .order_by("-fecha")
+        .order_by(
+            "-fecha"
+        )
     )
 
     resultado = []
 
     for item in datos:
 
-        fecha = item.get("fecha")
+        fecha = item.get(
+            "fecha"
+        )
 
         if not fecha:
             continue
 
         resultado.append({
-            "fecha": fecha.strftime("%Y-%m-%d"),
-            "cumple": item["cumple"],
-            "no_cumple": item["no_cumple"],
-            "total": item["total"],
+
+            "fecha":
+                fecha.strftime(
+                    "%Y-%m-%d"
+                ),
+
+            "cumple":
+                item["cumple"],
+
+            "no_cumple":
+                item["no_cumple"],
+
+            "total":
+                item["total"],
         })
 
     return resultado
 
 
 # ============================================================
-# 3. RESUMEN GENERAL CUMPLE / NO CUMPLE
+# 3. RESUMEN GENERAL
 # ============================================================
 
 def obtener_datos_no_cumplen(queryset):
-    """
-    Resumen general de cumplimiento.
-    """
 
     cumple = queryset.filter(
-        resultado_auditoria="cumple"
+        resultado_auditoria__iexact="cumple"
     ).count()
 
     no_cumple = queryset.filter(
-        resultado_auditoria="no_cumple"
+        resultado_auditoria__iexact="no_cumple"
     ).count()
 
     total = queryset.count()
 
     return {
-        "cumple": cumple,
-        "no_cumple": no_cumple,
-        "total": total,
-    }
 
+        "cumple":
+            cumple,
+
+        "no_cumple":
+            no_cumple,
+
+        "total":
+            total,
+    }
 
 
 # ============================================================
@@ -355,13 +1263,9 @@ def obtener_datos_no_cumplen(queryset):
 # ============================================================
 
 def obtener_hallazgos_tecnico(queryset):
-    """
-    Técnicos que tienen auditorías NO CUMPLE
-    y cantidad de hallazgos por tipo.
-    """
 
     queryset = queryset.filter(
-        resultado_auditoria="no_cumple"
+        resultado_auditoria__iexact="no_cumple"
     )
 
     datos = (
@@ -384,18 +1288,23 @@ def obtener_hallazgos_tecnico(queryset):
     for item in datos:
 
         tecnico = texto_seguro(
-            item.get("nombre_tecnico"),
+            item.get(
+                "nombre_tecnico"
+            ),
             "Sin técnico"
         )
 
         tipo = texto_seguro(
-            item.get("tipo_hallazgo"),
+            item.get(
+                "tipo_hallazgo"
+            ),
             "sin_tipo"
         ).lower()
 
         if tecnico not in tecnicos:
 
             tecnicos[tecnico] = {
+
                 "alto": 0,
                 "medio": 0,
                 "bajo": 0,
@@ -404,13 +1313,13 @@ def obtener_hallazgos_tecnico(queryset):
 
         if tipo in tecnicos[tecnico]:
 
-            tecnicos[tecnico][tipo] += item["cantidad"]
+            tecnicos[tecnico][tipo] += \
+                item["cantidad"]
 
         else:
 
-            # Si aparece un tipo de hallazgo no contemplado,
-            # lo contabilizamos como sin_tipo.
-            tecnicos[tecnico]["sin_tipo"] += item["cantidad"]
+            tecnicos[tecnico]["sin_tipo"] += \
+                item["cantidad"]
 
     resultado = []
 
@@ -424,12 +1333,24 @@ def obtener_hallazgos_tecnico(queryset):
         )
 
         resultado.append({
-            "tecnico": tecnico,
-            "alto": valores["alto"],
-            "medio": valores["medio"],
-            "bajo": valores["bajo"],
-            "sin_tipo": valores["sin_tipo"],
-            "total": total,
+
+            "tecnico":
+                tecnico,
+
+            "alto":
+                valores["alto"],
+
+            "medio":
+                valores["medio"],
+
+            "bajo":
+                valores["bajo"],
+
+            "sin_tipo":
+                valores["sin_tipo"],
+
+            "total":
+                total,
         })
 
     return resultado
@@ -440,13 +1361,9 @@ def obtener_hallazgos_tecnico(queryset):
 # ============================================================
 
 def obtener_errores_por_tecnico(queryset):
-    """
-    Permite identificar qué técnicos presentan
-    mayor cantidad de cada tipo de error.
-    """
 
     queryset = queryset.filter(
-        resultado_auditoria="no_cumple"
+        resultado_auditoria__iexact="no_cumple"
     )
 
     datos = (
@@ -458,7 +1375,9 @@ def obtener_errores_por_tecnico(queryset):
         .annotate(
             cantidad=Count("id")
         )
-        .order_by("-cantidad")
+        .order_by(
+            "-cantidad"
+        )
     )
 
     resultado = []
@@ -466,70 +1385,75 @@ def obtener_errores_por_tecnico(queryset):
     for item in datos:
 
         resultado.append({
-            "tecnico": texto_seguro(
-                item.get("nombre_tecnico"),
-                "Sin técnico"
-            ),
 
-            "tipo_hallazgo": texto_seguro(
-                item.get("tipo_hallazgo"),
-                "sin_tipo"
-            ).lower(),
+            "tecnico":
+                texto_seguro(
+                    item.get(
+                        "nombre_tecnico"
+                    ),
+                    "Sin técnico"
+                ),
 
-            "cantidad": item["cantidad"],
+            "tipo_hallazgo":
+                texto_seguro(
+                    item.get(
+                        "tipo_hallazgo"
+                    ),
+                    "sin_tipo"
+                ).lower(),
+
+            "cantidad":
+                item["cantidad"],
         })
 
     return resultado
 
 
 # ============================================================
-# 6. CANTIDAD DE HALLAZGOS POR TÉCNICO
-# ============================================================
-
-# ============================================================
-# CANTIDAD DE HALLAZGOS
+# 6. CANTIDAD POR HALLAZGO
 # ============================================================
 
 def obtener_cantidad_por_hallazgo(queryset):
-    """
-    Cuenta la cantidad de registros por el texto exacto
-    del campo hallazgo.
-
-    NO agrupa por:
-        - técnico
-        - tipo_hallazgo
-
-    Agrupa únicamente por:
-        - hallazgo
-    """
 
     queryset = queryset.filter(
-        resultado_auditoria="no_cumple"
+        resultado_auditoria__iexact="no_cumple"
     )
 
     datos = (
         queryset
-        .exclude(hallazgo__isnull=True)
-        .exclude(hallazgo__exact="")
-        .values("hallazgo")
+        .exclude(
+            hallazgo__isnull=True
+        )
+        .exclude(
+            hallazgo__exact=""
+        )
+        .values(
+            "hallazgo"
+        )
         .annotate(
             cantidad=Count("id")
         )
-        .order_by("-cantidad")
+        .order_by(
+            "-cantidad"
+        )
     )
 
     resultado = []
 
     for item in datos:
 
-        hallazgo = texto_seguro(
-            item.get("hallazgo"),
-            "Sin hallazgo"
-        )
-
         resultado.append({
-            "hallazgo": hallazgo,
-            "cantidad": item["cantidad"],
+
+            "hallazgo":
+                texto_seguro(
+                    item.get(
+                        "hallazgo"
+                    ),
+                    "Sin hallazgo"
+                ),
+
+            "cantidad":
+                item["cantidad"],
         })
 
     return resultado
@@ -540,28 +1464,32 @@ def obtener_cantidad_por_hallazgo(queryset):
 # ============================================================
 
 def obtener_auditorias_por_digitador(queryset):
-    """
-    Estadísticas de auditorías realizadas por cada auditor.
-    """
 
     datos = (
         queryset
-        .exclude(fecha__isnull=True)
+        .exclude(
+            fecha__isnull=True
+        )
         .values(
             "nombre_auditor",
             "fecha"
         )
         .annotate(
+
             total=Count("id"),
 
             cumple=Count(
                 "id",
-                filter=Q(resultado_auditoria="cumple")
+                filter=Q(
+                    resultado_auditoria__iexact="cumple"
+                )
             ),
 
             no_cumple=Count(
                 "id",
-                filter=Q(resultado_auditoria="no_cumple")
+                filter=Q(
+                    resultado_auditoria__iexact="no_cumple"
+                )
             ),
         )
         .order_by(
@@ -570,56 +1498,55 @@ def obtener_auditorias_por_digitador(queryset):
         )
     )
 
-
     resultado = []
 
     for item in datos:
 
-        fecha = item.get("fecha")
+        fecha = item.get(
+            "fecha"
+        )
 
         if not fecha:
             continue
 
         resultado.append({
-            "fecha": fecha.strftime("%Y-%m-%d"),
 
-            "auditor": texto_seguro(
-                item.get("nombre_auditor"),
-                "Sin auditor"
-            ),
+            "fecha":
+                fecha.strftime(
+                    "%Y-%m-%d"
+                ),
 
-            "total": item["total"],
-            "cumple": item["cumple"],
-            "no_cumple": item["no_cumple"],
+            "auditor":
+                texto_seguro(
+                    item.get(
+                        "nombre_auditor"
+                    ),
+                    "Sin auditor"
+                ),
+
+            "total":
+                item["total"],
+
+            "cumple":
+                item["cumple"],
+
+            "no_cumple":
+                item["no_cumple"],
         })
 
     return resultado
 
+
 # ============================================================
-# ERRORES DETALLADOS POR TÉCNICO
+# 8. ERRORES DETALLADOS POR TÉCNICO
 # ============================================================
 
-def obtener_errores_detallados_por_tecnico(queryset):
-    """
-    Obtiene los hallazgos NO CUMPLE agrupados por técnico
-    y posteriormente por el texto exacto del hallazgo.
-
-    Ejemplo:
-
-    Técnico A
-        total: 50
-        hallazgos:
-            Registro fotográfico incompleto: 50
-
-    Técnico B
-        total: 36
-        hallazgos:
-            Registro fotográfico incompleto: 30
-            Troque de válvula: 6
-    """
+def obtener_errores_detallados_por_tecnico(
+    queryset
+):
 
     queryset = queryset.filter(
-        resultado_auditoria="no_cumple"
+        resultado_auditoria__iexact="no_cumple"
     )
 
     datos = (
@@ -642,12 +1569,16 @@ def obtener_errores_detallados_por_tecnico(queryset):
     for item in datos:
 
         tecnico = texto_seguro(
-            item.get("nombre_tecnico"),
+            item.get(
+                "nombre_tecnico"
+            ),
             "Sin técnico"
         )
 
         hallazgo = texto_seguro(
-            item.get("hallazgo"),
+            item.get(
+                "hallazgo"
+            ),
             "Sin hallazgo"
         )
 
@@ -656,20 +1587,32 @@ def obtener_errores_detallados_por_tecnico(queryset):
         if tecnico not in tecnicos:
 
             tecnicos[tecnico] = {
-                "tecnico": tecnico,
-                "total": 0,
-                "hallazgos": []
+
+                "tecnico":
+                    tecnico,
+
+                "total":
+                    0,
+
+                "hallazgos":
+                    []
             }
 
-        tecnicos[tecnico]["total"] += cantidad
+        tecnicos[tecnico]["total"] += \
+            cantidad
 
         tecnicos[tecnico]["hallazgos"].append({
-            "hallazgo": hallazgo,
-            "cantidad": cantidad
+
+            "hallazgo":
+                hallazgo,
+
+            "cantidad":
+                cantidad
         })
 
-    # Convertir a lista y ordenar por total
-    resultado = list(tecnicos.values())
+    resultado = list(
+        tecnicos.values()
+    )
 
     resultado.sort(
         key=lambda x: x["total"],
@@ -678,75 +1621,46 @@ def obtener_errores_detallados_por_tecnico(queryset):
 
     return resultado
 
-def extraer_cedula_nombre_tecnico(nombre):
-    """
-    Extrae la cédula que aparece al final de nombre_tecnico.
 
-    Ejemplo:
-    'Rodriguez Mendez Hector Daniel -79939032'
-    -> '79939032'
-    """
-
-    if not nombre:
-        return ""
-
-    nombre = str(nombre).strip()
-
-    coincidencia = re.search(r"-\s*(\d+)\s*$", nombre)
-
-    if coincidencia:
-        return coincidencia.group(1)
-
-    return ""
+# ============================================================
+# 9. RESULTADO AUDITORÍAS POR TÉCNICO
+# ============================================================
 
 def obtener_resultado_auditorias_tecnico(
     queryset,
     supervisor=""
 ):
-    """
-    Compara los técnicos ACTUALES de carga.Tecnicos
-    contra las auditorías.
 
-    La coincidencia se realiza por la cédula que está
-    al final del campo Auditoria.nombre_tecnico.
+    print("\n")
+    print("=" * 100)
+    print("RESULTADO AUDITORÍAS POR TÉCNICO")
+    print("=" * 100)
 
-    Ejemplo:
+    supervisor = texto_seguro(
+        supervisor
+    )
 
-        Rodriguez Mendez Hector Daniel -79939032
-                                              ↑
-                                           cédula
-
-    Se compara contra:
-
-        Tecnicos.tecnico_cedula = 79939032
-    """
-
-    # =========================================================
-    # 1. TÉCNICOS ACTUALES
-    # =========================================================
-
-    tecnicos_query = (
+    tecnicos_queryset = (
         Tecnicos.objects
         .exclude(
-            tecnico_cedula__isnull=True
+            tecnico_apellido_nombres__isnull=True
         )
         .exclude(
-            tecnico_cedula__exact=""
+            tecnico_apellido_nombres__exact=""
         )
     )
 
-    # =========================================================
-    # 2. FILTRO POR SUPERVISOR
-    # =========================================================
-
     if supervisor:
 
-        tecnicos_query = tecnicos_query.filter(
-            supervisor=supervisor
+        tecnicos_queryset = (
+            tecnicos_queryset
+            .filter(
+                supervisor__iexact=supervisor
+            )
         )
 
-    tecnicos_query = (
-        tecnicos_query
+    tecnicos = list(
+        tecnicos_queryset
         .values(
             "supervisor",
             "tecnico_cedula",
@@ -758,109 +1672,148 @@ def obtener_resultado_auditorias_tecnico(
         )
     )
 
-    # =========================================================
-    # 3. AGRUPAR AUDITORÍAS POR CÉDULA
-    # =========================================================
+    # ========================================================
+    # MAPA DE AUDITORÍAS
+    # ========================================================
 
     auditorias_por_cedula = {}
 
-    auditorias = queryset.values(
-        "nombre_tecnico",
-        "resultado_auditoria",
-        "fecha"
+    auditorias_por_nombre = {}
+
+    auditorias = (
+        queryset
+        .exclude(
+            fecha__isnull=True
+        )
+        .values(
+            "id",
+            "nombre_tecnico",
+            "resultado_auditoria",
+            "fecha"
+        )
     )
 
     for auditoria in auditorias:
 
-        nombre_tecnico = texto_seguro(
-            auditoria.get("nombre_tecnico")
+        nombre_original = texto_seguro(
+            auditoria.get(
+                "nombre_tecnico"
+            )
         )
 
-        # -----------------------------------------------------
-        # SACAR LA CÉDULA DESDE nombre_tecnico
-        # -----------------------------------------------------
-
-        cedula = extraer_cedula_nombre_tecnico(
-            nombre_tecnico
+        cedula = (
+            extraer_cedula_nombre_tecnico(
+                nombre_original
+            )
         )
 
-        if not cedula:
+        nombre_limpio = (
+            obtener_nombre_sin_cedula(
+                nombre_original
+            )
+        )
+
+        nombre_normalizado = (
+            normalizar_texto(
+                nombre_limpio
+            )
+        )
+
+        resultado_auditoria = (
+            texto_seguro(
+                auditoria.get(
+                    "resultado_auditoria"
+                )
+            ).lower()
+        )
+
+        if resultado_auditoria not in (
+            "cumple",
+            "no_cumple"
+        ):
             continue
 
-        # -----------------------------------------------------
-        # CREAR REGISTRO DEL TÉCNICO SI NO EXISTE
-        # -----------------------------------------------------
+        fecha = auditoria.get(
+            "fecha"
+        )
 
-        if cedula not in auditorias_por_cedula:
+        if not fecha:
+            continue
 
-            auditorias_por_cedula[cedula] = {
+        # ----------------------------------------------------
+        # DATOS BASE
+        # ----------------------------------------------------
+
+        clave = cedula or nombre_normalizado
+
+        if not clave:
+            continue
+
+        if clave not in auditorias_por_cedula:
+
+            auditorias_por_cedula[clave] = {
+
                 "total": 0,
-                "no_cumple": 0,
+
                 "cumple": 0,
+
+                "no_cumple": 0,
+
                 "fechas": set(),
             }
 
-        estadisticas = auditorias_por_cedula[cedula]
+        datos = (
+            auditorias_por_cedula[
+                clave
+            ]
+        )
 
-        # -----------------------------------------------------
-        # TOTAL
-        # -----------------------------------------------------
+        datos["total"] += 1
 
-        estadisticas["total"] += 1
+        if resultado_auditoria == "cumple":
 
-        # -----------------------------------------------------
-        # RESULTADO
-        # -----------------------------------------------------
+            datos["cumple"] += 1
 
-        if auditoria.get(
-            "resultado_auditoria"
-        ) == "cumple":
+        else:
 
-            estadisticas["cumple"] += 1
+            datos["no_cumple"] += 1
 
-        elif auditoria.get(
-            "resultado_auditoria"
-        ) == "no_cumple":
+        datos["fechas"].add(
+            fecha
+        )
 
-            estadisticas["no_cumple"] += 1
+        # ----------------------------------------------------
+        # MAPA POR NOMBRE
+        # ----------------------------------------------------
 
-        # -----------------------------------------------------
-        # DÍA AUDITADO
-        # -----------------------------------------------------
+        if nombre_normalizado:
 
-        fecha = auditoria.get("fecha")
+            auditorias_por_nombre[
+                nombre_normalizado
+            ] = datos
 
-        if fecha:
-
-            estadisticas["fechas"].add(
-                fecha
-            )
-
-    # =========================================================
-    # 4. COMPARAR TÉCNICOS ACTUALES
-    #    CONTRA LAS AUDITORÍAS
-    # =========================================================
+    # ========================================================
+    # CREAR RESULTADO
+    # ========================================================
 
     resultado = []
 
-    for tecnico in tecnicos_query:
+    coincidencias = 0
+
+    for tecnico in tecnicos:
 
         supervisor_tecnico = texto_seguro(
-            tecnico.get("supervisor"),
+            tecnico.get(
+                "supervisor"
+            ),
             "Sin supervisor"
         )
 
-        # -----------------------------------------------------
-        # CÉDULA DEL TÉCNICO ACTUAL
-        # -----------------------------------------------------
-
-        cedula = texto_seguro(
-            tecnico.get("tecnico_cedula")
+        cedula = normalizar_cedula(
+            tecnico.get(
+                "tecnico_cedula"
+            )
         )
-
-        # -----------------------------------------------------
-        # NOMBRE ACTUAL
-        # -----------------------------------------------------
 
         nombre = texto_seguro(
             tecnico.get(
@@ -869,37 +1822,71 @@ def obtener_resultado_auditorias_tecnico(
             "Sin técnico"
         )
 
-        # -----------------------------------------------------
-        # BUSCAR SUS AUDITORÍAS
-        # -----------------------------------------------------
-
-        estadisticas = (
-            auditorias_por_cedula.get(
-                cedula
+        nombre_normalizado = (
+            normalizar_texto(
+                nombre
             )
         )
 
-        # =====================================================
-        # TIENE AUDITORÍAS
-        # =====================================================
+        # ----------------------------------------------------
+        # PRIMERA BÚSQUEDA: CÉDULA
+        # ----------------------------------------------------
+
+        estadisticas = None
+
+        if cedula:
+
+            estadisticas = (
+                auditorias_por_cedula.get(
+                    cedula
+                )
+            )
+
+        # ----------------------------------------------------
+        # SEGUNDA BÚSQUEDA: NOMBRE
+        # ----------------------------------------------------
+
+        if not estadisticas:
+
+            estadisticas = (
+                auditorias_por_nombre.get(
+                    nombre_normalizado
+                )
+            )
+
+        # ----------------------------------------------------
+        # CON AUDITORÍAS
+        # ----------------------------------------------------
 
         if estadisticas:
 
-            total = estadisticas["total"]
-            no_cumple = estadisticas["no_cumple"]
-            cumple = estadisticas["cumple"]
+            coincidencias += 1
 
-            # -------------------------------------------------
-            # % ERROR
-            # -------------------------------------------------
+            total = (
+                estadisticas["total"]
+            )
+
+            cumple = (
+                estadisticas["cumple"]
+            )
+
+            no_cumple = (
+                estadisticas["no_cumple"]
+            )
 
             porcentaje_error = (
-                (no_cumple / total) * 100
+
+                (
+                    no_cumple
+                    / total
+                ) * 100
+
                 if total > 0
+
                 else 0
             )
 
-            resultado.append({
+            fila = {
 
                 "supervisor":
                     supervisor_tecnico,
@@ -935,15 +1922,15 @@ def obtener_resultado_auditorias_tecnico(
 
                 "estado":
                     "auditado",
-            })
+            }
 
-        # =====================================================
-        # NO TIENE AUDITORÍAS
-        # =====================================================
+        # ----------------------------------------------------
+        # SIN AUDITORÍAS
+        # ----------------------------------------------------
 
         else:
 
-            resultado.append({
+            fila = {
 
                 "supervisor":
                     supervisor_tecnico,
@@ -974,60 +1961,81 @@ def obtener_resultado_auditorias_tecnico(
 
                 "estado":
                     "falta_auditar",
-            })
+            }
 
-    # =========================================================
-    # 5. ORDEN
-    # =========================================================
+        resultado.append(
+            fila
+        )
+
+    print(
+        "Técnicos encontrados:",
+        len(resultado)
+    )
+
+    print(
+        "Técnicos con auditorías:",
+        coincidencias
+    )
+
+    print(
+        "Técnicos sin auditorías:",
+        len(resultado) - coincidencias
+    )
+
+    # ========================================================
+    # ORDEN
+    # ========================================================
 
     resultado.sort(
+
         key=lambda x: (
+
             x["supervisor"].lower(),
+
             not x["tiene_auditorias"],
+
             -x["porcentaje_error"],
+
             x["tecnico"].lower()
         )
     )
 
+    print("=" * 100)
+    print("\n")
+
     return resultado
 
+
 # ============================================================
-# RESULTADO DE AUDITORÍAS POR DIGITADOR
+# 10. RESULTADO AUDITORÍAS POR DIGITADOR
 # ============================================================
 
-def obtener_resultado_auditorias_digitador(queryset):
-    """
-    Resumen de auditorías realizadas por digitador.
-
-    Columnas:
-        Digitador
-        Técnicos auditados
-        Auditorías realizadas
-        % No Cumple
-        No Cumplen
-        Cumplen
-
-    Orden:
-        Mayor % No Cumple -> menor % No Cumple
-    """
+def obtener_resultado_auditorias_digitador(
+    queryset
+):
 
     datos = (
         queryset
-        .values("nombre_auditor")
+        .values(
+            "nombre_auditor"
+        )
         .annotate(
-            auditorias_realizadas=Count("id"),
+
+            auditorias_realizadas=Count(
+                "id"
+            ),
 
             no_cumplen=Count(
                 "id",
                 filter=Q(
-                    resultado_auditoria="no_cumple"
+                    resultado_auditoria__iexact="no_cumple"
                 )
             ),
 
             cumplen=Count(
                 "id",
                 filter=Q(
-                    resultado_auditoria="cumple"
+                    resultado_auditoria__iexact="cumple"
                 )
             ),
 
@@ -1042,79 +2050,514 @@ def obtener_resultado_auditorias_digitador(queryset):
 
     for item in datos:
 
-        digitador = texto_seguro(
-            item.get("nombre_auditor"),
-            "Sin digitador"
+        total = (
+            item["auditorias_realizadas"]
+            or 0
         )
 
-        total = item["auditorias_realizadas"] or 0
-        no_cumplen = item["no_cumplen"] or 0
-        cumplen = item["cumplen"] or 0
-        tecnicos = item["tecnicos_auditados"] or 0
+        no_cumplen = (
+            item["no_cumplen"]
+            or 0
+        )
 
-        if total > 0:
+        cumplen = (
+            item["cumplen"]
+            or 0
+        )
 
-            porcentaje_no_cumple = (
-                no_cumplen / total
+        tecnicos = (
+            item["tecnicos_auditados"]
+            or 0
+        )
+
+        porcentaje_no_cumple = (
+
+            (
+                no_cumplen
+                / total
             ) * 100
 
-        else:
+            if total > 0
 
-            porcentaje_no_cumple = 0
+            else 0
+        )
 
         resultado.append({
-            "digitador": digitador,
 
-            "tecnicos_auditados": tecnicos,
+            "digitador":
+                texto_seguro(
+                    item.get(
+                        "nombre_auditor"
+                    ),
+                    "Sin digitador"
+                ),
 
-            "auditorias_realizadas": total,
+            "tecnicos_auditados":
+                tecnicos,
 
-            "porcentaje_no_cumple": round(
-                porcentaje_no_cumple,
-                2
-            ),
+            "auditorias_realizadas":
+                total,
 
-            "no_cumplen": no_cumplen,
+            "porcentaje_no_cumple":
+                round(
+                    porcentaje_no_cumple,
+                    2
+                ),
 
-            "cumplen": cumplen,
+            "no_cumplen":
+                no_cumplen,
+
+            "cumplen":
+                cumplen,
         })
 
-    # ========================================================
-    # ORDENAR POR % NO CUMPLE
-    # ========================================================
-
     resultado.sort(
-        key=lambda x: x["porcentaje_no_cumple"],
+
+        key=lambda x:
+            x["porcentaje_no_cumple"],
+
         reverse=True
     )
 
     return resultado
 
-def obtener_cantidad_auditorias_por_auditor(queryset):
+
+# ============================================================
+# 11. CANTIDAD AUDITORÍAS POR AUDITOR
+# ============================================================
+
+def obtener_cantidad_auditorias_por_auditor(
+    queryset
+):
 
     datos = (
         queryset
-        .values("nombre_auditor")
-        .annotate(
-            total=Count("id")
+        .values(
+            "nombre_auditor"
         )
-        .order_by("-total", "nombre_auditor")
+        .annotate(
+
+            total=Count("id"),
+
+            cumple=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria__iexact="cumple"
+                )
+            ),
+
+            no_cumple=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria__iexact="no_cumple"
+                )
+            ),
+        )
+        .order_by(
+            "-total",
+            "nombre_auditor"
+        )
     )
 
     resultado = []
 
     for item in datos:
 
+        total = (
+            item["total"]
+            or 0
+        )
+
+        cumple = (
+            item["cumple"]
+            or 0
+        )
+
+        no_cumple = (
+            item["no_cumple"]
+            or 0
+        )
+
         resultado.append({
-            "auditor": texto_seguro(
-                item.get("nombre_auditor"),
-                "Sin auditor"
-            ),
-            "total": item["total"],
+
+            "auditor":
+                texto_seguro(
+                    item.get(
+                        "nombre_auditor"
+                    ),
+                    "Sin auditor"
+                ),
+
+            "total":
+                total,
+
+            "cumple":
+                cumple,
+
+            "no_cumple":
+                no_cumple,
         })
 
     return resultado
 
+
+# ============================================================
+# 12. RESULTADO DIARIO POR TÉCNICO
+# ============================================================
+
+def obtener_resultado_diario_tecnico(
+    queryset,
+    supervisor=""
+):
+
+    supervisor = texto_seguro(
+        supervisor
+    )
+
+    tecnicos_query = (
+        Tecnicos.objects
+        .exclude(
+            tecnico_apellido_nombres__isnull=True
+        )
+        .exclude(
+            tecnico_apellido_nombres__exact=""
+        )
+    )
+
+    if supervisor:
+
+        tecnicos_query = (
+            tecnicos_query
+            .filter(
+                supervisor__iexact=supervisor
+            )
+        )
+
+    tecnicos_query = (
+        tecnicos_query
+        .values(
+            "supervisor",
+            "tecnico_cedula",
+            "tecnico_apellido_nombres"
+        )
+        .order_by(
+            "supervisor",
+            "tecnico_apellido_nombres"
+        )
+    )
+
+    auditorias = (
+        queryset
+        .exclude(
+            fecha__isnull=True
+        )
+        .values(
+            "nombre_tecnico",
+            "fecha",
+            "resultado_auditoria"
+        )
+        .order_by(
+            "fecha",
+            "nombre_tecnico"
+        )
+    )
+
+    auditorias_por_clave = {}
+
+    dias = set()
+
+    for auditoria in auditorias:
+
+        nombre_original = texto_seguro(
+            auditoria.get(
+                "nombre_tecnico"
+            )
+        )
+
+        cedula = (
+            extraer_cedula_nombre_tecnico(
+                nombre_original
+            )
+        )
+
+        nombre_limpio = (
+            obtener_nombre_sin_cedula(
+                nombre_original
+            )
+        )
+
+        nombre_normalizado = (
+            normalizar_texto(
+                nombre_limpio
+            )
+        )
+
+        clave = cedula or nombre_normalizado
+
+        if not clave:
+            continue
+
+        fecha = auditoria.get(
+            "fecha"
+        )
+
+        if not fecha:
+            continue
+
+        dia = fecha.strftime(
+            "%Y-%m-%d"
+        )
+
+        resultado_auditoria = (
+            texto_seguro(
+                auditoria.get(
+                    "resultado_auditoria"
+                )
+            ).lower()
+        )
+
+        if resultado_auditoria not in (
+            "cumple",
+            "no_cumple"
+        ):
+            continue
+
+        dias.add(
+            dia
+        )
+
+        if clave not in auditorias_por_clave:
+
+            auditorias_por_clave[clave] = {
+                "dias": {}
+            }
+
+        datos_tecnico = (
+            auditorias_por_clave[
+                clave
+            ]
+        )
+
+        if resultado_auditoria == "cumple":
+
+            valor = "OK"
+
+        else:
+
+            valor = 1
+
+        if dia not in datos_tecnico["dias"]:
+
+            datos_tecnico["dias"][dia] = valor
+
+        else:
+
+            anterior = (
+                datos_tecnico["dias"][dia]
+            )
+
+            if (
+                anterior == "OK"
+                and valor == "OK"
+            ):
+
+                datos_tecnico["dias"][dia] = "OK"
+
+            elif (
+                anterior == "OK"
+                and isinstance(
+                    valor,
+                    int
+                )
+            ):
+
+                datos_tecnico["dias"][dia] = valor
+
+            elif (
+                isinstance(
+                    anterior,
+                    int
+                )
+                and valor == "OK"
+            ):
+
+                datos_tecnico["dias"][dia] = anterior
+
+            elif (
+                isinstance(
+                    anterior,
+                    int
+                )
+                and isinstance(
+                    valor,
+                    int
+                )
+            ):
+
+                datos_tecnico["dias"][dia] = (
+                    anterior + valor
+                )
+
+    resultado = []
+
+    for tecnico in tecnicos_query:
+
+        supervisor_tecnico = texto_seguro(
+            tecnico.get(
+                "supervisor"
+            ),
+            "Sin supervisor"
+        )
+
+        cedula = normalizar_cedula(
+            tecnico.get(
+                "tecnico_cedula"
+            )
+        )
+
+        nombre = texto_seguro(
+            tecnico.get(
+                "tecnico_apellido_nombres"
+            ),
+            "Sin técnico"
+        )
+
+        nombre_normalizado = (
+            normalizar_texto(
+                nombre
+            )
+        )
+
+        # ----------------------------------------------------
+        # BUSCAR POR CÉDULA
+        # ----------------------------------------------------
+
+        datos = None
+
+        if cedula:
+
+            datos = (
+                auditorias_por_clave.get(
+                    cedula
+                )
+            )
+
+        # ----------------------------------------------------
+        # FALLBACK POR NOMBRE
+        # ----------------------------------------------------
+
+        if not datos:
+
+            datos = (
+                auditorias_por_clave.get(
+                    nombre_normalizado
+                )
+            )
+
+        if not datos:
+
+            datos = {
+                "dias": {}
+            }
+
+        dias_tecnico = datos["dias"]
+
+        errores = 0
+
+        auditados = 0
+
+        for valor in dias_tecnico.values():
+
+            if valor == "OK":
+
+                auditados += 1
+
+            elif isinstance(
+                valor,
+                int
+            ):
+
+                auditados += 1
+
+                errores += valor
+
+        if auditados == 0:
+
+            estado = "Sin auditorías"
+
+        elif errores == 0:
+
+            estado = "Todo bien"
+
+        elif errores >= 5:
+
+            estado = "Crítico"
+
+        else:
+
+            estado = "Mejora"
+
+        if errores == 0:
+
+            accion = "Todo bien"
+
+        else:
+
+            accion = "Volver a auditar"
+
+        resultado.append({
+
+            "supervisor":
+                supervisor_tecnico,
+
+            "tecnico":
+                nombre,
+
+            "cedula":
+                cedula,
+
+            "dias":
+                dias_tecnico,
+
+            "total":
+                auditados,
+
+            "auditados":
+                auditados,
+
+            "errores":
+                errores,
+
+            "estado":
+                estado,
+
+            "accion":
+                accion,
+
+            "tiene_auditorias":
+                auditados > 0,
+        })
+
+    resultado.sort(
+
+        key=lambda x: (
+
+            x["supervisor"].lower(),
+
+            -x["errores"],
+
+            x["tecnico"].lower()
+        )
+    )
+
+    return {
+
+        "dias":
+            sorted(dias),
+
+        "tecnicos":
+            resultado,
+    }
 
 
 # ============================================================
@@ -1123,110 +2566,218 @@ def obtener_cantidad_auditorias_por_auditor(queryset):
 
 def estadisticas_auditorias(request):
 
-    filtros = obtener_filtros(request)
+    print("\n")
+    print("#" * 100)
+    print("# INICIO CONTEXT PROCESSOR ESTADISTICAS AUDITORIAS")
+    print("#" * 100)
+
+    # ========================================================
+    # FILTROS
+    # ========================================================
+
+    filtros = obtener_filtros(
+        request
+    )
+
+    # ========================================================
+    # QUERYSET BASE
+    # ========================================================
 
     queryset = Auditoria.objects.all()
+
+    print(
+        "Auditorías totales en BD:",
+        queryset.count()
+    )
+
+    # ========================================================
+    # APLICAR FILTROS
+    # ========================================================
 
     queryset = aplicar_filtros(
         queryset,
         filtros
     )
 
+    # ========================================================
+    # DEBUG FINAL
+    # ========================================================
+
+    print("\n")
+    print("=" * 100)
+    print("QUERYSET FINAL")
+    print("=" * 100)
+
+    print(
+        "Filtros:",
+        filtros
+    )
+
+    print(
+        "Total final:",
+        queryset.count()
+    )
+
+    ejemplos = (
+        queryset
+        .values(
+            "id",
+            "fecha",
+            "nombre_tecnico",
+            "tipo_operacion",
+            "resultado_auditoria"
+        )[:10]
+    )
+
+    for item in ejemplos:
+
+        nombre_tecnico = texto_seguro(
+            item.get(
+                "nombre_tecnico"
+            )
+        )
+
+        print(
+            "ID:",
+            item["id"],
+            "| Fecha:",
+            item["fecha"],
+            "| Técnico:",
+            repr(nombre_tecnico),
+            "| Cédula técnico extraída:",
+            extraer_cedula_nombre_tecnico(
+                nombre_tecnico
+            ),
+            "| Operación:",
+            item["tipo_operacion"],
+            "| Resultado:",
+            item["resultado_auditoria"]
+        )
+
+    print("=" * 100)
+
+    # ========================================================
+    # OPCIONES
+    # ========================================================
+
     opciones = obtener_opciones_filtros()
 
-    # ====================================================
-    # TOTALES POR TIPO DE OPERACIÓN
-    # ====================================================
+    # ========================================================
+    # TOTALES
+    # ========================================================
 
     total_dc00 = queryset.filter(
-        tipo_operacion="DC00"
+        tipo_operacion__iexact="DC00"
     ).count()
 
     total_rc00 = queryset.filter(
-        tipo_operacion="RC00"
+        tipo_operacion__iexact="RC00"
     ).count()
 
     total_zvcl = queryset.filter(
-        tipo_operacion="ZVCL"
+        tipo_operacion__iexact="ZVCL"
     ).count()
-    
+
     total_operaciones = (
         total_dc00
         + total_rc00
         + total_zvcl
     )
 
-    return {
+    # ========================================================
+    # CONTEXTO
+    # ========================================================
 
-        # ====================================================
-        # FILTROS
-        # ====================================================
+    contexto = {
 
-        "filtros_estadisticas": filtros,
+        "filtros_estadisticas":
+            filtros,
 
         **opciones,
 
-        # ====================================================
-        # TOTALES DE OPERACIONES
-        # ====================================================
+        "Suspensiones":
+            total_dc00,
 
-        "Suspensiones": total_dc00,
-        "Reconexiones": total_rc00,
-        "Zvcl": total_zvcl,
-        "total_operaciones": total_operaciones,
+        "Reconexiones":
+            total_rc00,
 
-        # ====================================================
-        # ESTADÍSTICAS
-        # ====================================================
+        "Zvcl":
+            total_zvcl,
 
-        "datos_operaciones": obtener_datos_operaciones(
-            queryset
-        ),
+        "total_operaciones":
+            total_operaciones,
 
-        "Auditoria_Dia": obtener_auditorias_dia(
-            queryset
-        ),
+        "datos_operaciones":
+            obtener_datos_operaciones(
+                queryset
+            ),
 
-        "Datos_No_Cumplen": obtener_datos_no_cumplen(
-            queryset
-        ),
+        "Auditoria_Dia":
+            obtener_auditorias_dia(
+                queryset
+            ),
 
-        "Estadisticas_Tecnico": obtener_hallazgos_tecnico(
-            queryset
-        ),
+        "Datos_No_Cumplen":
+            obtener_datos_no_cumplen(
+                queryset
+            ),
 
-        "Cantidad_Por_Hallazgo": obtener_cantidad_por_hallazgo(
-            queryset
-        ),
+        "Estadisticas_Tecnico":
+            obtener_hallazgos_tecnico(
+                queryset
+            ),
 
-        "Auditorias_Por_Digitador": obtener_auditorias_por_digitador(
-            queryset
-        ),
-        
-        "Errores_Detallados_Tecnico": obtener_errores_detallados_por_tecnico(
-            queryset
-        ),
-        
-        "Errores_Por_Tecnicos": obtener_errores_por_tecnico(
-            queryset
-        ),
-        
+        "Cantidad_Por_Hallazgo":
+            obtener_cantidad_por_hallazgo(
+                queryset
+            ),
+
+        "Auditorias_Por_Digitador":
+            obtener_auditorias_por_digitador(
+                queryset
+            ),
+
+        "Errores_Detallados_Tecnico":
+            obtener_errores_detallados_por_tecnico(
+                queryset
+            ),
+
+        "Errores_Por_Tecnicos":
+            obtener_errores_por_tecnico(
+                queryset
+            ),
+
         "Resultado_Auditorias_Tecnico":
-        obtener_resultado_auditorias_tecnico(
-            queryset,
-            filtros["supervisor"]
-        ),
+            obtener_resultado_auditorias_tecnico(
+                queryset,
+                filtros["supervisor"]
+            ),
 
-        
         "Resultado_Auditorias_Digitador":
-        obtener_resultado_auditorias_digitador(
-            queryset
-        ), 
-        
+            obtener_resultado_auditorias_digitador(
+                queryset
+            ),
+
         "Cantidad_Auditorias_Auditor":
-        obtener_cantidad_auditorias_por_auditor(
-            queryset
-        ),
+            obtener_cantidad_auditorias_por_auditor(
+                queryset
+            ),
 
-
+        "Resultado_Diario_Tecnico":
+            obtener_resultado_diario_tecnico(
+                queryset,
+                filtros["supervisor"]
+            ),
     }
+
+    print("\n")
+    print("#" * 100)
+    print("# FIN CONTEXT PROCESSOR")
+    print(
+        "# Auditorías finales:",
+        queryset.count()
+    )
+    print("#" * 100)
+    print("\n")
+
+    return contexto

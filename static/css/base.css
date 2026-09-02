@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
+    background-color: #ffffff;
 }
 
 .layout {
@@ -12,11 +12,14 @@ body {
 .sidebar {
     width: 170px;
     padding: 25px;
-    background: linear-gradient(180deg,#1f2937,#111827);
+    background: linear-gradient(180deg,#aac5d3,#0a1d38);
     color: white;
     box-shadow: 4px 0 15px rgba(0,0,0,0.2);
 }
 
+.sidebar h2 {
+    color: black;
+}
 .logo {
     width: 100px;
     display: block;
@@ -46,7 +49,7 @@ body {
 .sidebar a {
     display: block;
     padding: 12px 15px;
-    color: white;
+    color: rgb(7, 7, 7);
     text-decoration: none;
     font-size: 17px;
     border-radius: 10px;
@@ -54,7 +57,7 @@ body {
 }
 
 .sidebar a:hover {
-    background-color: #2b3547;
+    background-color: rgba(20, 68, 88, 0.15);
     transform: translateX(5px);
     padding-left: 20px;
 }

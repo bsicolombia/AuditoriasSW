@@ -18,6 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
 
+    // =====================================================
+    // VALIDAR ELEMENTOS
+    // =====================================================
+
     if (!elemento || !canvas) {
 
         console.error(
@@ -25,14 +29,15 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         return;
+
     }
 
 
     // =====================================================
-    // JSON
+    // LEER JSON
     // =====================================================
 
-    let datos;
+    let datos = [];
 
     try {
 
@@ -48,10 +53,14 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         return;
+
     }
 
 
-    if (!Array.isArray(datos) || datos.length === 0) {
+    if (
+        !Array.isArray(datos) ||
+        datos.length === 0
+    ) {
 
         console.warn(
             "⚠️ No existen datos"
@@ -65,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         return;
+
     }
 
 
@@ -95,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // DATOS DE LA GRÁFICA
+    // DATOS
     // =====================================================
 
     const labels = [];
@@ -166,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
             Array.isArray(
                 tecnico.hallazgos
             )
-                ? tecnico.hallazgos
+                ? [...tecnico.hallazgos]
                 : [];
 
 
@@ -255,7 +265,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ALTURA
     // =====================================================
 
-    const alturaPorFila = 45;
+    const alturaPorFila = 52;
 
     const alturaMinima = 500;
 
@@ -267,8 +277,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alturaMaxima,
             Math.max(
                 alturaMinima,
-                labels.length *
-                alturaPorFila
+                labels.length * alturaPorFila
             )
         );
 
@@ -281,6 +290,92 @@ document.addEventListener("DOMContentLoaded", function () {
 
     canvas.style.display =
         "block";
+
+
+    // =====================================================
+    // FUNCIÓN PARA NOMBRES EN 2 LÍNEAS
+    // =====================================================
+
+    function dividirTexto(texto, maximo) {
+
+        texto =
+            String(texto || "").trim();
+
+
+        if (
+            texto.length <= maximo
+        ) {
+
+            return texto;
+
+        }
+
+
+        // -----------------------------------------------
+        // Buscar espacio cercano al centro
+        // -----------------------------------------------
+
+        const limite =
+            Math.min(
+                maximo,
+                texto.length
+            );
+
+
+        let posicion =
+            texto.lastIndexOf(
+                " ",
+                limite
+            );
+
+
+        if (
+            posicion < 10
+        ) {
+
+            posicion =
+                texto.indexOf(
+                    " ",
+                    limite
+                );
+
+        }
+
+
+        if (
+            posicion === -1
+        ) {
+
+            return [
+
+                texto.substring(
+                    0,
+                    maximo
+                ),
+
+                texto.substring(
+                    maximo
+                )
+
+            ];
+
+        }
+
+
+        return [
+
+            texto.substring(
+                0,
+                posicion
+            ).trim(),
+
+            texto.substring(
+                posicion + 1
+            ).trim()
+
+        ];
+
+    }
 
 
     // =====================================================
@@ -335,6 +430,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             );
 
 
+                        // ---------------------------------
+                        // FUENTE
+                        // ---------------------------------
+
                         ctx.font =
                             tipos[index] === "tecnico"
                                 ? "800 11px Arial"
@@ -347,23 +446,27 @@ document.addEventListener("DOMContentLoaded", function () {
                             ).width;
 
 
-                        const x =
-                            barra.x + 9;
+                        // ---------------------------------
+                        // POSICIÓN
+                        // ---------------------------------
 
+                        const x =
+                            barra.x + 8;
 
                         const y =
                             barra.y;
 
 
-                        // -------------------------------------
+                        // ---------------------------------
                         // FONDO DEL NÚMERO
-                        // -------------------------------------
+                        // ---------------------------------
 
                         ctx.fillStyle =
                             "#ffffff";
 
 
                         ctx.beginPath();
+
 
                         ctx.roundRect(
                             x,
@@ -373,27 +476,30 @@ document.addEventListener("DOMContentLoaded", function () {
                             5
                         );
 
+
                         ctx.fill();
 
 
-                        // -------------------------------------
+                        // ---------------------------------
                         // BORDE
-                        // -------------------------------------
+                        // ---------------------------------
 
                         ctx.strokeStyle =
                             tipos[index] === "tecnico"
                                 ? "#bfdbfe"
                                 : "#e2e8f0";
 
+
                         ctx.lineWidth =
                             1;
+
 
                         ctx.stroke();
 
 
-                        // -------------------------------------
+                        // ---------------------------------
                         // NÚMERO
-                        // -------------------------------------
+                        // ---------------------------------
 
                         ctx.fillStyle =
                             tipos[index] === "tecnico"
@@ -451,16 +557,16 @@ document.addEventListener("DOMContentLoaded", function () {
                         colores,
 
                     borderRadius:
-                        8,
+                        7,
 
                     borderSkipped:
                         false,
 
                     barThickness:
-                        20,
+                        22,
 
                     maxBarThickness:
-                        20
+                        22
 
                 }
 
@@ -515,25 +621,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 padding: {
 
                     top:
-                        10,
+                        15,
 
                     right:
-                        80,
+                        90,
 
                     bottom:
                         25,
 
                     left:
-                        5
+                        10
 
                 }
 
             },
 
 
-            // =================================================
+            // =====================================================
             // EJES
-            // =================================================
+            // =====================================================
 
             scales: {
 
@@ -543,7 +649,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         true,
 
                     grace:
-                        "15%",
+                        "18%",
 
 
                     border: {
@@ -625,11 +731,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
 
 
+                    // =================================================
+                    // ESPACIO PARA LOS NOMBRES
+                    // =================================================
+
                     afterFit:
                         function (scale) {
 
                             scale.width =
-                                340;
+                                window.innerWidth <= 600
+                                    ? 190
+                                    : 300;
 
                         },
 
@@ -640,7 +752,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             "#172554",
 
                         padding:
-                            12,
+                            10,
 
                         autoSkip:
                             false,
@@ -670,6 +782,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             },
 
 
+                        // =================================================
+                        // TEXTO DEL EJE Y
+                        // =================================================
+
                         callback:
                             function (value) {
 
@@ -686,9 +802,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                 }
 
 
-                                // ---------------------------------
+                                // -----------------------------------------
                                 // HALLAZGO
-                                // ---------------------------------
+                                // -----------------------------------------
 
                                 if (
                                     tipos[value] ===
@@ -700,32 +816,16 @@ document.addEventListener("DOMContentLoaded", function () {
                                 }
 
 
-                                // ---------------------------------
+                                // -----------------------------------------
                                 // TÉCNICO
-                                // ---------------------------------
+                                // -----------------------------------------
 
-                                if (
-                                    texto.length > 42
-                                ) {
-
-                                    return [
-
-                                        texto.substring(
-                                            0,
-                                            42
-                                        ),
-
-                                        texto.substring(
-                                            42,
-                                            84
-                                        )
-
-                                    ];
-
-                                }
-
-
-                                return texto;
+                                return dividirTexto(
+                                    texto,
+                                    window.innerWidth <= 600
+                                        ? 24
+                                        : 38
+                                );
 
                             }
 
@@ -741,7 +841,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // =====================================================
 
             plugins: {
-
 
                 // =================================================
                 // LEYENDA
@@ -790,7 +889,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                     callbacks: {
-
 
                         title:
                             function (items) {

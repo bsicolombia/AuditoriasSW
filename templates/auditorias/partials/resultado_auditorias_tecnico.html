@@ -2,7 +2,7 @@
 
     <div class="resultado-tecnico-header">
 
-        <div>
+        <div class="resultado-tecnico-titulo">
 
             <h2>
                 Resultado de Auditorías por Técnico
@@ -13,115 +13,234 @@
                 cumplimiento y días auditados.
             </p>
 
-            <div class="resumen-comparacion">
+        </div>
 
-                <div class="resumen-comparacion-item">
 
-                    <span>
-                        Técnicos a cargo
-                    </span>
+        <div class="resumen-comparacion">
 
-                    <strong id="totalTecnicos">
-                        0
-                    </strong>
+            <div class="resumen-comparacion-item">
 
-                </div>
+                <span>
+                    Técnicos Contratados
+                </span>
 
-                <div class="resumen-comparacion-item">
-
-                    <span>
-                        Técnicos auditados
-                    </span>
-
-                    <strong
-                        id="totalTecnicosAuditados"
-                        class="verde"
-                    >
-                        0
-                    </strong>
-
-                </div>
-
-                <div class="resumen-comparacion-item">
-
-                    <span>
-                        Técnicos sin auditoría
-                    </span>
-
-                    <strong
-                        id="totalTecnicosSinAuditoria"
-                        class="rojo"
-                    >
-                        0
-                    </strong>
-
-                </div>
-
-                <div class="resumen-comparacion-item">
-
-                    <span>
-                        Cobertura
-                    </span>
-
-                    <strong id="porcentajeCobertura">
-                        0%
-                    </strong>
-
-                </div>
+                <strong id="totalTecnicos">
+                    0
+                </strong>
 
             </div>
 
+
+            <div class="resumen-comparacion-item resumen-verde">
+
+                <span>
+                    Técnicos auditados
+                </span>
+
+                <strong
+                    id="totalTecnicosAuditados"
+                    class="verde"
+                >
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumen-comparacion-item resumen-verde">
+
+                <span>
+                    % Auditados
+                </span>
+
+                <strong
+                    id="porcentajeCobertura"
+                    class="verde"
+                >
+                    0%
+                </strong>
+
+            </div>
+
+
+            <div class="resumen-comparacion-item resumen-rojo">
+
+                <span>
+                    Técnicos sin auditoría
+                </span>
+
+                <strong
+                    id="totalTecnicosSinAuditoria"
+                    class="rojo"
+                >
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumen-comparacion-item resumen-rojo">
+
+                <span>
+                    % sin auditar
+                </span>
+
+                <strong
+                    id="porcentajeTecnicosSinAuditoria"
+                    class="rojo"
+                >
+                    0%
+                </strong>
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- ============================================== -->
-    <!-- BOTONES DE VISTA -->
-    <!-- ============================================== -->
-
-    <div class="resultado-tecnico-controles">
-
-        <button
-            type="button"
-            id="btnVerTodosTecnicos"
-            class="btn-vista activo"
-        >
-            👥 Todos los técnicos
-        </button>
-
-        <button
-            type="button"
-            id="btnVerSinAuditorias"
-            class="btn-vista btn-sin-auditorias"
-        >
-            ⚠️ Técnicos sin auditorías
-            <span id="contadorSinAuditorias">
-                0
-            </span>
-        </button>
-
-    </div>
-
-
-    <!-- ============================================== -->
-    <!-- TABLA -->
-    <!-- ============================================== -->
-
     <div class="tabla-responsive">
 
         <table class="tabla-resultado-tecnico">
 
+            <colgroup>
+
+                <col style="width:16%">
+                <col style="width:17%">
+                <col style="width:11%">
+                <col style="width:12%">
+                <col style="width:10%">
+                <col style="width:11%">
+                <col style="width:11%">
+                <col style="width:12%">
+
+            </colgroup>
+
+
             <thead>
 
-                <tr>
+                <tr class="fila-ordenamiento">
 
-                    <th>Supervisor</th>
+                    <th
+                        colspan="3"
+                        class="th-controles"
+                    >
 
-                    <th>Técnico</th>
+                        <div class="resultado-tecnico-controles">
 
-                    <th>Cédula</th>
+                            <button
+                                type="button"
+                                id="btnVerTodosTecnicos"
+                                class="btn-vista activo"
+                            >
+                                👥 Todos los técnicos
+                            </button>
+
+
+                            <button
+                                type="button"
+                                id="btnVerSinAuditorias"
+                                class="btn-vista btn-sin-auditorias"
+                            >
+
+                                ⚠️ Técnicos sin auditorías
+
+                                <span id="contadorSinAuditorias">
+                                    0
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </th>
+
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden"
+                            data-orden="total"
+                            id="ordenTotal"
+                        >
+                            N° Auditorías
+                        </button>
+
+                    </th>
+
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden activo"
+                            data-orden="porcentaje_error"
+                            id="ordenError"
+                        >
+                            % Error
+                        </button>
+
+                    </th>
+
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden"
+                            data-orden="no_cumple"
+                            id="ordenNoCumple"
+                        >
+                            No Cumple
+                        </button>
+
+                    </th>
+
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden"
+                            data-orden="cumple"
+                            id="ordenCumple"
+                        >
+                            Cumple
+                        </button>
+
+                    </th>
+
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden"
+                            data-orden="dias_auditados"
+                            id="ordenDias"
+                        >
+                            Días Auditados
+                        </button>
+
+                    </th>
+
+                </tr>
+
+
+                <tr class="fila-encabezados">
+
+                    <th>
+                        Supervisor
+                    </th>
+
+                    <th>
+                        Técnico
+                    </th>
+
+                    <th>
+                        Cédula
+                    </th>
 
                     <th>
                         N° Auditorías
@@ -147,7 +266,9 @@
 
             </thead>
 
+
             <tbody id="tablaResultadoAuditoriasTecnico">
+
             </tbody>
 
         </table>
@@ -157,138 +278,1443 @@
 </div>
 
 
+<script>
+
+(function () {
+
+    "use strict";
+
+
+    /* ============================================================
+       ESTADO GLOBAL DE LA TABLA
+       ============================================================ */
+
+    window.estadoResultadoTecnicos =
+        window.estadoResultadoTecnicos || {
+
+            orden:
+                "porcentaje_error",
+
+            vista:
+                "todos"
+
+        };
+
+
+    /* ============================================================
+       OBTENER DATOS GLOBALES
+       ============================================================ */
+
+    function obtenerDatosTecnicos() {
+
+        const datos =
+            window.Resultado_Auditorias_Tecnico;
+
+
+        if (Array.isArray(datos)) {
+
+            return datos;
+
+        }
+
+
+        if (
+            datos &&
+            Array.isArray(datos.data)
+        ) {
+
+            return datos.data;
+
+        }
+
+
+        if (
+            datos &&
+            Array.isArray(datos.resultado)
+        ) {
+
+            return datos.resultado;
+
+        }
+
+
+        if (
+            datos &&
+            Array.isArray(datos.datos)
+        ) {
+
+            return datos.datos;
+
+        }
+
+
+        return [];
+
+    }
+
+
+    window.obtenerDatosTecnicos =
+        obtenerDatosTecnicos;
+
+
+    /* ============================================================
+       CONVERTIR A NÚMERO
+       ============================================================ */
+
+    function numero(valor) {
+
+        if (
+            valor === null ||
+            valor === undefined ||
+            valor === ""
+        ) {
+
+            return 0;
+
+        }
+
+
+        if (
+            typeof valor === "number"
+        ) {
+
+            return Number.isFinite(valor)
+                ? valor
+                : 0;
+
+        }
+
+
+        let valorLimpio =
+            String(valor)
+                .trim()
+                .replace("%", "")
+                .replace(/\s/g, "");
+
+
+        if (
+            valorLimpio.includes(",") &&
+            valorLimpio.includes(".")
+        ) {
+
+            valorLimpio =
+                valorLimpio
+                    .replace(/\./g, "")
+                    .replace(",", ".");
+
+        }
+        else if (
+            valorLimpio.includes(",")
+        ) {
+
+            valorLimpio =
+                valorLimpio.replace(",", ".");
+
+        }
+
+
+        const resultado =
+            Number(valorLimpio);
+
+
+        return Number.isFinite(resultado)
+            ? resultado
+            : 0;
+
+    }
+
+
+    window.numeroResultadoTecnicos =
+        numero;
+
+
+    /* ============================================================
+       TEXTO
+       ============================================================ */
+
+    function texto(valor, defecto) {
+
+        if (
+            valor === null ||
+            valor === undefined ||
+            String(valor).trim() === ""
+        ) {
+
+            return defecto || "";
+
+        }
+
+
+        return String(valor);
+
+    }
+
+
+    /* ============================================================
+       ESCAPAR HTML
+       ============================================================ */
+
+    function escaparHTML(valor) {
+
+        return String(valor)
+
+            .replace(/&/g, "&amp;")
+
+            .replace(/</g, "&lt;")
+
+            .replace(/>/g, "&gt;")
+
+            .replace(/"/g, "&quot;")
+
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* ============================================================
+       TOTAL AUDITORÍAS
+       ============================================================ */
+
+    function obtenerTotal(item) {
+
+        return numero(
+
+            item.total ??
+            item.total_auditorias ??
+            item.numero_auditorias ??
+            item.n_auditorias ??
+            item.auditorias ??
+            item.cantidad_auditorias ??
+            0
+
+        );
+
+    }
+
+
+    /* ============================================================
+       PORCENTAJE ERROR
+       ============================================================ */
+
+    function obtenerError(item) {
+
+        return numero(
+
+            item.porcentaje_error ??
+            item.porcentajeError ??
+            item.error_porcentaje ??
+            item.error ??
+            0
+
+        );
+
+    }
+
+
+    /* ============================================================
+       NO CUMPLE
+       ============================================================ */
+
+    function obtenerNoCumple(item) {
+
+        return numero(
+
+            item.no_cumple ??
+            item.noCumple ??
+            item.total_no_cumple ??
+            item.totalNoCumple ??
+            item.cantidad_no_cumple ??
+            0
+
+        );
+
+    }
+
+
+    /* ============================================================
+       CUMPLE
+       ============================================================ */
+
+    function obtenerCumple(item) {
+
+        return numero(
+
+            item.cumple ??
+            item.total_cumple ??
+            item.totalCumple ??
+            item.cantidad_cumple ??
+            0
+
+        );
+
+    }
+
+
+    /* ============================================================
+       DÍAS
+       ============================================================ */
+
+    function obtenerDias(item) {
+
+        return numero(
+
+            item.dias_auditados ??
+            item.diasAuditados ??
+            item.dias_auditados_total ??
+            item.dias ??
+            0
+
+        );
+
+    }
+
+
+    /* ============================================================
+       SUPERVISOR
+       ============================================================ */
+
+    function obtenerSupervisor(item) {
+
+        return texto(
+
+            item.supervisor ??
+            item.nombre_supervisor ??
+            item.supervisor_nombre ??
+            item.nombreSupervisor,
+
+            "Sin supervisor"
+
+        );
+
+    }
+
+
+    /* ============================================================
+       TÉCNICO
+       ============================================================ */
+
+    function obtenerTecnico(item) {
+
+        return texto(
+
+            item.tecnico ??
+            item.nombre_tecnico ??
+            item.tecnico_nombre ??
+            item.nombreTecnico ??
+            item.nombre,
+
+            "Sin nombre"
+
+        );
+
+    }
+
+
+    /* ============================================================
+       CÉDULA
+       ============================================================ */
+
+    function obtenerCedula(item) {
+
+        return texto(
+
+            item.cedula ??
+            item.documento ??
+            item.identificacion ??
+            item.identificacion_tecnico ??
+            item.cedula_tecnico,
+
+            "N/A"
+
+        );
+
+    }
+
+
+    /* ============================================================
+       TIENE AUDITORÍAS
+       ============================================================ */
+
+    function tieneAuditorias(item) {
+
+        const valor =
+            item.tiene_auditorias ??
+            item.tieneAuditorias;
+
+
+        if (
+            valor === true ||
+            valor === 1 ||
+            valor === "1" ||
+            valor === "true" ||
+            valor === "True" ||
+            valor === "TRUE" ||
+            valor === "SI" ||
+            valor === "Si" ||
+            valor === "Sí" ||
+            valor === "sí"
+        ) {
+
+            return true;
+
+        }
+
+
+        return obtenerTotal(item) > 0;
+
+    }
+
+
+    /* ============================================================
+       FORMATEAR NÚMERO
+       ============================================================ */
+
+    function formatearNumero(valor) {
+
+        return numero(valor).toLocaleString(
+            "es-CO"
+        );
+
+    }
+
+
+    /* ============================================================
+       FORMATEAR PORCENTAJE
+       ============================================================ */
+
+    function formatearPorcentaje(valor) {
+
+        return numero(valor)
+            .toFixed(2)
+            .replace(/\.00$/, "")
+            .replace(/(\.\d)0$/, "$1")
+            + "%";
+
+    }
+
+
+    /* ============================================================
+       ACTUALIZAR RESUMEN
+       ============================================================ */
+
+    function actualizarResumen() {
+
+        const datos =
+            obtenerDatosTecnicos();
+
+
+        const totalTecnicos =
+            datos.length;
+
+
+        const totalAuditados =
+            datos.filter(function (item) {
+
+                return tieneAuditorias(item);
+
+            }).length;
+
+
+        const totalSinAuditoria =
+            totalTecnicos -
+            totalAuditados;
+
+
+        const cobertura =
+            totalTecnicos > 0
+
+                ? (
+                    totalAuditados /
+                    totalTecnicos
+                ) * 100
+
+                : 0;
+
+
+        const porcentajeSinAuditoria =
+            totalTecnicos > 0
+
+                ? (
+                    totalSinAuditoria /
+                    totalTecnicos
+                ) * 100
+
+                : 0;
+
+
+        const elementos = {
+
+            total:
+                document.getElementById(
+                    "totalTecnicos"
+                ),
+
+            auditados:
+                document.getElementById(
+                    "totalTecnicosAuditados"
+                ),
+
+            cobertura:
+                document.getElementById(
+                    "porcentajeCobertura"
+                ),
+
+            sinAuditoria:
+                document.getElementById(
+                    "totalTecnicosSinAuditoria"
+                ),
+
+            porcentajeSin:
+                document.getElementById(
+                    "porcentajeTecnicosSinAuditoria"
+                ),
+
+            contador:
+                document.getElementById(
+                    "contadorSinAuditorias"
+                )
+
+        };
+
+
+        if (elementos.total) {
+
+            elementos.total.textContent =
+                formatearNumero(
+                    totalTecnicos
+                );
+
+        }
+
+
+        if (elementos.auditados) {
+
+            elementos.auditados.textContent =
+                formatearNumero(
+                    totalAuditados
+                );
+
+        }
+
+
+        if (elementos.cobertura) {
+
+            elementos.cobertura.textContent =
+                formatearPorcentaje(
+                    cobertura
+                );
+
+        }
+
+
+        if (elementos.sinAuditoria) {
+
+            elementos.sinAuditoria.textContent =
+                formatearNumero(
+                    totalSinAuditoria
+                );
+
+        }
+
+
+        if (elementos.porcentajeSin) {
+
+            elementos.porcentajeSin.textContent =
+                formatearPorcentaje(
+                    porcentajeSinAuditoria
+                );
+
+        }
+
+
+        if (elementos.contador) {
+
+            elementos.contador.textContent =
+                formatearNumero(
+                    totalSinAuditoria
+                );
+
+        }
+
+
+        return {
+
+            totalTecnicos:
+                totalTecnicos,
+
+            totalAuditados:
+                totalAuditados,
+
+            totalSinAuditoria:
+                totalSinAuditoria,
+
+            cobertura:
+                cobertura,
+
+            porcentajeSinAuditoria:
+                porcentajeSinAuditoria
+
+        };
+
+    }
+
+
+    window.obtenerResumenTecnicos =
+        actualizarResumen;
+
+
+    /* ============================================================
+       VALOR PARA ORDENAMIENTO
+       ============================================================ */
+
+    function obtenerValorOrden(item, campo) {
+
+        switch (campo) {
+
+            case "total":
+
+                return obtenerTotal(item);
+
+
+            case "porcentaje_error":
+
+                return obtenerError(item);
+
+
+            case "no_cumple":
+
+                return obtenerNoCumple(item);
+
+
+            case "cumple":
+
+                return obtenerCumple(item);
+
+
+            case "dias_auditados":
+
+                return obtenerDias(item);
+
+
+            default:
+
+                return 0;
+
+        }
+
+    }
+
+
+    /* ============================================================
+       BOTONES DE ORDEN
+       ============================================================ */
+
+    function actualizarBotonesOrden() {
+
+        document
+            .querySelectorAll(
+                ".resultado-tecnico-card .btn-orden"
+            )
+            .forEach(function (boton) {
+
+                boton.classList.toggle(
+
+                    "activo",
+
+                    boton.dataset.orden ===
+                    window.estadoResultadoTecnicos.orden
+
+                );
+
+            });
+
+    }
+
+
+    /* ============================================================
+       BOTONES DE VISTA
+       ============================================================ */
+
+    function actualizarBotonesVista() {
+
+        const todos =
+            document.getElementById(
+                "btnVerTodosTecnicos"
+            );
+
+
+        const sin =
+            document.getElementById(
+                "btnVerSinAuditorias"
+            );
+
+
+        if (todos) {
+
+            todos.classList.toggle(
+
+                "activo",
+
+                window.estadoResultadoTecnicos.vista ===
+                "todos"
+
+            );
+
+        }
+
+
+        if (sin) {
+
+            sin.classList.toggle(
+
+                "activo",
+
+                window.estadoResultadoTecnicos.vista ===
+                "sin_auditorias"
+
+            );
+
+        }
+
+    }
+
+
+    /* ============================================================
+       ORDENAR
+       ============================================================ */
+
+    function ordenarTecnicos(campo) {
+
+        if (!campo) {
+
+            return;
+
+        }
+
+
+        window.estadoResultadoTecnicos.orden =
+            campo;
+
+
+        actualizarBotonesOrden();
+
+        renderizarTablaResultadoTecnico();
+
+    }
+
+
+    window.ordenarTecnicos =
+        ordenarTecnicos;
+
+
+    /* ============================================================
+       CAMBIAR VISTA
+       ============================================================ */
+
+    function cambiarVistaTecnicos(vista) {
+
+        if (
+            vista !== "todos" &&
+            vista !== "sin_auditorias"
+        ) {
+
+            vista = "todos";
+
+        }
+
+
+        window.estadoResultadoTecnicos.vista =
+            vista;
+
+
+        actualizarBotonesVista();
+
+        renderizarTablaResultadoTecnico();
+
+    }
+
+
+    window.cambiarVistaTecnicos =
+        cambiarVistaTecnicos;
+
+
+    /* ============================================================
+       RENDERIZAR TABLA
+       ============================================================ */
+
+    function renderizarTablaResultadoTecnico() {
+
+        const tbody =
+            document.getElementById(
+                "tablaResultadoAuditoriasTecnico"
+            );
+
+
+        if (!tbody) {
+
+            return;
+
+        }
+
+
+        const datosOriginales =
+            obtenerDatosTecnicos();
+
+
+        if (
+            !Array.isArray(datosOriginales) ||
+            datosOriginales.length === 0
+        ) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="sin-datos"
+                    >
+                        Esperando datos de técnicos...
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            actualizarResumen();
+
+            return;
+
+        }
+
+
+        let datos =
+            datosOriginales.slice();
+
+
+        /* --------------------------------------------------------
+           FILTRO
+           -------------------------------------------------------- */
+
+        if (
+            window.estadoResultadoTecnicos.vista ===
+            "sin_auditorias"
+        ) {
+
+            datos =
+                datos.filter(function (item) {
+
+                    return !tieneAuditorias(item);
+
+                });
+
+        }
+
+
+        /* --------------------------------------------------------
+           ORDENAMIENTO
+           -------------------------------------------------------- */
+
+        const campo =
+            window.estadoResultadoTecnicos.orden;
+
+
+        datos.sort(function (a, b) {
+
+            const auditadoA =
+                tieneAuditorias(a);
+
+
+            const auditadoB =
+                tieneAuditorias(b);
+
+
+            /*
+             * En vista TODOS:
+             * técnicos auditados primero.
+             */
+
+            if (
+                window.estadoResultadoTecnicos.vista ===
+                "todos" &&
+                auditadoA !== auditadoB
+            ) {
+
+                return auditadoA
+                    ? -1
+                    : 1;
+
+            }
+
+
+            const valorA =
+                obtenerValorOrden(
+                    a,
+                    campo
+                );
+
+
+            const valorB =
+                obtenerValorOrden(
+                    b,
+                    campo
+                );
+
+
+            if (
+                valorA !== valorB
+            ) {
+
+                return valorB - valorA;
+
+            }
+
+
+            const supervisorA =
+                obtenerSupervisor(a);
+
+
+            const supervisorB =
+                obtenerSupervisor(b);
+
+
+            const comparacionSupervisor =
+                supervisorA.localeCompare(
+                    supervisorB,
+                    "es",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+
+            if (
+                comparacionSupervisor !== 0
+            ) {
+
+                return comparacionSupervisor;
+
+            }
+
+
+            return obtenerTecnico(a)
+                .localeCompare(
+                    obtenerTecnico(b),
+                    "es",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+        });
+
+
+        /* --------------------------------------------------------
+           SIN RESULTADOS
+           -------------------------------------------------------- */
+
+        if (datos.length === 0) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="sin-datos"
+                    >
+                        No existen técnicos sin auditorías.
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            actualizarResumen();
+
+            return;
+
+        }
+
+
+        /* --------------------------------------------------------
+           CREAR HTML
+           -------------------------------------------------------- */
+
+        let html = "";
+
+
+        datos.forEach(function (item) {
+
+            const supervisor =
+                obtenerSupervisor(item);
+
+
+            const tecnico =
+                obtenerTecnico(item);
+
+
+            const cedula =
+                obtenerCedula(item);
+
+
+            const auditado =
+                tieneAuditorias(item);
+
+
+            const total =
+                obtenerTotal(item);
+
+
+            const error =
+                obtenerError(item);
+
+
+            const noCumple =
+                obtenerNoCumple(item);
+
+
+            const cumple =
+                obtenerCumple(item);
+
+
+            const dias =
+                obtenerDias(item);
+
+
+            const claseFila =
+                auditado
+                    ? ""
+                    : "fila-sin-auditoria";
+
+
+            html += `
+
+                <tr class="${claseFila}">
+
+                    <td>
+                        ${escaparHTML(
+                            supervisor
+                        )}
+                    </td>
+
+                    <td>
+                        ${escaparHTML(
+                            tecnico
+                        )}
+                    </td>
+
+                    <td>
+                        ${escaparHTML(
+                            cedula
+                        )}
+                    </td>
+
+                    <td class="valor-total">
+
+                        ${
+                            auditado
+
+                            ? formatearNumero(total)
+
+                            : `<span class="valor-na">N/A</span>`
+
+                        }
+
+                    </td>
+
+                    <td class="porcentaje-error">
+
+                        ${
+                            auditado
+
+                            ? formatearPorcentaje(error)
+
+                            : `<span class="valor-na">N/A</span>`
+
+                        }
+
+                    </td>
+
+                    <td class="valor-no-cumple">
+
+                        ${
+                            auditado
+
+                            ? formatearNumero(noCumple)
+
+                            : `<span class="valor-na">N/A</span>`
+
+                        }
+
+                    </td>
+
+                    <td class="valor-cumple">
+
+                        ${
+                            auditado
+
+                            ? formatearNumero(cumple)
+
+                            : `<span class="valor-na">N/A</span>`
+
+                        }
+
+                    </td>
+
+                    <td class="valor-dias">
+
+                        ${
+                            auditado
+
+                            ? formatearNumero(dias)
+
+                            : `<span class="valor-na">N/A</span>`
+
+                        }
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+
+        tbody.innerHTML =
+            html;
+
+
+        actualizarResumen();
+
+    }
+
+
+    window.renderizarTablaResultadoTecnico =
+        renderizarTablaResultadoTecnico;
+
+
+    /* ============================================================
+       ACTUALIZACIÓN GENERAL
+       ============================================================ */
+
+    function actualizarResultadoTecnicos() {
+
+        actualizarResumen();
+
+        actualizarBotonesOrden();
+
+        actualizarBotonesVista();
+
+        renderizarTablaResultadoTecnico();
+
+    }
+
+
+    window.actualizarResultadoTecnicos =
+        actualizarResultadoTecnicos;
+
+
+    /* ============================================================
+       EVENTOS
+       ============================================================ */
+
+    function configurarEventos() {
+
+        const card =
+            document.querySelector(
+                ".resultado-tecnico-card"
+            );
+
+
+        if (!card) {
+
+            return;
+
+        }
+
+
+        /*
+         * Evitar registrar eventos dos veces.
+         */
+
+        if (
+            card.dataset.eventosConfigurados ===
+            "true"
+        ) {
+
+            return;
+
+        }
+
+
+        card.dataset.eventosConfigurados =
+            "true";
+
+
+        /* --------------------------------------------------------
+           ORDEN
+           -------------------------------------------------------- */
+
+        card
+            .querySelectorAll(
+                ".btn-orden"
+            )
+            .forEach(function (boton) {
+
+                boton.addEventListener(
+                    "click",
+                    function () {
+
+                        ordenarTecnicos(
+                            boton.dataset.orden
+                        );
+
+                    }
+                );
+
+            });
+
+
+        /* --------------------------------------------------------
+           TODOS
+           -------------------------------------------------------- */
+
+        const btnTodos =
+            document.getElementById(
+                "btnVerTodosTecnicos"
+            );
+
+
+        if (btnTodos) {
+
+            btnTodos.addEventListener(
+                "click",
+                function () {
+
+                    cambiarVistaTecnicos(
+                        "todos"
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* --------------------------------------------------------
+           SIN AUDITORÍAS
+           -------------------------------------------------------- */
+
+        const btnSin =
+            document.getElementById(
+                "btnVerSinAuditorias"
+            );
+
+
+        if (btnSin) {
+
+            btnSin.addEventListener(
+                "click",
+                function () {
+
+                    cambiarVistaTecnicos(
+                        "sin_auditorias"
+                    );
+
+                }
+            );
+
+        }
+
+    }
+
+
+    /* ============================================================
+       INICIALIZACIÓN
+       ============================================================ */
+
+    function inicializar() {
+
+        configurarEventos();
+
+        actualizarResultadoTecnicos();
+
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            inicializar
+        );
+
+    }
+    else {
+
+        inicializar();
+
+    }
+
+
+})();
+
+</script>
+
+
 <style>
 
-/* =========================================================
-   CONTENEDOR PRINCIPAL
-   ========================================================= */
+/* ============================================================
+   CONTENEDOR
+   ============================================================ */
 
 .resultado-tecnico-card {
 
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
 
 }
 
 
-/* =========================================================
+/* ============================================================
    ENCABEZADO
-   ========================================================= */
+   ============================================================ */
 
 .resultado-tecnico-header {
 
-    margin-bottom: 20px;
+    width: 100%;
+
+    margin-bottom: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    box-sizing: border-box;
 
 }
+
+
+.resultado-tecnico-titulo {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
 
 .resultado-tecnico-header h2 {
 
-    margin-top: 0;
-    margin-bottom: 6px;
+    margin: 0 0 6px;
 
     color: #0f172a;
 
+    font-size: 22px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+
 }
 
-.resultado-tecnico-header p {
+
+.grafica-descripcion {
 
     margin: 0;
 
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
 }
 
 
-/* =========================================================
-   RESUMEN DE TÉCNICOS
-   ========================================================= */
+/* ============================================================
+   RESUMEN
+   ============================================================ */
 
-.resumen-tecnicos {
+.resumen-comparacion {
 
     display: grid;
 
     grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(5, minmax(0, 1fr));
 
-    gap: 15px;
+    gap: 10px;
 
-    margin-bottom: 20px;
+    width: 50%;
+
+    flex-shrink: 0;
 
 }
 
 
-/* Tarjeta */
+.resumen-comparacion-item {
 
-.resumen-item {
+    min-width: 0;
 
-    background: #ffffff;
-
-    border: 1px solid #e2e8f0;
-
-    border-radius: 12px;
-
-    padding: 16px;
-
-    text-align: center;
+    padding: 11px 8px;
 
     box-sizing: border-box;
 
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease,
-        background .2s ease;
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    text-align: center;
 
 }
 
 
-/* Hover */
-
-.resumen-item:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 4px 12px
-        rgba(15, 23, 42, 0.08);
-
-}
-
-
-/* Número */
-
-.resumen-item strong {
-
-    display: block;
-
-    margin-top: 6px;
-
-    font-size: 28px;
-
-    line-height: 1;
-
-    color: #172554;
-
-}
-
-
-/* Texto */
-
-.resumen-label {
+.resumen-comparacion-item span {
 
     display: block;
 
     color: #64748b;
 
-    font-size: 13px;
+    font-size: 11px;
 
     font-weight: 600;
+
+    line-height: 1.3;
 
 }
 
 
-/* =========================================================
-   TARJETA VERDE
-   ========================================================= */
+.resumen-comparacion-item strong {
 
-.resumen-verde {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #172554;
+
+    font-size: 21px;
+
+    font-weight: 800;
+
+}
+
+
+.resumen-comparacion-item.resumen-verde {
 
     background: #f0fdf4;
 
@@ -296,47 +1722,35 @@
 
 }
 
-.resumen-verde strong {
+
+.resumen-comparacion-item.resumen-verde strong {
 
     color: #16a34a;
 
 }
 
 
-/* =========================================================
-   TARJETA ROJA
-   ========================================================= */
-
-.resumen-rojo {
+.resumen-comparacion-item.resumen-rojo {
 
     background: #fef2f2;
 
     border-color: #fecaca;
 
-    cursor: pointer;
-
 }
 
-.resumen-rojo strong {
+
+.resumen-comparacion-item.resumen-rojo strong {
 
     color: #dc2626;
 
 }
 
-.resumen-rojo:hover {
 
-    background: #fee2e2;
+/* ============================================================
+   CONTROLES
+   ============================================================ */
 
-    border-color: #fca5a5;
-
-}
-
-
-/* =========================================================
-   BOTONES DE VISTA
-   ========================================================= */
-
-.filtros-tabla-tecnicos {
+.resultado-tecnico-controles {
 
     display: flex;
 
@@ -344,16 +1758,44 @@
 
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
 
-    margin-bottom: 18px;
+    margin: 0;
 
 }
 
 
-/* Botón */
+.th-controles {
 
-.btn-vista-tecnicos {
+    padding: 5px 8px !important;
+
+    text-align: left !important;
+
+    vertical-align: middle;
+
+}
+
+
+.th-controles .resultado-tecnico-controles {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    flex-wrap: nowrap;
+
+    gap: 8px;
+
+}
+
+
+/* ============================================================
+   BOTONES VISTA
+   ============================================================ */
+
+.btn-vista {
 
     display: inline-flex;
 
@@ -363,36 +1805,32 @@
 
     gap: 6px;
 
-    min-height: 38px;
+    min-height: 36px;
 
-    padding: 8px 15px;
+    padding: 7px 13px;
 
     border: 1px solid #cbd5e1;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
     background: #ffffff;
 
     color: #334155;
 
-    font-size: 14px;
+    font-size: 12px;
 
     font-weight: 600;
 
     cursor: pointer;
 
-    transition:
-        background .2s ease,
-        color .2s ease,
-        border-color .2s ease,
-        transform .15s ease;
+    transition: .2s ease;
+
+    white-space: nowrap;
 
 }
 
 
-/* Hover */
-
-.btn-vista-tecnicos:hover {
+.btn-vista:hover {
 
     background: #f8fafc;
 
@@ -401,18 +1839,7 @@
 }
 
 
-/* Click */
-
-.btn-vista-tecnicos:active {
-
-    transform: scale(.98);
-
-}
-
-
-/* Botón activo */
-
-.btn-vista-tecnicos.activo {
+.btn-vista.activo {
 
     background: #172554;
 
@@ -423,181 +1850,44 @@
 }
 
 
-/* =========================================================
-   TABLA RESPONSIVE
-   ========================================================= */
+/* ============================================================
+   SIN AUDITORÍAS
+   ============================================================ */
 
-.tabla-responsive {
+.btn-sin-auditorias {
 
-    width: 100%;
-
-    overflow-x: auto;
-
-    overflow-y: hidden;
-
-    border: 1px solid #e2e8f0;
-
-    border-radius: 10px;
-
-    background: #ffffff;
-
-}
-
-
-/* =========================================================
-   TABLA
-   ========================================================= */
-
-.tabla-resultado-tecnico {
-
-    width: 100%;
-
-    min-width: 750px;
-
-    border-collapse: collapse;
-
-    border-spacing: 0;
-
-}
-
-
-/* =========================================================
-   CABECERA
-   ========================================================= */
-
-.tabla-resultado-tecnico thead {
-
-    background: #172554;
+    background: #c00000;
 
     color: #ffffff;
 
-}
-
-
-/* Celdas cabecera */
-
-.tabla-resultado-tecnico th {
-
-    padding: 13px 15px;
-
-    text-align: center;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    white-space: nowrap;
-
-    border-bottom: 2px solid #0f172a;
+    border-color: #c00000;
 
 }
 
 
-/* Primera columna */
+.btn-sin-auditorias:hover {
 
-.tabla-resultado-tecnico th:first-child {
+    background: #960000;
 
-    text-align: left;
-
-}
-
-
-/* =========================================================
-   CUERPO
-   ========================================================= */
-
-.tabla-resultado-tecnico td {
-
-    padding: 12px 15px;
-
-    text-align: center;
-
-    color: #334155;
-
-    font-size: 14px;
-
-    border-bottom: 1px solid #e2e8f0;
-
-    background: #ffffff;
+    border-color: #960000;
 
 }
 
 
-/* Primera columna */
+.btn-sin-auditorias.activo {
 
-.tabla-resultado-tecnico td:first-child {
+    background: #dc2626;
 
-    text-align: left;
-
-    font-weight: 600;
-
-    color: #0f172a;
+    border-color: #dc2626;
 
 }
 
 
-/* Última fila */
+/* ============================================================
+   CONTADOR
+   ============================================================ */
 
-.tabla-resultado-tecnico tbody tr:last-child td {
-
-    border-bottom: none;
-
-}
-
-
-/* Hover fila */
-
-.tabla-resultado-tecnico tbody tr:hover td {
-
-    background: #f8fafc;
-
-}
-
-
-/* =========================================================
-   PORCENTAJE DE ERROR
-   ========================================================= */
-
-.porcentaje-error {
-
-    color: #dc2626 !important;
-
-    font-weight: 700 !important;
-
-}
-
-
-/* =========================================================
-   CUMPLE
-   ========================================================= */
-
-.valor-cumple {
-
-    color: #16a34a !important;
-
-    font-weight: 700 !important;
-
-}
-
-
-/* =========================================================
-   NO CUMPLE
-   ========================================================= */
-
-.valor-no-cumple {
-
-    color: #dc2626 !important;
-
-    font-weight: 700 !important;
-
-}
-
-
-/* =========================================================
-   N/A
-   ========================================================= */
-
-.btn-na {
+#contadorSinAuditorias {
 
     display: inline-flex;
 
@@ -605,109 +1895,374 @@
 
     justify-content: center;
 
-    min-width: 52px;
+    min-width: 21px;
 
-    padding: 6px 12px;
+    height: 21px;
 
-    border: 1px solid #fecaca;
+    padding: 0 6px;
 
-    border-radius: 6px;
+    border-radius: 50px;
 
-    background: #fef2f2;
+    background: #fee2e2;
 
     color: #dc2626;
 
-    font-size: 13px;
+    font-size: 12px;
+
+    font-weight: 800;
+
+}
+
+
+.btn-sin-auditorias.activo
+#contadorSinAuditorias {
+
+    background: #ffffff;
+
+    color: #dc2626;
+
+}
+
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.tabla-responsive {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    max-height: 500px;
+
+    overflow-x: auto;
+
+    overflow-y: auto;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #94a3b8
+        #f1f5f9;
+
+}
+
+
+.tabla-responsive::-webkit-scrollbar {
+
+    width: 9px;
+
+    height: 9px;
+
+}
+
+
+.tabla-responsive::-webkit-scrollbar-track {
+
+    background: #f1f5f9;
+
+}
+
+
+.tabla-responsive::-webkit-scrollbar-thumb {
+
+    background: #94a3b8;
+
+    border-radius: 10px;
+
+}
+
+
+.tabla-resultado-tecnico {
+
+    width: 100%;
+
+    table-layout: fixed;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+}
+
+
+/* ============================================================
+   CABECERAS
+   ============================================================ */
+
+.tabla-resultado-tecnico th {
+
+    text-align: center;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    line-height: 1.25;
+
+    overflow-wrap: break-word;
+
+}
+
+
+.fila-ordenamiento th {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 20;
+
+    padding: 5px 4px;
+
+    background: #0f172a;
+
+    border-bottom: 1px solid #334155;
+
+}
+
+
+.fila-encabezados th {
+
+    position: sticky;
+
+    top: 39px;
+
+    z-index: 19;
+
+    padding: 10px 7px;
+
+    background: #172554;
+
+    border-bottom: 2px solid #0f172a;
+
+    color: #ffffff;
+
+}
+
+
+/* ============================================================
+   BOTONES ORDEN
+   ============================================================ */
+
+.btn-orden {
+
+    display: block;
+
+    width: 100%;
+
+    min-height: 28px;
+
+    padding: 5px;
+
+    border: 1px solid #475569;
+
+    border-radius: 6px;
+
+    background: #1e293b;
+
+    color: #cbd5e1;
+
+    font-size: 10px;
 
     font-weight: 700;
 
     cursor: pointer;
 
-    transition:
-        background .2s ease,
-        border-color .2s ease,
-        transform .15s ease;
+    transition: .2s ease;
 
 }
 
 
-/* Hover N/A */
+.btn-orden:hover {
 
-.btn-na:hover {
+    background: #334155;
 
-    background: #fee2e2;
-
-    border-color: #fca5a5;
-
-    transform: translateY(-1px);
+    color: #ffffff;
 
 }
 
 
-/* Click N/A */
+.btn-orden.activo {
 
-.btn-na:active {
+    background: #2563eb;
 
-    transform: scale(.97);
+    border-color: #60a5fa;
+
+    color: #ffffff;
 
 }
 
 
-/* =========================================================
-   ESTADO N/A EN FILA
-   ========================================================= */
+#ordenError.activo,
+#ordenNoCumple.activo {
+
+    background: #dc2626;
+
+    border-color: #f87171;
+
+}
+
+
+#ordenCumple.activo {
+
+    background: #16a34a;
+
+    border-color: #4ade80;
+
+}
+
+
+#ordenDias.activo {
+
+    background: #7c3aed;
+
+    border-color: #a78bfa;
+
+}
+
+
+/* ============================================================
+   CELDAS
+   ============================================================ */
+
+.tabla-resultado-tecnico td {
+
+    padding: 10px 7px;
+
+    text-align: center;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    line-height: 1.35;
+
+    overflow-wrap: anywhere;
+
+    word-break: break-word;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e2e8f0;
+
+}
+
+
+.tabla-resultado-tecnico td:first-child {
+
+    text-align: left;
+
+    color: #0f172a;
+
+    font-weight: 600;
+
+}
+
+
+.tabla-resultado-tecnico
+td:nth-child(n+4) {
+
+    font-weight: 800;
+
+}
+
+
+.porcentaje-error {
+
+    color: #dc2626 !important;
+
+}
+
+
+.valor-no-cumple {
+
+    color: #dc2626 !important;
+
+}
+
+
+.valor-cumple {
+
+    color: #16a34a !important;
+
+}
+
+
+.valor-na {
+
+    color: #94a3b8;
+
+    font-weight: 700;
+
+}
+
+
+.tabla-resultado-tecnico
+tbody tr:hover td {
+
+    background: #f8fafc;
+
+}
+
+
+/* ============================================================
+   SIN AUDITORÍA
+   ============================================================ */
 
 .fila-sin-auditoria td {
 
-    background: #fffafa;
+    background: #fff7f7 !important;
+
+    color: #64748b;
 
 }
 
-/* =========================================================
-   MENSAJE SIN DATOS
-   ========================================================= */
+
+.fila-sin-auditoria:hover td {
+
+    background: #feecec !important;
+
+}
+
+
+/* ============================================================
+   SIN DATOS
+   ============================================================ */
 
 .sin-datos {
 
-    text-align: center !important;
+    padding: 30px 20px !important;
 
-    padding: 35px 20px !important;
+    text-align: center !important;
 
     color: #64748b !important;
 
-    font-size: 14px;
+    font-size: 13px;
+
+    font-weight: 600 !important;
 
     background: #ffffff !important;
 
 }
 
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+/* ============================================================
+   TABLET
+   ============================================================ */
 
 @media (max-width: 900px) {
 
-    .resumen-tecnicos {
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-    }
-
-}
-
-
-@media (max-width: 600px) {
-
-    .resumen-tecnicos {
-
-        grid-template-columns: 1fr;
-
-    }
-
-
-    .filtros-tabla-tecnicos {
+    .resultado-tecnico-header {
 
         flex-direction: column;
 
@@ -716,23 +2271,160 @@
     }
 
 
-    .btn-vista-tecnicos {
+    .resumen-comparacion {
+
+        width: 100%;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+    }
+
+
+    .fila-encabezados th {
+
+        top: 36px;
+
+    }
+
+
+    .tabla-resultado-tecnico th {
+
+        font-size: 11px;
+
+        padding: 9px 5px;
+
+    }
+
+
+    .tabla-resultado-tecnico td {
+
+        font-size: 12px;
+
+        padding: 9px 5px;
+
+    }
+
+}
+
+
+/* ============================================================
+   MÓVIL
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .resultado-tecnico-header h2 {
+
+        font-size: 19px;
+
+    }
+
+
+    .grafica-descripcion {
+
+        font-size: 12px;
+
+    }
+
+
+    .resumen-comparacion {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 7px;
+
+    }
+
+
+    .resumen-comparacion-item {
+
+        padding: 9px 6px;
+
+    }
+
+
+    .resumen-comparacion-item span {
+
+        font-size: 10px;
+
+    }
+
+
+    .resumen-comparacion-item strong {
+
+        font-size: 18px;
+
+    }
+
+
+    .th-controles .resultado-tecnico-controles {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .th-controles .btn-vista {
 
         width: 100%;
 
     }
 
 
-    .resultado-tecnico-card {
+    .tabla-responsive {
 
-        padding: 15px;
+        max-height: 450px;
 
     }
 
 
-    .tabla-responsive {
+    .fila-ordenamiento th {
 
-        border-radius: 8px;
+        top: 0;
+
+    }
+
+
+    .fila-encabezados th {
+
+        top: 34px;
+
+    }
+
+
+    .tabla-resultado-tecnico th {
+
+        padding: 8px 3px;
+
+        font-size: 9px;
+
+        line-height: 1.15;
+
+    }
+
+
+    .tabla-resultado-tecnico td {
+
+        padding: 8px 3px;
+
+        font-size: 10px;
+
+        line-height: 1.2;
+
+    }
+
+
+    .btn-orden {
+
+        min-height: 25px;
+
+        padding: 4px 2px;
+
+        font-size: 8px;
 
     }
 

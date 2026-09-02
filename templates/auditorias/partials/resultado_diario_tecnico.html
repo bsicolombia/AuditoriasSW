@@ -1,0 +1,1080 @@
+<div class="grafica-card resultado-diario-tecnico-card">
+
+    <div class="resultado-diario-header">
+
+        <div>
+
+            <h2>
+                Resultado Diario por Técnico
+            </h2>
+
+            <p class="grafica-descripcion">
+                Seguimiento diario de errores, auditorías correctas y días sin auditoría por técnico.
+            </p>
+
+        </div>
+
+        <div class="resultado-diario-leyenda">
+
+            <span class="leyenda-item">
+                <span class="leyenda-color leyenda-error"></span>
+                Errores
+            </span>
+
+            <span class="leyenda-item">
+                <span class="leyenda-color leyenda-ok"></span>
+                OK
+            </span>
+
+            <span class="leyenda-item">
+                <span class="leyenda-color leyenda-na"></span>
+                N/A
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="tabla-responsive tabla-responsive-diario-tecnico">
+
+        <table
+            id="tablaResultadoDiarioTecnico"
+            class="tabla-estadisticas"
+        >
+
+            <thead id="tablaResultadoDiarioTecnicoHead"></thead>
+
+            <tbody id="tablaResultadoDiarioTecnicoBody"></tbody>
+
+            <tfoot id="tablaResultadoDiarioTecnicoFoot"></tfoot>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   TARJETA
+   ========================================================= */
+
+.resultado-diario-tecnico-card {
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 2px 10px
+        rgba(15, 23, 42, 0.06);
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.resultado-diario-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 20px;
+
+    margin-bottom: 18px;
+
+}
+
+
+/* =========================================================
+   TITULO
+   ========================================================= */
+
+.resultado-diario-tecnico-card h2 {
+
+    margin: 0 0 6px 0;
+
+    color: #0f172a;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   DESCRIPCIÓN
+   ========================================================= */
+
+.resultado-diario-tecnico-card
+.grafica-descripcion {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   LEYENDA
+   ========================================================= */
+
+.resultado-diario-leyenda {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    font-size: 12px;
+
+    color: #475569;
+
+}
+
+
+.leyenda-item {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    white-space: nowrap;
+
+}
+
+
+.leyenda-color {
+
+    width: 12px;
+
+    height: 12px;
+
+    flex: 0 0 12px;
+
+    border-radius: 3px;
+
+    display: inline-block;
+
+}
+
+
+.leyenda-error {
+
+    background: #fee2e2;
+
+    border: 1px solid #fecaca;
+
+}
+
+
+.leyenda-ok {
+
+    background: #dcfce7;
+
+    border: 1px solid #bbf7d0;
+
+}
+
+
+.leyenda-na {
+
+    background: #f1f5f9;
+
+    border: 1px solid #cbd5e1;
+
+}
+
+
+/* =========================================================
+   CONTENEDOR SCROLL
+   ========================================================= */
+
+.tabla-responsive-diario-tecnico {
+
+    position: relative;
+
+    width: 100%;
+
+    max-width: 100%;
+
+    min-width: 0;
+
+    max-height: 550px;
+
+    overflow: auto;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #94a3b8
+        #f1f5f9;
+
+}
+
+
+.tabla-responsive-diario-tecnico::-webkit-scrollbar {
+
+    width: 9px;
+
+    height: 9px;
+
+}
+
+
+.tabla-responsive-diario-tecnico::-webkit-scrollbar-track {
+
+    background: #f1f5f9;
+
+}
+
+
+.tabla-responsive-diario-tecnico::-webkit-scrollbar-thumb {
+
+    background: #94a3b8;
+
+    border-radius: 10px;
+
+}
+
+
+.tabla-responsive-diario-tecnico::-webkit-scrollbar-thumb:hover {
+
+    background: #64748b;
+
+}
+
+
+/* =========================================================
+   TABLA
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico {
+
+    width: max-content;
+
+    min-width: 100%;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    background: #ffffff;
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico thead th {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 20;
+
+    background: #0f172a;
+
+    color: #ffffff;
+
+    padding: 10px 8px;
+
+    text-align: center;
+
+    font-weight: 700;
+
+    border-right:
+        1px solid
+        rgba(255,255,255,0.15);
+
+    border-bottom:
+        1px solid
+        #0f172a;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   COLUMNA TÉCNICO
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+thead th.columna-tecnico {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 40;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    text-align: left;
+
+    background: #0f172a;
+
+}
+
+
+/* =========================================================
+   DÍAS
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.dia-header {
+
+    width: 65px;
+
+    min-width: 65px;
+
+}
+
+
+/* =========================================================
+   COLUMNAS FINALES
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.columna-total {
+
+    min-width: 75px;
+
+}
+
+
+#tablaResultadoDiarioTecnico
+.columna-errores {
+
+    min-width: 75px;
+
+}
+
+
+#tablaResultadoDiarioTecnico
+.columna-estado {
+
+    min-width: 130px;
+
+}
+
+
+#tablaResultadoDiarioTecnico
+.columna-accion {
+
+    min-width: 145px;
+
+}
+
+
+/* =========================================================
+   CELDAS
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico tbody td {
+
+    padding: 9px 8px;
+
+    border-bottom:
+        1px solid
+        #e2e8f0;
+
+    border-right:
+        1px solid
+        #f1f5f9;
+
+    text-align: center;
+
+    color: #334155;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   NOMBRE TÉCNICO FIJO
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+tbody td.nombre-tecnico {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 10;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    text-align: left;
+
+    font-weight: 600;
+
+    color: #0f172a;
+
+    background: #ffffff;
+
+}
+
+
+/* =========================================================
+   FILAS ALTERNAS
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+tbody tr:nth-child(even) {
+
+    background: #f8fafc;
+
+}
+
+
+#tablaResultadoDiarioTecnico
+tbody tr:nth-child(even)
+.nombre-tecnico {
+
+    background: #f8fafc;
+
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+tbody tr:hover td {
+
+    background: #eff6ff;
+
+}
+
+
+#tablaResultadoDiarioTecnico
+tbody tr:hover
+.nombre-tecnico {
+
+    background: #eff6ff;
+
+}
+
+
+/* =========================================================
+   N/A
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.celda-na {
+
+    background: #f1f5f9 !important;
+
+    color: #64748b !important;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   OK
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.celda-ok {
+
+    background: #dcfce7 !important;
+
+    color: #15803d !important;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   ERRORES
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.celda-error {
+
+    background: #fee2e2 !important;
+
+    color: #b91c1c !important;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   TOTAL
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.celda-total {
+
+    background: #fef3c7 !important;
+
+    color: #92400e !important;
+
+    font-weight: 900;
+
+}
+
+
+/* =========================================================
+   TOTAL GENERAL ARRIBA
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.fila-total-superior td {
+
+    padding: 10px 8px;
+
+    background: #e2e8f0;
+
+    color: #0f172a;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    border-bottom:
+        2px solid
+        #94a3b8;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   NOMBRE TOTAL SUPERIOR
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.fila-total-superior
+.nombre-total-superior {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 35;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    text-align: left;
+
+    background: #cbd5e1 !important;
+
+}
+
+
+/* =========================================================
+   TOTAL GENERAL
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.celda-total-general {
+
+    background: #16a34a !important;
+
+    color: #ffffff !important;
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+}
+
+
+/* =========================================================
+   RESUMEN
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.footer-resumen {
+
+    background: #cbd5e1 !important;
+
+    color: #334155 !important;
+
+}
+
+
+/* =========================================================
+   BADGE ESTADO
+   ========================================================= */
+
+.estado-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+}
+
+
+.estado-todo-bien {
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+}
+
+
+.estado-mejora {
+
+    background: #fef3c7;
+
+    color: #a16207;
+
+}
+
+
+.estado-critico {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+}
+
+
+.estado-sin-auditorias {
+
+    background: #f1f5f9;
+
+    color: #64748b;
+
+}
+
+
+/* =========================================================
+   BADGE ACCIÓN
+   ========================================================= */
+
+.accion-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+}
+
+
+.accion-ok {
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+}
+
+
+.accion-reauditar {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+}
+
+
+.accion-seguimiento {
+
+    background: #fef3c7;
+
+    color: #a16207;
+
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico tfoot td {
+
+    padding: 10px 8px;
+
+    background: #e2e8f0;
+
+    color: #0f172a;
+
+    font-weight: 800;
+
+    text-align: center;
+
+    border-top:
+        2px solid
+        #94a3b8;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   SIN DATOS
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.tabla-sin-datos {
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-weight: 600;
+
+    background: #f8fafc;
+
+}
+
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .resultado-diario-tecnico-card {
+
+        padding: 12px;
+
+    }
+
+
+    .resultado-diario-header {
+
+        flex-direction: column;
+
+        gap: 10px;
+
+    }
+
+
+    .resultado-diario-leyenda {
+
+        justify-content: flex-start;
+
+    }
+
+
+    .tabla-responsive-diario-tecnico {
+
+        max-height: 450px;
+
+    }
+
+
+    #tablaResultadoDiarioTecnico {
+
+        min-width: 700px;
+
+        font-size: 12px;
+
+    }
+
+
+    #tablaResultadoDiarioTecnico
+    thead th,
+    #tablaResultadoDiarioTecnico
+    tbody td,
+    #tablaResultadoDiarioTecnico
+    tfoot td {
+
+        padding: 7px 6px;
+
+    }
+
+
+    #tablaResultadoDiarioTecnico
+    thead th.columna-tecnico,
+    #tablaResultadoDiarioTecnico
+    tbody td.nombre-tecnico,
+    #tablaResultadoDiarioTecnico
+    .fila-total-superior
+    .nombre-total-superior {
+
+        width: 150px;
+
+        min-width: 150px;
+
+    }
+
+
+    #tablaResultadoDiarioTecnico
+    .dia-header {
+
+        width: 60px;
+
+        min-width: 60px;
+
+    }
+
+}
+
+/* =========================================================
+   TOTAL GENERAL ARRIBA DEL CUERPO
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico thead tr:nth-child(2) th,
+#tablaResultadoDiarioTecnico thead tr:nth-child(2) td {
+
+    background: #e2e8f0;
+
+    color: #0f172a;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    padding: 10px 8px;
+
+    border-bottom: 2px solid #94a3b8;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   TOTAL GENERAL - TÉCNICO FIJO
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+thead tr:nth-child(2)
+.nombre-total {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 35;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    background: #e2e8f0 !important;
+
+    color: #0f172a !important;
+
+    text-align: left;
+
+    font-weight: 900;
+
+}
+
+
+/* =========================================================
+   TOTAL POR DÍA
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+thead tr:nth-child(2)
+.total-dia {
+
+    font-weight: 900;
+
+}
+
+
+/* =========================================================
+   TOTAL GENERAL SUPERIOR
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+thead tr:nth-child(2)
+.celda-total-general {
+
+    background: #16a34a !important;
+
+    color: #ffffff !important;
+
+    font-weight: 900;
+
+}
+
+
+/* =========================================================
+   RESUMEN SUPERIOR
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+thead tr:nth-child(2)
+.resumen-superior {
+
+    background: #f1f5f9 !important;
+
+}
+
+
+/* =========================================================
+   BOTÓN DE ORDEN DE FECHA
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.boton-orden-dia {
+
+    width: 100%;
+
+    min-width: 60px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 0;
+
+    margin: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    font: inherit;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+
+#tablaResultadoDiarioTecnico
+.boton-orden-dia:hover {
+
+    color: #bfdbfe;
+
+}
+
+
+#tablaResultadoDiarioTecnico
+.icono-orden {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 16px;
+
+    height: 16px;
+
+    font-size: 13px;
+
+    opacity: 0.9;
+
+}
+
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    #tablaResultadoDiarioTecnico
+    thead tr:nth-child(2)
+    .nombre-total {
+
+        width: 150px;
+
+        min-width: 150px;
+
+    }
+
+}
+
+</style>

@@ -2,13 +2,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("=== HALLAZGOS_TECNICO.JS INICIADO ===");
 
-    const elemento = document.getElementById(
-        "datos-Hallazgos-Tecnico"
-    );
 
-    const canvas = document.getElementById(
-        "graficaHallazgosTecnico"
-    );
+    // =====================================================
+    // ELEMENTOS
+    // =====================================================
+
+    const elemento =
+        document.getElementById(
+            "datos-Hallazgos-Tecnico"
+        );
+
+
+    const canvas =
+        document.getElementById(
+            "graficaHallazgosTecnico"
+        );
 
 
     // =====================================================
@@ -22,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         return;
+
     }
 
 
@@ -29,22 +38,39 @@ document.addEventListener("DOMContentLoaded", function () {
     // LEER JSON
     // =====================================================
 
-    let datos;
+    let datos = [];
+
 
     try {
 
-        datos = JSON.parse(
-            elemento.textContent
-        );
+        const texto =
+            elemento.textContent.trim();
+
+
+        if (!texto) {
+
+            console.warn(
+                "⚠️ El elemento de datos está vacío"
+            );
+
+            return;
+
+        }
+
+
+        datos =
+            JSON.parse(texto);
+
 
     } catch (error) {
 
         console.error(
-            "❌ ERROR JSON:",
+            "❌ ERROR LEYENDO JSON:",
             error
         );
 
         return;
+
     }
 
 
@@ -59,17 +85,22 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         return;
+
     }
 
 
     // =====================================================
-    // PREPARAR Y ORDENAR DATOS
-    // MAYOR → MENOR
+    // PREPARAR DATOS
     // =====================================================
 
     const datosOrdenados = datos
 
         .map(function (item) {
+
+
+            // ---------------------------------------------
+            // TOTAL
+            // ---------------------------------------------
 
             const total =
                 Number(item.total) ||
@@ -80,21 +111,55 @@ document.addEventListener("DOMContentLoaded", function () {
                     (Number(item.sin_tipo) || 0)
                 );
 
+
+            // ---------------------------------------------
+            // NOMBRE DEL TÉCNICO
+            // ---------------------------------------------
+
+            const tecnico =
+                String(
+                    item.tecnico ||
+                    "Sin técnico"
+                ).trim();
+
+
             return {
 
                 tecnico:
-                    item.tecnico ||
-                    "Sin técnico",
+                    tecnico,
 
-                total: total
+                total:
+                    total
 
             };
 
         })
 
+
+        // =================================================
+        // ELIMINAR REGISTROS COMPLETAMENTE VACÍOS
+        // =================================================
+
+        .filter(function (item) {
+
+            return (
+                item.tecnico !== "" ||
+                item.total > 0
+            );
+
+        })
+
+
+        // =================================================
+        // ORDENAR MAYOR → MENOR
+        // =================================================
+
         .sort(function (a, b) {
 
-            return b.total - a.total;
+            return (
+                Number(b.total || 0) -
+                Number(a.total || 0)
+            );
 
         });
 
@@ -103,27 +168,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // ARRAYS PARA CHART.JS
     // =====================================================
 
-    const labels = datosOrdenados.map(function (item) {
+    const labels =
+        datosOrdenados.map(function (item) {
 
-        return item.tecnico;
+            return item.tecnico;
 
-    });
+        });
 
 
-    const totales = datosOrdenados.map(function (item) {
+    const totales =
+        datosOrdenados.map(function (item) {
 
-        return item.total;
+            return Number(item.total) || 0;
 
-    });
+        });
 
 
     console.log(
-        "TÉCNICOS:",
+        "👷 TÉCNICOS:",
         labels
     );
 
+
     console.log(
-        "TOTALES:",
+        "🔢 TOTALES:",
         totales
     );
 
@@ -132,13 +200,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // SI NO HAY DATOS
     // =====================================================
 
-    if (labels.length === 0) {
+    if (datosOrdenados.length === 0) {
 
         console.warn(
-            "⚠️ No existen datos para mostrar"
+            "⚠️ No existen datos de técnicos para mostrar."
         );
 
         return;
+
     }
 
 
@@ -149,6 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const graficaExistente =
         Chart.getChart(canvas);
 
+
     if (graficaExistente) {
 
         graficaExistente.destroy();
@@ -157,62 +227,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // ALTURA Y ANCHO DE LA GRÁFICA
+    // ALTURA
     // =====================================================
 
-    /*
-    * Altura por técnico.
-    *
-    * 32px hace la gráfica más compacta.
-    */
+    const alturaPorTecnico = 45;
 
-    const alturaPorTecnico = 32;
+    const alturaMinima = 400;
+
+    const alturaMaxima = 6000;
 
 
-    /*
-    * Altura mínima de la gráfica.
-    *
-    * Se mantiene en 400px para evitar
-    * que quede demasiado pequeña.
-    */
+    const altura =
+        Math.min(
 
-    const altura = Math.max(
-        400,
-        labels.length * alturaPorTecnico
-    );
+            alturaMaxima,
 
+            Math.max(
 
-    /*
-    * Aplicar altura al canvas.
-    */
+                alturaMinima,
+
+                labels.length *
+                alturaPorTecnico
+
+            )
+
+        );
+
 
     canvas.style.height =
         altura + "px";
 
 
-    /*
-    * =====================================================
-    * ANCHO
-    * =====================================================
-    *
-    * El canvas ocupa únicamente el ancho
-    * disponible de su contenedor.
-    *
-    * No se utiliza un ancho fijo como 900px.
-    */
+    canvas.style.width =
+        "100%";
 
-    canvas.style.width = "100%";
 
-    canvas.style.maxWidth = "100%";
+    canvas.style.maxWidth =
+        "100%";
 
-    canvas.style.display = "block";
 
-    canvas.style.boxSizing = "border-box";
+    canvas.style.display =
+        "block";
 
+
+    canvas.style.boxSizing =
+        "border-box";
 
 
     // =====================================================
-    // CALCULAR MÁXIMO DEL EJE X
+    // MÁXIMO DEL EJE X
     // =====================================================
 
     const maximo =
@@ -223,25 +286,298 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /*
-     * Agregamos un 15% de espacio al final.
-     *
-     * Ejemplo:
-     *
-     * Mayor valor = 100
-     *
-     * Máximo del eje = 115
-     *
-     * Entonces la barra llega hasta
-     * aproximadamente el 87% del ancho.
+     * Espacio adicional para que el número
+     * pueda quedar FUERA de la barra.
      */
 
     const maximoEje =
-
         maximo > 0
 
-            ? maximo * 1.15
+            ? maximo * 1.20
 
             : 10;
+
+
+    // =====================================================
+    // FUNCIÓN PARA DIVIDIR NOMBRES
+    // =====================================================
+
+    function dividirTexto(
+        texto,
+        maximoCaracteres
+    ) {
+
+        texto =
+            String(
+                texto || ""
+            ).trim();
+
+
+        if (
+            texto.length <=
+            maximoCaracteres
+        ) {
+
+            return texto;
+
+        }
+
+
+        const posicion =
+            texto.lastIndexOf(
+                " ",
+                maximoCaracteres
+            );
+
+
+        if (
+            posicion > 0
+        ) {
+
+            return [
+
+                texto.substring(
+                    0,
+                    posicion
+                ).trim(),
+
+                texto.substring(
+                    posicion + 1
+                ).trim()
+
+            ];
+
+        }
+
+
+        return [
+
+            texto.substring(
+                0,
+                maximoCaracteres
+            ),
+
+            texto.substring(
+                maximoCaracteres
+            )
+
+        ];
+
+    }
+
+
+    // =====================================================
+    // PLUGIN PARA MOSTRAR EL NÚMERO
+    // AFUERA DE LA BARRA
+    // =====================================================
+
+    const cantidadesPlugin = {
+
+        id:
+            "cantidadesHallazgosTecnico",
+
+
+        afterDatasetsDraw:
+            function (chart) {
+
+                const ctx =
+                    chart.ctx;
+
+
+                const meta =
+                    chart.getDatasetMeta(0);
+
+
+                ctx.save();
+
+
+                ctx.textBaseline =
+                    "middle";
+
+
+                // =================================================
+                // RECORRER TODAS LAS BARRAS
+                // =================================================
+
+                totales.forEach(
+                    function (
+                        valor,
+                        index
+                    ) {
+
+
+                        // ---------------------------------------------
+                        // IGNORAR CEROS
+                        // ---------------------------------------------
+
+                        if (
+                            valor <= 0
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        // ---------------------------------------------
+                        // VALIDAR BARRA
+                        // ---------------------------------------------
+
+                        if (
+                            !meta.data[index]
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        const barra =
+                            meta.data[index];
+
+
+                        // ---------------------------------------------
+                        // FORMATO DEL NÚMERO
+                        // ---------------------------------------------
+
+                        const texto =
+                            Number(
+                                valor
+                            ).toLocaleString(
+                                "es-CO"
+                            );
+
+
+                        // ---------------------------------------------
+                        // FUENTE
+                        // ---------------------------------------------
+
+                        ctx.font =
+                            "800 11px Arial";
+
+
+                        const anchoTexto =
+                            ctx.measureText(
+                                texto
+                            ).width;
+
+
+                        // ---------------------------------------------
+                        // DIMENSIONES DEL CUADRO
+                        // ---------------------------------------------
+
+                        const paddingHorizontal =
+                            6;
+
+
+                        const anchoCaja =
+                            anchoTexto +
+                            (
+                                paddingHorizontal *
+                                2
+                            );
+
+
+                        const altoCaja =
+                            20;
+
+
+                        // ---------------------------------------------
+                        // POSICIÓN
+                        // ---------------------------------------------
+
+                        /*
+                         * barra.x es el final de la barra
+                         * porque la gráfica es horizontal.
+                         *
+                         * Dejamos el número unos píxeles
+                         * después de la barra.
+                         */
+
+                        const x =
+                            barra.x + 8;
+
+
+                        const y =
+                            barra.y;
+
+
+                        // ---------------------------------------------
+                        // FONDO BLANCO
+                        // ---------------------------------------------
+
+                        ctx.fillStyle =
+                            "#ffffff";
+
+
+                        ctx.beginPath();
+
+
+                        ctx.roundRect(
+
+                            x,
+
+                            y -
+                            (
+                                altoCaja /
+                                2
+                            ),
+
+                            anchoCaja,
+
+                            altoCaja,
+
+                            5
+
+                        );
+
+
+                        ctx.fill();
+
+
+                        // ---------------------------------------------
+                        // BORDE
+                        // ---------------------------------------------
+
+                        ctx.strokeStyle =
+                            "#000000";
+
+
+                        ctx.lineWidth =
+                            1;
+
+
+                        ctx.stroke();
+
+
+                        // ---------------------------------------------
+                        // NÚMERO
+                        // ---------------------------------------------
+
+                        ctx.fillStyle =
+                            "#000000";
+
+
+                        ctx.fillText(
+
+                            texto,
+
+                            x +
+                            paddingHorizontal,
+
+                            y
+
+                        );
+
+                    }
+                );
+
+
+                ctx.restore();
+
+            }
+
+    };
 
 
     // =====================================================
@@ -250,7 +586,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     new Chart(canvas, {
 
-        type: "bar",
+        type:
+            "bar",
 
 
         // =================================================
@@ -259,34 +596,60 @@ document.addEventListener("DOMContentLoaded", function () {
 
         data: {
 
-            labels: labels,
+            labels:
+                labels,
+
 
             datasets: [
 
                 {
 
-                    label: "Errores",
+                    label:
+                        "Errores",
 
-                    data: totales,
 
-                    backgroundColor: "#dc2626",
+                    data:
+                        totales,
 
-                    borderColor: "#991b1b",
 
-                    borderWidth: 1,
+                    backgroundColor:
+                        "#dc2626",
 
-                    borderRadius: 5,
+
+                    hoverBackgroundColor:
+                        "#b91c1c",
+
+
+                    borderColor:
+                        "#991b1b",
+
+
+                    borderWidth:
+                        1,
+
+
+                    borderRadius:
+                        7,
+
+
+                    borderSkipped:
+                        false,
 
 
                     /*
-                     * BARRAS MÁS DELGADAS
+                     * Barras compactas
                      */
 
-                    barPercentage: 0.45,
+                    barPercentage:
+                        0.55,
 
-                    categoryPercentage: 0.70,
 
-                    minBarLength: 4
+                    categoryPercentage:
+                        0.75,
+
+
+                    minBarLength:
+                        4
 
                 }
 
@@ -301,16 +664,66 @@ document.addEventListener("DOMContentLoaded", function () {
 
         options: {
 
-            responsive: true,
+            responsive:
+                true,
 
-            maintainAspectRatio: false,
+
+            maintainAspectRatio:
+                false,
 
 
-            /*
-             * Barras horizontales
-             */
+            indexAxis:
+                "y",
 
-            indexAxis: "y",
+
+            animation: {
+
+                duration:
+                    700,
+
+                easing:
+                    "easeOutQuart"
+
+            },
+
+
+            interaction: {
+
+                mode:
+                    "nearest",
+
+                axis:
+                    "y",
+
+                intersect:
+                    false
+
+            },
+
+
+            // =================================================
+            // ESPACIO INTERNO
+            // =================================================
+
+            layout: {
+
+                padding: {
+
+                    top:
+                        15,
+
+                    right:
+                        70,
+
+                    bottom:
+                        25,
+
+                    left:
+                        10
+
+                }
+
+            },
 
 
             // =================================================
@@ -319,47 +732,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
             scales: {
 
+
                 // =============================================
                 // EJE X
                 // =============================================
 
                 x: {
 
-                    beginAtZero: true,
-
-                    /*
-                     * Deja espacio después de la barra
-                     */
-
-                    max: maximoEje,
+                    beginAtZero:
+                        true,
 
 
-                    ticks: {
-
-                        precision: 0,
-
-                        color: "#374151",
-
-                        font: {
-
-                            size: 11
-
-                        },
+                    max:
+                        maximoEje,
 
 
-                        callback: function (value) {
+                    border: {
 
-                            return Number(value)
-                                .toLocaleString("es-CO");
-
-                        }
+                        display:
+                            false
 
                     },
 
 
                     grid: {
 
-                        color: "#e5e7eb"
+                        color:
+                            "rgba(148, 163, 184, 0.18)",
+
+                        drawTicks:
+                            false
+
+                    },
+
+
+                    ticks: {
+
+                        precision:
+                            0,
+
+                        color:
+                            "#374151",
+
+                        padding:
+                            8,
+
+                        font: {
+
+                            size:
+                                11,
+
+                            weight:
+                                "500"
+
+                        },
+
+
+                        callback:
+                            function (value) {
+
+                                return Number(
+                                    value
+                                ).toLocaleString(
+                                    "es-CO"
+                                );
+
+                            }
 
                     }
 
@@ -372,69 +810,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 y: {
 
-                    /*
-                     * Espacio para los nombres
-                     */
-
-                    afterFit: function (scale) {
-
-                        scale.width = 170;
-
-                    },
+                    offset:
+                        true,
 
 
-                    ticks: {
+                    border: {
 
-                        color: "#374151",
-
-                        font: {
-
-                            size: 11,
-
-                            weight: "bold"
-
-                        },
-
-                        padding: 8,
-
-
-                        /*
-                         * Evitar nombres demasiado largos
-                         */
-
-                        callback: function (value) {
-
-                            const nombre =
-                                this.getLabelForValue(
-                                    value
-                                );
-
-
-                            if (
-                                nombre.length > 24
-                            ) {
-
-                                return (
-                                    nombre.substring(
-                                        0,
-                                        24
-                                    ) +
-                                    "..."
-                                );
-
-                            }
-
-
-                            return nombre;
-
-                        }
+                        display:
+                            false
 
                     },
 
 
                     grid: {
 
-                        display: false
+                        display:
+                            false
+
+                    },
+
+
+                    // -----------------------------------------
+                    // ESPACIO PARA NOMBRE DEL TÉCNICO
+                    // -----------------------------------------
+
+                    afterFit:
+                        function (scale) {
+
+                            scale.width =
+                                window.innerWidth <= 600
+                                    ? 190
+                                    : 250;
+
+                        },
+
+
+                    ticks: {
+
+                        color:
+                            "#172554",
+
+                        padding:
+                            10,
+
+                        autoSkip:
+                            false,
+
+
+                        font: {
+
+                            size:
+                                11,
+
+                            weight:
+                                "800"
+
+                        },
+
+
+                        callback:
+                            function (value) {
+
+                                const nombre =
+                                    this.getLabelForValue(
+                                        value
+                                    );
+
+
+                                if (!nombre) {
+
+                                    return "";
+
+                                }
+
+
+                                return dividirTexto(
+
+                                    nombre,
+
+                                    window.innerWidth <= 600
+                                        ? 22
+                                        : 36
+
+                                );
+
+                            }
 
                     }
 
@@ -449,13 +909,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             plugins: {
 
+
                 // =============================================
                 // LEYENDA
                 // =============================================
 
                 legend: {
 
-                    display: false
+                    display:
+                        false
 
                 },
 
@@ -466,41 +928,79 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 tooltip: {
 
+                    backgroundColor:
+                        "rgba(15, 23, 42, 0.97)",
+
+                    titleColor:
+                        "#ffffff",
+
+                    bodyColor:
+                        "#e2e8f0",
+
+                    borderColor:
+                        "rgba(148, 163, 184, 0.30)",
+
+                    borderWidth:
+                        1,
+
+                    cornerRadius:
+                        10,
+
+                    padding:
+                        13,
+
+                    displayColors:
+                        true,
+
+                    boxPadding:
+                        5,
+
+
                     callbacks: {
 
-                        title: function (items) {
 
-                            if (
-                                !items.length
-                            ) {
+                        title:
+                            function (items) {
 
-                                return "";
+                                if (
+                                    !items.length
+                                ) {
+
+                                    return "";
+
+                                }
+
+
+                                const index =
+                                    items[0]
+                                        .dataIndex;
+
+
+                                return (
+                                    "👷 " +
+                                    labels[index]
+                                );
+
+                            },
+
+
+                        label:
+                            function (context) {
+
+                                const valor =
+                                    Number(
+                                        context.raw
+                                    ) || 0;
+
+
+                                return (
+                                    " Errores: " +
+                                    valor.toLocaleString(
+                                        "es-CO"
+                                    )
+                                );
 
                             }
-
-
-                            return labels[
-                                items[0].dataIndex
-                            ];
-
-                        },
-
-
-                        label: function (context) {
-
-                            return (
-
-                                " Errores: " +
-
-                                Number(
-                                    context.raw
-                                ).toLocaleString(
-                                    "es-CO"
-                                )
-
-                            );
-
-                        }
 
                     }
 
@@ -508,45 +1008,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 // =============================================
-                // VALORES SOBRE LAS BARRAS
+                // IMPORTANTE
+                //
+                // ChartDataLabels NO SE UTILIZA
+                // porque queremos el número FUERA
+                // de la barra.
                 // =============================================
 
                 datalabels: {
 
-                    color: "#ffffff",
-
-                    anchor: "center",
-
-                    align: "center",
-
-                    clamp: true,
-
-
-                    font: {
-
-                        weight: "bold",
-
-                        size: 11
-
-                    },
-
-
-                    formatter: function (value) {
-
-                        if (!value) {
-
-                            return "";
-
-                        }
-
-
-                        return Number(
-                            value
-                        ).toLocaleString(
-                            "es-CO"
-                        );
-
-                    }
+                    display:
+                        false
 
                 }
 
@@ -556,20 +1028,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // =====================================================
-        // PLUGIN CHARTDATALABELS
+        // PLUGIN PERSONALIZADO
         // =====================================================
 
         plugins: [
 
-            ChartDataLabels
+            cantidadesPlugin
 
         ]
 
     });
 
 
+    // =====================================================
+    // FINAL
+    // =====================================================
+
     console.log(
-        "✅ GRÁFICA CREADA CORRECTAMENTE"
+        `✅ GRÁFICA CREADA: ${datosOrdenados.length} técnicos`
     );
 
 });

@@ -18,10 +18,24 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
 
-    if (!elemento || !canvas) {
+    // =====================================================
+    // VALIDAR
+    // =====================================================
+
+    if (!elemento) {
 
         console.error(
-            "❌ No se encontró datos o canvas de Auditorías por día"
+            "❌ No existe #datos-Auditoria_Dia"
+        );
+
+        return;
+    }
+
+
+    if (!canvas) {
+
+        console.error(
+            "❌ No existe #graficaAuditoriasDia"
         );
 
         return;
@@ -32,13 +46,26 @@ document.addEventListener("DOMContentLoaded", function () {
     // LEER JSON
     // =====================================================
 
-    let datos;
+    let datos = [];
 
     try {
 
-        datos = JSON.parse(
-            elemento.textContent.trim()
-        );
+        const contenido =
+            elemento.textContent.trim();
+
+
+        if (!contenido) {
+
+            console.warn(
+                "⚠️ El elemento de datos está vacío"
+            );
+
+            return;
+        }
+
+
+        datos =
+            JSON.parse(contenido);
 
     } catch (error) {
 
@@ -47,18 +74,30 @@ document.addEventListener("DOMContentLoaded", function () {
             error
         );
 
+        console.error(
+            "Contenido recibido:",
+            elemento.textContent
+        );
+
         return;
     }
 
 
     // =====================================================
-    // VALIDAR
+    // VALIDAR ARRAY
     // =====================================================
 
-    if (
-        !Array.isArray(datos) ||
-        datos.length === 0
-    ) {
+    if (!Array.isArray(datos)) {
+
+        console.error(
+            "❌ Los datos no son un Array"
+        );
+
+        return;
+    }
+
+
+    if (datos.length === 0) {
 
         console.warn(
             "⚠️ No existen datos para Auditorías por día"
@@ -69,27 +108,98 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // ORDENAR POR FECHA
+    // NORMALIZAR
+    // =====================================================
+
+    datos =
+        datos.map(function (item) {
+
+            const cumple =
+                Number(
+                    item.cumple ??
+                    item.cumplen
+                ) || 0;
+
+
+            const noCumple =
+                Number(
+                    item.no_cumple ??
+                    item.noCumple
+                ) || 0;
+
+
+            let total =
+                Number(
+                    item.total
+                ) || 0;
+
+
+            if (total <= 0) {
+
+                total =
+                    cumple +
+                    noCumple;
+
+            }
+
+
+            return {
+
+                fecha:
+                    String(
+                        item.fecha ||
+                        ""
+                    ).trim(),
+
+                total:
+                    total,
+
+                cumple:
+                    cumple,
+
+                noCumple:
+                    noCumple
+
+            };
+
+        });
+
+
+    // =====================================================
+    // ORDENAR
+    // MÁS RECIENTE → MÁS ANTIGUA
     // =====================================================
 
     datos.sort(function (a, b) {
 
-        return (
-            new Date(b.fecha) -
-            new Date(a.fecha)
-        );
+        const fechaA =
+            new Date(a.fecha);
+
+        const fechaB =
+            new Date(b.fecha);
+
+
+        return fechaB - fechaA;
 
     });
 
 
     // =====================================================
-    // PREPARAR DATOS
+    // ARRAYS
     // =====================================================
 
     const labels =
         datos.map(function (item) {
 
-            return item.fecha || "";
+            return item.fecha;
+
+        });
+
+
+    const total =
+        datos.map(function (item) {
+
+            return item.total;
 
         });
 
@@ -97,11 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const cumple =
         datos.map(function (item) {
 
-            return Number(
-                item.cumple ??
-                item.cumplen ??
-                0
-            ) || 0;
+            return item.cumple;
 
         });
 
@@ -109,67 +215,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const noCumple =
         datos.map(function (item) {
 
-            return Number(
-                item.no_cumple ??
-                item.noCumple ??
-                0
-            ) || 0;
+            return item.noCumple;
 
         });
-
-
-    /*
-     * TOTAL
-     *
-     * Primero intentamos utilizar el total
-     * enviado por Django.
-     *
-     * Si no existe:
-     *
-     * TOTAL = CUMPLE + NO CUMPLE
-     */
-
-    const total =
-        datos.map(function (item, index) {
-
-            const valor =
-                Number(item.total) || 0;
-
-
-            if (valor > 0) {
-
-                return valor;
-
-            }
-
-
-            return (
-                cumple[index] +
-                noCumple[index]
-            );
-
-        });
-
-
-    console.log(
-        "📅 Fechas:",
-        labels
-    );
-
-    console.log(
-        "🔵 Total:",
-        total
-    );
-
-    console.log(
-        "🟢 Cumplen:",
-        cumple
-    );
-
-    console.log(
-        "🟠 No cumplen:",
-        noCumple
-    );
 
 
     // =====================================================
@@ -192,22 +240,28 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
 
     /*
+     * IMPORTANTE:
      *
-     * CADA DÍA TIENE:
+     * Aumentamos bastante el espacio vertical
+     * de cada día porque ahora queremos separar
      *
-     *   TOTAL
-     *   CUMPLEN
-     *   NO CUMPLEN
+     *     TOTAL
+     *     CUMPLEN
+     *     NO CUMPLEN
      *
-     * 90px por día da bastante separación.
-     *
+     * visualmente.
      */
 
-    const alturaPorDia = 90;
+    const alturaPorDia =
+        120;
 
-    const alturaMinima = 500;
 
-    const alturaMaxima = 4000;
+    const alturaMinima =
+        500;
+
+
+    const alturaMaxima =
+        6000;
 
 
     const altura =
@@ -233,6 +287,257 @@ document.addEventListener("DOMContentLoaded", function () {
     canvas.style.display =
         "block";
 
+    canvas.style.boxSizing =
+        "border-box";
+
+
+    // =====================================================
+    // MÁXIMO DEL EJE X
+    // =====================================================
+
+    const maximo =
+        Math.max.apply(
+            null,
+            total
+        );
+
+
+    const maximoEje =
+        maximo > 0
+            ? maximo * 1.22
+            : 10;
+
+
+    // =====================================================
+    // PLUGIN
+    // NÚMEROS FUERA DE LAS BARRAS
+    // =====================================================
+
+    const numerosFueraBarra = {
+
+        id:
+            "numerosFueraBarraAuditoriasDia",
+
+
+        afterDatasetsDraw:
+            function (chart) {
+
+                const ctx =
+                    chart.ctx;
+
+
+                ctx.save();
+
+
+                ctx.textBaseline =
+                    "middle";
+
+
+                chart.data.datasets.forEach(
+                    function (
+                        dataset,
+                        datasetIndex
+                    ) {
+
+
+                        const meta =
+                            chart.getDatasetMeta(
+                                datasetIndex
+                            );
+
+
+                        if (
+                            !meta ||
+                            !meta.data
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        meta.data.forEach(
+                            function (
+                                barra,
+                                index
+                            ) {
+
+
+                                const valor =
+                                    Number(
+                                        dataset.data[index]
+                                    ) || 0;
+
+
+                                if (
+                                    valor <= 0 ||
+                                    !barra
+                                ) {
+
+                                    return;
+
+                                }
+
+
+                                // =====================================
+                                // TEXTO
+                                // =====================================
+
+                                const texto =
+                                    valor.toLocaleString(
+                                        "es-CO"
+                                    );
+
+
+                                ctx.font =
+                                    "800 10px Arial, sans-serif";
+
+
+                                const anchoTexto =
+                                    ctx.measureText(
+                                        texto
+                                    ).width;
+
+
+                                // =====================================
+                                // CAJA
+                                // =====================================
+
+                                const paddingX =
+                                    6;
+
+
+                                const anchoCaja =
+                                    anchoTexto +
+                                    (
+                                        paddingX *
+                                        2
+                                    );
+
+
+                                const altoCaja =
+                                    20;
+
+
+                                // =====================================
+                                // POSICIÓN
+                                // =====================================
+
+                                const x =
+                                    barra.x + 8;
+
+
+                                const y =
+                                    barra.y;
+
+
+                                // =====================================
+                                // COLORES
+                                // =====================================
+
+                                let colorBorde =
+                                    "#bfdbfe";
+
+
+                                let colorTexto =
+                                    "#172554";
+
+
+                                if (
+                                    datasetIndex === 1
+                                ) {
+
+                                    colorBorde =
+                                        "#bbf7d0";
+
+                                    colorTexto =
+                                        "#15803d";
+
+                                }
+
+
+                                if (
+                                    datasetIndex === 2
+                                ) {
+
+                                    colorBorde =
+                                        "#fed7aa";
+
+                                    colorTexto =
+                                        "#c2410c";
+
+                                }
+
+
+                                // =====================================
+                                // FONDO
+                                // =====================================
+
+                                ctx.fillStyle =
+                                    "#ffffff";
+
+
+                                ctx.beginPath();
+
+
+                                ctx.roundRect(
+                                    x,
+                                    y -
+                                    (
+                                        altoCaja /
+                                        2
+                                    ),
+                                    anchoCaja,
+                                    altoCaja,
+                                    5
+                                );
+
+
+                                ctx.fill();
+
+
+                                // =====================================
+                                // BORDE
+                                // =====================================
+
+                                ctx.strokeStyle =
+                                    colorBorde;
+
+
+                                ctx.lineWidth =
+                                    1;
+
+
+                                ctx.stroke();
+
+
+                                // =====================================
+                                // TEXTO
+                                // =====================================
+
+                                ctx.fillStyle =
+                                    colorTexto;
+
+
+                                ctx.fillText(
+                                    texto,
+                                    x + paddingX,
+                                    y
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                ctx.restore();
+
+            }
+
+    };
+
 
     // =====================================================
     // CREAR GRÁFICA
@@ -240,23 +545,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     new Chart(canvas, {
 
-        type: "bar",
+        type:
+            "bar",
 
-
-        // =================================================
-        // DATOS
-        // =================================================
 
         data: {
 
-            labels: labels,
+            labels:
+                labels,
 
 
             datasets: [
 
-                // =========================================
+                // =================================================
                 // TOTAL
-                // =========================================
+                // =================================================
 
                 {
 
@@ -272,36 +575,31 @@ document.addEventListener("DOMContentLoaded", function () {
                     hoverBackgroundColor:
                         "#1d4ed8",
 
-                    borderColor:
-                        "#2563eb",
-
-                    borderWidth:
-                        0,
-
                     borderRadius:
                         6,
 
                     borderSkipped:
                         false,
 
-                    barThickness:
-                        14,
-
-                    maxBarThickness:
-                        14,
+                    /*
+                     * NO usar barThickness.
+                     *
+                     * Chart.js calculará la posición
+                     * de cada barra automáticamente.
+                     */
 
                     categoryPercentage:
-                        0.72,
+                        0.82,
 
                     barPercentage:
-                        0.70
+                        0.48
 
                 },
 
 
-                // =========================================
+                // =================================================
                 // CUMPLEN
-                // =========================================
+                // =================================================
 
                 {
 
@@ -317,36 +615,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     hoverBackgroundColor:
                         "#16a34a",
 
-                    borderColor:
-                        "#22c55e",
-
-                    borderWidth:
-                        0,
-
                     borderRadius:
                         6,
 
                     borderSkipped:
                         false,
 
-                    barThickness:
-                        14,
-
-                    maxBarThickness:
-                        14,
-
                     categoryPercentage:
-                        0.72,
+                        0.82,
 
                     barPercentage:
-                        0.70
+                        0.48
 
                 },
 
 
-                // =========================================
+                // =================================================
                 // NO CUMPLEN
-                // =========================================
+                // =================================================
 
                 {
 
@@ -362,29 +648,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     hoverBackgroundColor:
                         "#ea580c",
 
-                    borderColor:
-                        "#f97316",
-
-                    borderWidth:
-                        0,
-
                     borderRadius:
                         6,
 
                     borderSkipped:
                         false,
 
-                    barThickness:
-                        14,
-
-                    maxBarThickness:
-                        14,
-
                     categoryPercentage:
-                        0.72,
+                        0.82,
 
                     barPercentage:
-                        0.70
+                        0.48
 
                 }
 
@@ -393,22 +667,19 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
 
-        // =================================================
+        // =====================================================
         // OPCIONES
-        // =================================================
+        // =====================================================
 
         options: {
 
             responsive:
                 true,
 
+
             maintainAspectRatio:
                 false,
 
-
-            // =================================================
-            // HORIZONTAL
-            // =================================================
 
             indexAxis:
                 "y",
@@ -456,10 +727,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         10,
 
                     right:
-                        70,
+                        90,
 
                     bottom:
-                        20,
+                        25,
 
                     left:
                         10
@@ -469,24 +740,25 @@ document.addEventListener("DOMContentLoaded", function () {
             },
 
 
-            // =================================================
+            // =====================================================
             // EJES
-            // =================================================
+            // =====================================================
 
             scales: {
 
 
-                // =============================================
+                // =================================================
                 // EJE X
-                // =============================================
+                // =================================================
 
                 x: {
 
                     beginAtZero:
                         true,
 
-                    grace:
-                        "10%",
+
+                    max:
+                        maximoEje,
 
 
                     border: {
@@ -547,17 +819,29 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
 
 
-                // =============================================
+                // =================================================
                 // EJE Y
-                // =============================================
+                // =================================================
 
                 y: {
 
                     offset:
                         true,
 
+
                     stacked:
                         false,
+
+
+                    afterFit:
+                        function (scale) {
+
+                            scale.width =
+                                window.innerWidth <= 600
+                                    ? 120
+                                    : 160;
+
+                        },
 
 
                     border: {
@@ -605,9 +889,9 @@ document.addEventListener("DOMContentLoaded", function () {
             },
 
 
-            // =================================================
+            // =====================================================
             // PLUGINS
-            // =================================================
+            // =====================================================
 
             plugins: {
 
@@ -700,7 +984,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     callbacks: {
 
-
                         title:
                             function (items) {
 
@@ -737,6 +1020,48 @@ document.addEventListener("DOMContentLoaded", function () {
                                     )
                                 );
 
+                            },
+
+
+                        afterBody:
+                            function (items) {
+
+                                if (
+                                    !items.length
+                                ) {
+
+                                    return "";
+
+                                }
+
+
+                                const index =
+                                    items[0]
+                                        .dataIndex;
+
+
+                                const item =
+                                    datos[index];
+
+
+                                return [
+
+                                    "",
+
+                                    `TOTAL: ${item.total.toLocaleString(
+                                        "es-CO"
+                                    )}`,
+
+                                    `CUMPLEN: ${item.cumple.toLocaleString(
+                                        "es-CO"
+                                    )}`,
+
+                                    `NO CUMPLEN: ${item.noCumple.toLocaleString(
+                                        "es-CO"
+                                    )}`
+
+                                ];
+
                             }
 
                     }
@@ -750,61 +1075,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 datalabels: {
 
-                    // Mostrar SIEMPRE el número
-                    display: true,
-
-
-                    // Color del número
-                    color: "#ffffff",
-
-
-                    // Número en el centro de la barra
-                    anchor: "center",
-
-                    align: "center",
-
-
-                    // Evita que el número se salga
-                    // de la barra
-                    clamp: true,
-
-                    clip: true,
-
-
-                    // Tamaño del número
-                    font: {
-
-                        size: 10,
-
-                        weight: "700"
-
-                    },
-
-
-                    // Formato del número
-                    formatter: function (value) {
-
-                        const numero =
-                            Number(value) || 0;
-
-                        return numero.toLocaleString(
-                            "es-CO"
-                        );
-
-                    }
+                    display:
+                        false
 
                 }
-
-
 
             }
 
         },
 
 
+        // =====================================================
+        // PLUGIN PERSONALIZADO
+        // =====================================================
+
         plugins: [
 
-            ChartDataLabels
+            numerosFueraBarra
 
         ]
 

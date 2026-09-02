@@ -1,6 +1,6 @@
-<div class="grafica-card">
+<div class="grafica-card grafica-card-tecnicos">
 
-    <h2>Hallazgos para Descontar Tecnico</h2>
+    <h2>Hallazgos Por Técnico</h2>
 
     <p class="grafica-descripcion">
         Cantidad total de errores encontrados en auditorías que no cumplen.
@@ -19,20 +19,30 @@
 </div>
 
 
+
 <style>
 
-/* =====================================================
-   CONTENEDOR DEL SCROLL
-   ===================================================== */
+.grafica-card-tecnicos {
+
+    width: 100%;
+    height: 640px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+
+}
+
 
 .grafica-scroll-tecnicos {
 
     width: 100%;
+    flex: 1;
 
-    height: 650px;
+    min-height: 0;
 
     overflow-y: auto;
-
     overflow-x: hidden;
 
     box-sizing: border-box;
@@ -42,22 +52,13 @@
 }
 
 
-/* =====================================================
-   CONTENEDOR INTERNO
-   ===================================================== */
-
 .grafica-contenedor-tecnicos {
 
     width: 100%;
-
-    min-width: 700px;
+    min-width: 0;
 
 }
 
-
-/* =====================================================
-   CANVAS
-   ===================================================== */
 
 .grafica-contenedor-tecnicos canvas {
 
@@ -67,53 +68,5 @@
 
 }
 
-
-/* =====================================================
-   SCROLLBAR
-   ===================================================== */
-
-.grafica-scroll-tecnicos::-webkit-scrollbar {
-
-    width: 12px;
-
-}
-
-
-.grafica-scroll-tecnicos::-webkit-scrollbar-track {
-
-    background: #e5e7eb;
-
-    border-radius: 10px;
-
-}
-
-
-.grafica-scroll-tecnicos::-webkit-scrollbar-thumb {
-
-    background: #94a3b8;
-
-    border-radius: 10px;
-
-}
-
-
-.grafica-scroll-tecnicos::-webkit-scrollbar-thumb:hover {
-
-    background: #64748b;
-
-}
-
-
-/* Firefox */
-
-.grafica-scroll-tecnicos {
-
-    scrollbar-width: auto;
-
-    scrollbar-color:
-        #94a3b8
-        #e5e7eb;
-
-}
 
 </style>

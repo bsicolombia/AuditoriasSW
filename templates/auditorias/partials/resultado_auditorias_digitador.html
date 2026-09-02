@@ -2,14 +2,87 @@
 
     <div class="resultado-tecnico-header">
 
-        <h2>
-            Resultado de Auditorías por Digitador
-        </h2>
+        <div class="resultado-tecnico-titulo">
 
-        <p class="grafica-descripcion">
-            Resumen de técnicos auditados, auditorías realizadas,
-            porcentaje de no cumplimiento y resultados.
-        </p>
+            <h2>
+                Resultado de Auditorías por Digitador
+            </h2>
+
+            <p class="grafica-descripcion">
+                Resumen de técnicos auditados, auditorías realizadas,
+                porcentaje de no cumplimiento y resultados.
+            </p>
+
+        </div>
+
+
+        <div class="resumen-comparacion">
+
+            <div class="resumen-comparacion-item">
+
+                <span>
+                    Técnicos Contratados
+                </span>
+
+                <strong id="totalTecnicosDigitador">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumen-comparacion-item resumen-verde">
+
+                <span>
+                    Técnicos auditados
+                </span>
+
+                <strong id="totalTecnicosAuditadosDigitador">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumen-comparacion-item resumen-verde">
+
+                <span>
+                    % Auditados
+                </span>
+
+                <strong id="porcentajeCoberturaDigitador">
+                    0%
+                </strong>
+
+            </div>
+
+
+            <div class="resumen-comparacion-item resumen-rojo">
+
+                <span>
+                    Técnicos sin auditoría
+                </span>
+
+                <strong id="totalTecnicosSinAuditoriaDigitador">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumen-comparacion-item resumen-rojo">
+
+                <span>
+                    % sin auditar
+                </span>
+
+                <strong id="porcentajeTecnicosSinAuditoriaDigitador">
+                    0%
+                </strong>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -20,7 +93,74 @@
 
             <thead>
 
-                <tr>
+                <tr class="fila-ordenamiento-digitador">
+
+                    <th></th>
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden-digitador"
+                            data-orden="tecnicos"
+                        >
+                            Técnicos auditados
+                        </button>
+
+                    </th>
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden-digitador"
+                            data-orden="auditorias"
+                        >
+                            Auditorías realizadas
+                        </button>
+
+                    </th>
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden-digitador"
+                            data-orden="porcentaje"
+                        >
+                            % No Cumple
+                        </button>
+
+                    </th>
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden-digitador"
+                            data-orden="no_cumple"
+                        >
+                            No Cumplen
+                        </button>
+
+                    </th>
+
+                    <th>
+
+                        <button
+                            type="button"
+                            class="btn-orden-digitador"
+                            data-orden="cumple"
+                        >
+                            Cumplen
+                        </button>
+
+                    </th>
+
+                </tr>
+
+
+                <tr class="fila-encabezados-digitador">
 
                     <th>
                         Digitador
@@ -52,7 +192,6 @@
 
 
             <tbody id="tablaResultadoAuditoriasDigitador">
-
             </tbody>
 
         </table>
@@ -62,54 +201,719 @@
 </div>
 
 
+<script>
+
+(function () {
+
+    "use strict";
+
+
+    let ordenActualDigitador =
+        "porcentaje";
+
+
+    const tabla =
+        document.getElementById(
+            "tablaResultadoAuditoriasDigitador"
+        );
+
+
+    const elementoDatos =
+        document.getElementById(
+            "datos-Resultado-Auditorias-Digitador"
+        );
+
+
+    if (!tabla) {
+
+        return;
+
+    }
+
+
+    let datos = [];
+
+
+    /* =========================================================
+       LEER DATOS
+       ========================================================= */
+
+    if (elementoDatos) {
+
+        try {
+
+            const contenido =
+                elementoDatos.textContent.trim();
+
+
+            if (contenido) {
+
+                datos =
+                    JSON.parse(contenido);
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Error leyendo datos por digitador:",
+                error
+            );
+
+            datos = [];
+
+        }
+
+    }
+
+
+    if (!Array.isArray(datos)) {
+
+        datos = [];
+
+    }
+
+
+    /* =========================================================
+       NÚMERO SEGURO
+       ========================================================= */
+
+    function numero(valor) {
+
+        const n =
+            Number(valor);
+
+
+        return Number.isFinite(n)
+            ? n
+            : 0;
+
+    }
+
+
+    /* =========================================================
+       ESCAPAR HTML
+       ========================================================= */
+
+    function escapeHtml(texto) {
+
+        const div =
+            document.createElement("div");
+
+
+        div.textContent =
+            texto == null
+                ? ""
+                : String(texto);
+
+
+        return div.innerHTML;
+
+    }
+
+
+    /* =========================================================
+       OBTENER VALOR DE ORDENAMIENTO
+       ========================================================= */
+
+    function obtenerValor(item, campo) {
+
+        switch (campo) {
+
+            case "tecnicos":
+
+                return numero(
+                    item.tecnicos_auditados
+                );
+
+
+            case "auditorias":
+
+                return numero(
+                    item.auditorias_realizadas
+                );
+
+
+            case "porcentaje":
+
+                return numero(
+                    item.porcentaje_no_cumple
+                );
+
+
+            case "no_cumple":
+
+                return numero(
+                    item.no_cumplen
+                );
+
+
+            case "cumple":
+
+                return numero(
+                    item.cumplen
+                );
+
+
+            default:
+
+                return 0;
+
+        }
+
+    }
+
+
+    /* =========================================================
+       BOTÓN ACTIVO
+       ========================================================= */
+
+    function actualizarBotones() {
+
+        document
+            .querySelectorAll(
+                ".resultado-digitador-card " +
+                ".btn-orden-digitador"
+            )
+            .forEach(function (boton) {
+
+                boton.classList.remove(
+                    "activo"
+                );
+
+            });
+
+
+        const activo =
+            document.querySelector(
+                '.resultado-digitador-card ' +
+                '.btn-orden-digitador[data-orden="' +
+                ordenActualDigitador +
+                '"]'
+            );
+
+
+        if (activo) {
+
+            activo.classList.add(
+                "activo"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       RENDERIZAR TABLA
+       ========================================================= */
+
+    function renderizarTabla() {
+
+        tabla.innerHTML = "";
+
+
+        if (datos.length === 0) {
+
+            tabla.innerHTML = `
+                <tr>
+                    <td
+                        colspan="6"
+                        class="sin-datos"
+                    >
+                        No existen auditorías para los
+                        filtros seleccionados.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        const ordenados =
+            datos.slice();
+
+
+        ordenados.sort(function (a, b) {
+
+            return (
+                obtenerValor(
+                    b,
+                    ordenActualDigitador
+                ) -
+                obtenerValor(
+                    a,
+                    ordenActualDigitador
+                )
+            );
+
+        });
+
+
+        ordenados.forEach(function (item) {
+
+            const digitador =
+                item.digitador ||
+                "Sin digitador";
+
+
+            const tecnicos =
+                numero(
+                    item.tecnicos_auditados
+                );
+
+
+            const auditorias =
+                numero(
+                    item.auditorias_realizadas
+                );
+
+
+            const porcentaje =
+                numero(
+                    item.porcentaje_no_cumple
+                );
+
+
+            const noCumplen =
+                numero(
+                    item.no_cumplen
+                );
+
+
+            const cumplen =
+                numero(
+                    item.cumplen
+                );
+
+
+            const fila =
+                document.createElement("tr");
+
+
+            fila.innerHTML = `
+
+                <td>
+                    ${escapeHtml(digitador)}
+                </td>
+
+                <td>
+                    ${tecnicos.toLocaleString("es-CO")}
+                </td>
+
+                <td>
+                    ${auditorias.toLocaleString("es-CO")}
+                </td>
+
+                <td class="porcentaje-no-cumple">
+                    ${porcentaje.toFixed(2)}%
+                </td>
+
+                <td class="valor-no-cumple">
+                    ${noCumplen.toLocaleString("es-CO")}
+                </td>
+
+                <td class="valor-cumple">
+                    ${cumplen.toLocaleString("es-CO")}
+                </td>
+
+            `;
+
+
+            tabla.appendChild(fila);
+
+        });
+
+    }
+
+
+    /* =========================================================
+    RESUMEN COMPARTIDO CON RESULTADO POR TÉCNICO
+    ========================================================= */
+
+    function actualizarResumenDigitador() {
+
+        /*
+        * IMPORTANTE:
+        * NO calculamos nada aquí.
+        *
+        * Tomamos exactamente el mismo resumen
+        * utilizado por Resultado_Auditorias_Tecnico.
+        */
+
+        if (
+            typeof window.obtenerResumenTecnicosGlobal !==
+            "function"
+        ) {
+
+            console.warn(
+                "⚠️ Todavía no existe obtenerResumenTecnicosGlobal()."
+            );
+
+            return;
+
+        }
+
+
+        const resumen =
+            window.obtenerResumenTecnicosGlobal();
+
+
+        console.log(
+            "📊 Resumen compartido con Digitador:",
+            resumen
+        );
+
+
+        /* ---------------------------------------------------------
+        TÉCNICOS CONTRATADOS
+        --------------------------------------------------------- */
+
+        const total =
+            document.getElementById(
+                "totalTecnicosDigitador"
+            );
+
+
+        if (total) {
+
+            total.textContent =
+                resumen.totalTecnicos.toLocaleString(
+                    "es-CO"
+                );
+
+        }
+
+
+        /* ---------------------------------------------------------
+        TÉCNICOS AUDITADOS
+        --------------------------------------------------------- */
+
+        const auditados =
+            document.getElementById(
+                "totalTecnicosAuditadosDigitador"
+            );
+
+
+        if (auditados) {
+
+            auditados.textContent =
+                resumen.totalAuditados.toLocaleString(
+                    "es-CO"
+                );
+
+        }
+
+
+        /* ---------------------------------------------------------
+        % AUDITADOS
+        --------------------------------------------------------- */
+
+        const cobertura =
+            document.getElementById(
+                "porcentajeCoberturaDigitador"
+            );
+
+
+        if (cobertura) {
+
+            cobertura.textContent =
+                resumen.cobertura
+                    .toFixed(2)
+                    .replace(/\.00$/, "")
+                    + "%";
+
+        }
+
+
+        /* ---------------------------------------------------------
+        TÉCNICOS SIN AUDITORÍA
+        --------------------------------------------------------- */
+
+        const sinAuditoria =
+            document.getElementById(
+                "totalTecnicosSinAuditoriaDigitador"
+            );
+
+
+        if (sinAuditoria) {
+
+            sinAuditoria.textContent =
+                resumen.totalSinAuditoria.toLocaleString(
+                    "es-CO"
+                );
+
+        }
+
+
+        /* ---------------------------------------------------------
+        % SIN AUDITAR
+        --------------------------------------------------------- */
+
+        const porcentajeSin =
+            document.getElementById(
+                "porcentajeTecnicosSinAuditoriaDigitador"
+            );
+
+
+        if (porcentajeSin) {
+
+            porcentajeSin.textContent =
+                resumen.porcentajeSinAuditoria
+                    .toFixed(2)
+                    .replace(/\.00$/, "")
+                    + "%";
+
+        }
+
+    }
+
+
+
+    /* =========================================================
+       EVENTOS
+       ========================================================= */
+
+    document
+        .querySelectorAll(
+            ".resultado-digitador-card " +
+            ".btn-orden-digitador"
+        )
+        .forEach(function (boton) {
+
+            boton.addEventListener(
+                "click",
+                function () {
+
+                    ordenActualDigitador =
+                        boton.dataset.orden;
+
+
+                    actualizarBotones();
+
+                    renderizarTabla();
+
+                }
+            );
+
+        });
+
+
+    /* =========================================================
+       INICIAR
+       ========================================================= */
+
+    actualizarBotones();
+
+    renderizarTabla();
+
+    actualizarResumenDigitador();
+    
+    /* =========================================================
+    ESCUCHAR LOS MISMOS DATOS DEL COMPONENTE TÉCNICO
+    ========================================================= */
+
+    window.addEventListener(
+        "ResultadoAuditoriasTecnicoActualizado",
+        function () {
+
+            console.log(
+                "🔄 Digitador: actualizando resumen compartido"
+            );
+
+            actualizarResumenDigitador();
+
+        }
+    );
+
+
+
+})();
+
+</script>
+
+
 <style>
 
 .resultado-digitador-card {
 
     width: 100%;
-
 }
 
+.resultado-digitador-card
+.resultado-tecnico-header {
+
+    width: 100%;
+
+    margin-bottom: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    box-sizing: border-box;
+}
+
+.resultado-digitador-card
+.resultado-tecnico-titulo {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+.resultado-digitador-card h2 {
+
+    margin: 0 0 6px;
+
+    color: #0f172a;
+
+    font-size: 22px;
+
+    font-weight: 700;
+}
+
+.resultado-digitador-card
+.grafica-descripcion {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+.resultado-digitador-card
+.resumen-comparacion {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 10px;
+
+    width: 50%;
+
+    flex-shrink: 0;
+}
+
+.resultado-digitador-card
+.resumen-comparacion-item {
+
+    min-width: 0;
+
+    padding: 11px 8px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    text-align: center;
+}
+
+.resultado-digitador-card
+.resumen-comparacion-item span {
+
+    display: block;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+}
+
+.resultado-digitador-card
+.resumen-comparacion-item strong {
+
+    display: block;
+
+    margin-top: 5px;
+
+    color: #172554;
+
+    font-size: 21px;
+
+    font-weight: 800;
+}
+
+.resultado-digitador-card
+.resumen-verde {
+
+    background: #f0fdf4;
+
+    border-color: #bbf7d0;
+}
+
+.resultado-digitador-card
+.resumen-verde strong {
+
+    color: #16a34a !important;
+}
+
+.resultado-digitador-card
+.resumen-rojo {
+
+    background: #fef2f2;
+
+    border-color: #fecaca;
+}
+
+.resultado-digitador-card
+.resumen-rojo strong {
+
+    color: #dc2626 !important;
+}
+
+.tabla-responsive {
+
+    width: 100%;
+
+    overflow-x: auto;
+}
 
 .tabla-resultado-digitador {
 
     width: 100%;
 
-    border-collapse: collapse;
-
     min-width: 850px;
 
+    border-collapse: collapse;
 }
-
-
-.tabla-resultado-digitador thead {
-
-    background: #172554;
-
-    color: white;
-
-}
-
 
 .tabla-resultado-digitador th {
 
     padding: 13px 15px;
 
+    background: #172554;
+
+    color: #ffffff;
+
     text-align: center;
 
-    font-size: 14px;
-
     white-space: nowrap;
-
 }
-
 
 .tabla-resultado-digitador th:first-child {
 
     text-align: left;
-
 }
-
 
 .tabla-resultado-digitador td {
 
@@ -120,9 +924,7 @@
     text-align: center;
 
     color: #334155;
-
 }
-
 
 .tabla-resultado-digitador td:first-child {
 
@@ -131,43 +933,87 @@
     font-weight: 600;
 
     color: #0f172a;
-
 }
 
+.fila-ordenamiento-digitador th {
 
-.tabla-resultado-digitador tbody tr:hover {
+    padding: 5px 4px;
 
-    background: #f8fafc;
-
+    background: #0f172a;
 }
 
+.btn-orden-digitador {
 
-.porcentaje-no-cumple {
+    display: block;
 
-    color: #dc2626 !important;
+    width: 100%;
+
+    min-height: 28px;
+
+    padding: 5px;
+
+    border: 1px solid #475569;
+
+    border-radius: 6px;
+
+    background: #1e293b;
+
+    color: #cbd5e1;
+
+    font-size: 10px;
 
     font-weight: 700;
 
+    cursor: pointer;
+
+    transition: .2s ease;
 }
 
+.btn-orden-digitador:hover {
 
+    background: #334155;
+
+    color: #ffffff;
+}
+
+.btn-orden-digitador.activo {
+
+    background: #2563eb;
+
+    border-color: #60a5fa;
+
+    color: #ffffff;
+}
+
+.btn-orden-digitador[data-orden="porcentaje"].activo,
+.btn-orden-digitador[data-orden="no_cumple"].activo {
+
+    background: #dc2626;
+
+    border-color: #f87171;
+}
+
+.btn-orden-digitador[data-orden="cumple"].activo {
+
+    background: #16a34a;
+
+    border-color: #4ade80;
+}
+
+.porcentaje-no-cumple,
 .valor-no-cumple {
 
     color: #dc2626 !important;
 
     font-weight: 700;
-
 }
-
 
 .valor-cumple {
 
     color: #16a34a !important;
 
     font-weight: 700;
-
 }
-
 
 .sin-datos {
 
@@ -176,6 +1022,88 @@
     padding: 30px !important;
 
     color: #64748b !important;
+}
+
+@media (max-width: 900px) {
+
+    .resultado-digitador-card
+    .resultado-tecnico-header {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+    .resultado-digitador-card
+    .resumen-comparacion {
+
+        width: 100%;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .resultado-digitador-card
+    .resumen-comparacion {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 7px;
+
+    }
+
+    .resultado-digitador-card h2 {
+
+        font-size: 19px;
+    }
+
+    .resultado-digitador-card
+    .grafica-descripcion {
+
+        font-size: 12px;
+    }
+
+    .resultado-digitador-card
+    .resumen-comparacion-item {
+
+        padding: 9px 6px;
+    }
+
+    .resultado-digitador-card
+    .resumen-comparacion-item strong {
+
+        font-size: 18px;
+    }
+
+    .fila-ordenamiento-digitador th {
+
+        padding: 4px 2px;
+    }
+
+    .btn-orden-digitador {
+
+        min-height: 25px;
+
+        padding: 4px 2px;
+
+        font-size: 8px;
+    }
+
+}
+
+@media (max-width: 400px) {
+
+    .btn-orden-digitador {
+
+        font-size: 7px;
+    }
 
 }
 

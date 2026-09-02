@@ -2,16 +2,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("=== OPERACIONES.JS INICIADO ===");
 
-    const elemento = document.getElementById("datos-operaciones");
-    const canvas = document.getElementById("graficaOperaciones");
+    const elemento =
+        document.getElementById("datos-operaciones");
+
+    const canvas =
+        document.getElementById("graficaOperaciones");
+
+
+    // =====================================================
+    // VALIDAR ELEMENTOS
+    // =====================================================
 
     if (!elemento) {
-        console.error("❌ NO EXISTE #datos-operaciones");
+
+        console.error(
+            "❌ NO EXISTE #datos-operaciones"
+        );
+
         return;
     }
 
+
     if (!canvas) {
-        console.error("❌ NO EXISTE #graficaOperaciones");
+
+        console.error(
+            "❌ NO EXISTE #graficaOperaciones"
+        );
+
         return;
     }
 
@@ -30,11 +47,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error("❌ ERROR JSON:", error);
+        console.error(
+            "❌ ERROR JSON:",
+            error
+        );
 
         return;
     }
 
+
+    // =====================================================
+    // VALIDAR ARRAY
+    // =====================================================
 
     if (!Array.isArray(datos)) {
 
@@ -50,78 +74,127 @@ document.addEventListener("DOMContentLoaded", function () {
     // DATOS
     // =====================================================
 
-    const operaciones = datos.map(
-        item => item.operacion
-    );
+    const operaciones =
+        datos.map(function (item) {
+
+            return item.operacion;
+
+        });
 
 
-    const total = datos.map(
-        item => Number(item.total) || 0
-    );
+    const total =
+        datos.map(function (item) {
+
+            return Number(item.total) || 0;
+
+        });
 
 
-    const cumple = datos.map(
-        item => Number(item.cumple) || 0
-    );
+    const cumple =
+        datos.map(function (item) {
+
+            return Number(item.cumple) || 0;
+
+        });
 
 
-    const noCumple = datos.map(
-        item => Number(item.no_cumple) || 0
-    );
+    const noCumple =
+        datos.map(function (item) {
+
+            return Number(item.no_cumple) || 0;
+
+        });
 
 
     // =====================================================
     // TOTALES GENERALES
     // =====================================================
 
-    const totalCumple = cumple.reduce(
-        (acumulado, valor) =>
-            acumulado + valor,
-        0
+    const totalCumple =
+        cumple.reduce(
+            function (acumulado, valor) {
+
+                return acumulado + valor;
+
+            },
+            0
+        );
+
+
+    const totalNoCumple =
+        noCumple.reduce(
+            function (acumulado, valor) {
+
+                return acumulado + valor;
+
+            },
+            0
+        );
+
+
+    const totalAuditorias =
+        total.reduce(
+            function (acumulado, valor) {
+
+                return acumulado + valor;
+
+            },
+            0
+        );
+
+
+    console.log(
+        "================================"
     );
 
-
-    const totalNoCumple = noCumple.reduce(
-        (acumulado, valor) =>
-            acumulado + valor,
-        0
+    console.log(
+        "TOTAL AUDITORÍAS:",
+        totalAuditorias
     );
 
-
-    const totalAuditorias = total.reduce(
-        (acumulado, valor) =>
-            acumulado + valor,
-        0
+    console.log(
+        "TOTAL CUMPLE:",
+        totalCumple
     );
 
+    console.log(
+        "TOTAL NO CUMPLE:",
+        totalNoCumple
+    );
 
-    console.log("================================");
-    console.log("TOTAL AUDITORÍAS:", totalAuditorias);
-    console.log("TOTAL CUMPLE:", totalCumple);
-    console.log("TOTAL NO CUMPLE:", totalNoCumple);
-    console.log("================================");
+    console.log(
+        "================================"
+    );
 
 
     // =====================================================
-    // MOSTRAR TOTALES EN LOS CÍRCULOS
+    // MOSTRAR TOTALES
     // =====================================================
 
     const elementoCumple =
-        document.getElementById("totalCumple");
+        document.getElementById(
+            "totalCumple"
+        );
 
 
     const elementoNoCumple =
-        document.getElementById("totalNoCumple");
+        document.getElementById(
+            "totalNoCumple"
+        );
 
 
     const elementoTotal =
-        document.getElementById("totalAuditorias");
+        document.getElementById(
+            "totalAuditorias"
+        );
 
 
     if (elementoCumple) {
 
         elementoCumple.textContent =
-            totalCumple.toLocaleString("es-CO");
+            totalCumple.toLocaleString(
+                "es-CO"
+            );
 
     }
 
@@ -129,7 +202,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (elementoNoCumple) {
 
         elementoNoCumple.textContent =
-            totalNoCumple.toLocaleString("es-CO");
+            totalNoCumple.toLocaleString(
+                "es-CO"
+            );
 
     }
 
@@ -137,7 +212,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (elementoTotal) {
 
         elementoTotal.textContent =
-            totalAuditorias.toLocaleString("es-CO");
+            totalAuditorias.toLocaleString(
+                "es-CO"
+            );
 
     }
 
@@ -158,7 +235,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // GRÁFICA
+    // CREAR GRÁFICA
     // =====================================================
 
     new Chart(canvas, {
@@ -166,78 +243,132 @@ document.addEventListener("DOMContentLoaded", function () {
         type: "bar",
 
 
+        // =================================================
+        // DATOS
+        // =================================================
+
         data: {
 
-            labels: operaciones,
+            labels:
+                operaciones,
 
 
             datasets: [
 
-                // =================================================
-                // 1️⃣ TOTAL
-                // =================================================
+                // =============================================
+                // 1. TOTAL
+                // =============================================
 
                 {
 
-                    label: "Total",
+                    label:
+                        "Total",
 
-                    data: total,
+                    data:
+                        total,
 
-                    backgroundColor: "#172554",
 
-                    hoverBackgroundColor: "#1e3a8a",
+                    /*
+                     * COLOR TOTAL
+                     */
 
-                    borderRadius: 6,
+                    backgroundColor:
+                        "#1e3a8a",
 
-                    borderSkipped: false,
+                    hoverBackgroundColor:
+                        "#1e3a8a",
 
-                    minBarLength: 8
+
+                    borderColor:
+                        "#1e3a8a",
+
+
+                    borderRadius:
+                        6,
+
+
+                    borderSkipped:
+                        false,
+
+
+                    minBarLength:
+                        8
 
                 },
 
 
-                // =================================================
-                // 2️⃣ CUMPLE
-                // =================================================
+                // =============================================
+                // 2. CUMPLE
+                // =============================================
 
                 {
 
-                    label: "Cumple",
+                    label:
+                        "Cumple",
 
-                    data: cumple,
+                    data:
+                        cumple,
 
-                    backgroundColor: "#22c55e",
 
-                    hoverBackgroundColor: "#16a34a",
+                    backgroundColor:
+                        "#22c55e",
 
-                    borderRadius: 6,
+                    hoverBackgroundColor:
+                        "#16a34a",
 
-                    borderSkipped: false,
 
-                    minBarLength: 8
+                    borderColor:
+                        "#16a34a",
+
+
+                    borderRadius:
+                        6,
+
+
+                    borderSkipped:
+                        false,
+
+
+                    minBarLength:
+                        8
 
                 },
 
 
-                // =================================================
-                // 3️⃣ NO CUMPLE
-                // =================================================
+                // =============================================
+                // 3. NO CUMPLE
+                // =============================================
 
                 {
 
-                    label: "No cumple",
+                    label:
+                        "No cumple",
 
-                    data: noCumple,
+                    data:
+                        noCumple,
 
-                    backgroundColor: "#ef4444",
 
-                    hoverBackgroundColor: "#dc2626",
+                    backgroundColor:
+                        "#ef4444",
 
-                    borderRadius: 6,
+                    hoverBackgroundColor:
+                        "#dc2626",
 
-                    borderSkipped: false,
 
-                    minBarLength: 8
+                    borderColor:
+                        "#dc2626",
+
+
+                    borderRadius:
+                        6,
+
+
+                    borderSkipped:
+                        false,
+
+
+                    minBarLength:
+                        8
 
                 }
 
@@ -252,27 +383,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
         options: {
 
-            responsive: true,
+            responsive:
+                true,
 
-            maintainAspectRatio: false,
 
+            maintainAspectRatio:
+                false,
+
+
+            // =================================================
+            // EJES
+            // =================================================
 
             scales: {
 
+                // =============================================
+                // EJE Y
+                // =============================================
+
                 y: {
 
-                    beginAtZero: true,
+                    beginAtZero:
+                        true,
 
 
                     ticks: {
 
-                        precision: 0,
+                        precision:
+                            0,
 
-                        color: "#374151",
+
+                        color:
+                            "#374151",
+
 
                         font: {
 
-                            size: 11
+                            size:
+                                11
 
                         }
 
@@ -289,24 +437,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     border: {
 
-                        display: false
+                        display:
+                            false
 
                     }
 
                 },
 
 
+                // =============================================
+                // EJE X
+                // =============================================
+
                 x: {
 
                     ticks: {
 
-                        color: "#374151",
+                        color:
+                            "#374151",
+
 
                         font: {
 
-                            weight: "bold",
+                            weight:
+                                "bold",
 
-                            size: 12
+                            size:
+                                12
 
                         }
 
@@ -315,14 +472,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     grid: {
 
-                        display: false
+                        display:
+                            false
 
                     },
 
 
                     border: {
 
-                        display: false
+                        display:
+                            false
 
                     }
 
@@ -331,73 +490,90 @@ document.addEventListener("DOMContentLoaded", function () {
             },
 
 
-            // =====================================================
+            // =================================================
             // PLUGINS
-            // =====================================================
+            // =================================================
 
             plugins: {
 
-                // =================================================
+                // =============================================
                 // LEYENDA
-                // =================================================
+                // =============================================
 
                 legend: {
 
-                    position: "top",
+                    position:
+                        "top",
 
-                    align: "start",
+
+                    align:
+                        "start",
 
 
                     labels: {
 
-                        usePointStyle: true,
+                        usePointStyle:
+                            true,
 
-                        pointStyle: "circle",
 
-                        padding: 18,
+                        pointStyle:
+                            "circle",
+
+
+                        padding:
+                            18,
 
 
                         font: {
 
-                            size: 12,
+                            size:
+                                12,
 
-                            weight: "bold"
+                            weight:
+                                "bold"
 
                         },
 
 
-                        /*
-                         * ORDEN:
-                         *
-                         * 1. Total
-                         * 2. Cumple
-                         * 3. No cumple
-                         */
+                        // =====================================
+                        // LEYENDA PERSONALIZADA
+                        // =====================================
 
                         generateLabels:
-                            function (chart) {
+                            function () {
 
                                 return [
 
+                                    // =========================
+                                    // TOTAL
+                                    // =========================
+
                                     {
+
                                         text:
                                             `Total (${totalAuditorias.toLocaleString("es-CO")})`,
 
                                         fillStyle:
-                                            "#172554",
+                                            "#1e3a8a",
 
                                         strokeStyle:
-                                            "#172554",
+                                            "#1e3a8a",
 
                                         pointStyle:
                                             "circle",
 
                                         datasetIndex:
                                             0
+
                                     },
 
 
+                                    // =========================
+                                    // CUMPLE
+                                    // =========================
+
                                     {
+
                                         text:
                                             `Cumple (${totalCumple.toLocaleString("es-CO")})`,
 
@@ -412,10 +588,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                         datasetIndex:
                                             1
+
                                     },
 
 
+                                    // =========================
+                                    // NO CUMPLE
+                                    // =========================
+
                                     {
+
                                         text:
                                             `No cumple (${totalNoCumple.toLocaleString("es-CO")})`,
 
@@ -430,6 +612,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                         datasetIndex:
                                             2
+
                                     }
 
                                 ];
@@ -441,26 +624,35 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
 
 
-                // =================================================
+                // =============================================
                 // DATOS SOBRE LAS BARRAS
-                // =================================================
+                // =============================================
 
                 datalabels: {
 
-                    color: "#ffffff",
+                    color:
+                        "#ffffff",
 
-                    anchor: "center",
 
-                    align: "center",
+                    anchor:
+                        "center",
 
-                    clamp: true,
+
+                    align:
+                        "center",
+
+
+                    clamp:
+                        true,
 
 
                     font: {
 
-                        weight: "bold",
+                        weight:
+                            "bold",
 
-                        size: 11
+                        size:
+                            11
 
                     },
 
@@ -475,10 +667,11 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
 
 
-                            return Number(value)
-                                .toLocaleString(
-                                    "es-CO"
-                                );
+                            return Number(
+                                value
+                            ).toLocaleString(
+                                "es-CO"
+                            );
 
                         }
 
@@ -488,6 +681,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         },
 
+
+        // =====================================================
+        // PLUGIN CHARTDATALABELS
+        // =====================================================
 
         plugins: [
 
@@ -499,7 +696,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     console.log(
-        "✅ GRÁFICA CREADA"
+        "✅ GRÁFICA CREADA CORRECTAMENTE"
     );
 
 });

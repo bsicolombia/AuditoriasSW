@@ -216,13 +216,25 @@ mes_actual = str(
 
 def obtener_filtros(request):
 
+    # ========================================================
+    # VALORES POR DEFECTO
+    # ========================================================
+
+    anio_default = str(
+        timezone.localtime().year
+    )
+
+    mes_default = str(
+        timezone.localtime().month
+    )
+
     filtros = {
 
         "anio":
             texto_seguro(
                 request.GET.get(
                     "anio",
-                    ""
+                    anio_default
                 )
             ),
 
@@ -230,7 +242,7 @@ def obtener_filtros(request):
             texto_seguro(
                 request.GET.get(
                     "mes",
-                    ""
+                    mes_default
                 )
             ),
 
@@ -292,24 +304,7 @@ def obtener_filtros(request):
     }
 
     # ========================================================
-    # SEGURIDAD
-    # ========================================================
-    #
-    # Si el frontend manda accidentalmente:
-    #
-    # resultado=tecnicos
-    #
-    # NO debemos dejar el queryset en cero.
-    #
-    # También protegemos contra:
-    #
-    # undefined
-    # null
-    # N/A
-    # na
-    # tecnico
-    # tecnicos
-    #
+    # SEGURIDAD RESULTADO
     # ========================================================
 
     resultado_invalido = (
@@ -329,7 +324,6 @@ def obtener_filtros(request):
     )
 
     if resultado_invalido:
-
         filtros["resultado"] = ""
 
     # ========================================================
@@ -342,7 +336,6 @@ def obtener_filtros(request):
     print("=" * 100)
 
     for nombre, valor in filtros.items():
-
         print(
             f"{nombre}: {repr(valor)}"
         )
@@ -351,6 +344,7 @@ def obtener_filtros(request):
     print("\n")
 
     return filtros
+
 
 
 # ============================================================

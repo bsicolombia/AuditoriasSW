@@ -301,6 +301,13 @@ def estadistica(request):
         "auditorias/estadistica.html"
     )
 
+def reauditar(request):
+
+    return render(
+        request,
+        "auditorias/reauditar.html"
+    )
+    
 def exportar_estadisticas_excel(request):
 
     # ==========================================

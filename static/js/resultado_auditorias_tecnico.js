@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     "use strict";
 
-
     console.log(
         "=== ESTADISTICAS DE AUDITORIAS INICIADAS ==="
     );
@@ -19,20 +18,15 @@ document.addEventListener("DOMContentLoaded", function () {
             valor === undefined ||
             valor === ""
         ) {
-
             return 0;
-
         }
 
 
-        if (
-            typeof valor === "number"
-        ) {
+        if (typeof valor === "number") {
 
             return Number.isFinite(valor)
                 ? valor
                 : 0;
-
         }
 
 
@@ -43,6 +37,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 .replace(/\s/g, "");
 
 
+        /*
+         * Si viene como:
+         *
+         * 1.234,56
+         *
+         * convertirlo a:
+         *
+         * 1234.56
+         */
+
         if (
             texto.includes(".") &&
             texto.includes(",")
@@ -52,15 +56,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 texto
                     .replace(/\./g, "")
                     .replace(",", ".");
-
         }
+
+        /*
+         * Si viene como:
+         *
+         * 12,5
+         *
+         * convertirlo a:
+         *
+         * 12.5
+         */
+
         else if (
             texto.includes(",")
         ) {
 
             texto =
                 texto.replace(",", ".");
-
         }
 
 
@@ -71,7 +84,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return Number.isFinite(numero)
             ? numero
             : 0;
-
     }
 
 
@@ -96,7 +108,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         return div.innerHTML;
-
     }
 
 
@@ -123,7 +134,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             return [];
-
         }
 
 
@@ -138,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             return [];
-
         }
 
 
@@ -151,9 +160,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             /*
-             * Permitir respuestas que vengan
-             * dentro de data, resultado o datos.
+             * Permitir diferentes estructuras
+             *
+             * {
+             *     "data": [...]
+             * }
+             *
+             * {
+             *     "resultado": [...]
+             * }
+             *
+             * {
+             *     "datos": [...]
+             * }
              */
+
 
             if (
                 !Array.isArray(datos) &&
@@ -163,7 +184,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 datos =
                     datos.data;
-
             }
 
 
@@ -175,7 +195,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 datos =
                     datos.resultado;
-
             }
 
 
@@ -187,13 +206,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 datos =
                     datos.datos;
-
             }
 
 
-            if (
-                !Array.isArray(datos)
-            ) {
+            if (!Array.isArray(datos)) {
 
                 console.error(
                     "❌ Los datos de técnicos no son un array:",
@@ -201,7 +217,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
                 return [];
-
             }
 
 
@@ -222,9 +237,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             return [];
-
         }
-
     }
 
 
@@ -239,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /*
-         * ESTA ES LA GLOBALIZACIÓN.
+         * Variable global.
          */
 
         window.Resultado_Auditorias_Tecnico =
@@ -253,9 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
 
-        if (
-            datos.length > 0
-        ) {
+        if (datos.length > 0) {
 
             console.table(
                 datos
@@ -274,13 +285,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     datos[0] || {}
                 )
             );
-
         }
 
 
         /*
-         * Avisar a cualquier código que esté
-         * escuchando los datos.
+         * Avisar a cualquier código que
+         * necesite los datos.
          */
 
         try {
@@ -300,13 +310,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 "⚠️ No se pudo emitir evento global:",
                 error
             );
-
         }
 
 
         /*
-         * Actualizar directamente la tarjeta
-         * si ya está cargada.
+         * Actualizar tabla si existe.
          */
 
         if (
@@ -315,12 +323,17 @@ document.addEventListener("DOMContentLoaded", function () {
         ) {
 
             window.actualizarResultadoTecnicos();
-
         }
 
 
-        return datos;
+        /*
+         * Actualizar resumen global.
+         */
 
+        actualizarResumenVisual();
+
+
+        return datos;
     }
 
 
@@ -329,7 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =========================================================
-       RESUMEN GLOBAL
+       RESUMEN GLOBAL DE TÉCNICOS
        ========================================================= */
 
     window.obtenerResumenTecnicosGlobal =
@@ -343,7 +356,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     : [];
 
 
+            /*
+             * Determinar si un técnico tiene auditorías.
+             */
+
             function tieneAuditorias(item) {
+
+                if (!item) {
+                    return false;
+                }
+
+
+                /*
+                 * Primero revisar los campos booleanos
+                 * que puedan venir desde Django.
+                 */
 
                 const valor =
                     item.tiene_auditorias ??
@@ -364,50 +391,77 @@ document.addEventListener("DOMContentLoaded", function () {
                 ) {
 
                     return true;
-
                 }
 
 
-                return obtenerNumero(
-                    item.total ??
-                    item.total_auditorias ??
-                    item.numero_auditorias ??
-                    item.auditorias ??
-                    0
-                ) > 0;
+                /*
+                 * Si no existe un indicador booleano,
+                 * revisar la cantidad de auditorías.
+                 */
 
+                const totalAuditorias =
+                    obtenerNumero(
+                        item.total ??
+                        item.total_auditorias ??
+                        item.numero_auditorias ??
+                        item.auditorias ??
+                        0
+                    );
+
+
+                return totalAuditorias > 0;
             }
 
 
-            const total =
+            /*
+             * Total de técnicos contratados.
+             */
+
+            const totalTecnicos =
                 datos.length;
 
 
-            const auditados =
+            /*
+             * Técnicos que tienen auditorías.
+             */
+
+            const tecnicosAuditados =
                 datos.filter(
                     tieneAuditorias
                 ).length;
 
 
-            const sinAuditoria =
-                total -
-                auditados;
+            /*
+             * Técnicos que NO tienen auditorías.
+             */
+
+            const tecnicosSinAuditoria =
+                totalTecnicos -
+                tecnicosAuditados;
 
 
-            const cobertura =
-                total > 0
+            /*
+             * Porcentaje de técnicos auditados.
+             */
+
+            const porcentajeAuditados =
+                totalTecnicos > 0
                     ? (
-                        auditados /
-                        total
+                        tecnicosAuditados /
+                        totalTecnicos
                     ) * 100
                     : 0;
 
 
-            const porcentajeSin =
-                total > 0
+            /*
+             * Porcentaje de técnicos sin auditar.
+             */
+
+            const porcentajeSinAuditar =
+                totalTecnicos > 0
                     ? (
-                        sinAuditoria /
-                        total
+                        tecnicosSinAuditoria /
+                        totalTecnicos
                     ) * 100
                     : 0;
 
@@ -415,22 +469,21 @@ document.addEventListener("DOMContentLoaded", function () {
             return {
 
                 totalTecnicos:
-                    total,
+                    totalTecnicos,
 
                 totalAuditados:
-                    auditados,
+                    tecnicosAuditados,
 
                 totalSinAuditoria:
-                    sinAuditoria,
+                    tecnicosSinAuditoria,
 
-                cobertura:
-                    cobertura,
+                porcentajeAuditados:
+                    porcentajeAuditados,
 
-                porcentajeSinAuditoria:
-                    porcentajeSin
+                porcentajeSinAuditar:
+                    porcentajeSinAuditar
 
             };
-
         };
 
 
@@ -444,41 +497,47 @@ document.addEventListener("DOMContentLoaded", function () {
             window.obtenerResumenTecnicosGlobal();
 
 
+        /*
+         * IMPORTANTE:
+         *
+         * Estos ID corresponden exactamente
+         * a los ID de estadisticas.html
+         */
+
+
         const elementoTotal =
             document.getElementById(
-                "totalTecnicos"
+                "contadorTotalTecnicosGlobal"
             );
 
 
         const elementoAuditados =
             document.getElementById(
-                "totalTecnicosAuditados"
+                "contadorTecnicosAuditadosGlobal"
             );
 
 
-        const elementoCobertura =
+        const elementoPorcentajeAuditados =
             document.getElementById(
-                "porcentajeCobertura"
+                "contadorPorcentajeAuditadosGlobal"
             );
 
 
-        const elementoSin =
+        const elementoSinAuditoria =
             document.getElementById(
-                "totalTecnicosSinAuditoria"
+                "contadorTecnicosSinAuditoriaGlobal"
             );
 
 
-        const elementoPorcentajeSin =
+        const elementoPorcentajeSinAuditar =
             document.getElementById(
-                "porcentajeTecnicosSinAuditoria"
+                "contadorPorcentajeSinAuditarGlobal"
             );
 
 
-        const contador =
-            document.getElementById(
-                "contadorSinAuditorias"
-            );
-
+        /* =====================================================
+           TÉCNICOS CONTRATADOS
+           ===================================================== */
 
         if (elementoTotal) {
 
@@ -486,9 +545,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 resumen.totalTecnicos.toLocaleString(
                     "es-CO"
                 );
-
         }
 
+
+        /* =====================================================
+           TÉCNICOS AUDITADOS
+           ===================================================== */
 
         if (elementoAuditados) {
 
@@ -496,54 +558,57 @@ document.addEventListener("DOMContentLoaded", function () {
                 resumen.totalAuditados.toLocaleString(
                     "es-CO"
                 );
-
         }
 
 
-        if (elementoCobertura) {
+        /* =====================================================
+           % AUDITADOS
+           ===================================================== */
 
-            elementoCobertura.textContent =
-                resumen.cobertura
+        if (elementoPorcentajeAuditados) {
+
+            elementoPorcentajeAuditados.textContent =
+                resumen.porcentajeAuditados
                     .toFixed(2)
-                    .replace(/\.00$/, "")
-                    + "%";
-
+                    .replace(/\.00$/, "") +
+                "%";
         }
 
 
-        if (elementoSin) {
+        /* =====================================================
+           TÉCNICOS SIN AUDITORÍA
+           ===================================================== */
 
-            elementoSin.textContent =
+        if (elementoSinAuditoria) {
+
+            elementoSinAuditoria.textContent =
                 resumen.totalSinAuditoria.toLocaleString(
                     "es-CO"
                 );
-
         }
 
 
-        if (elementoPorcentajeSin) {
+        /* =====================================================
+           % SIN AUDITAR
+           ===================================================== */
 
-            elementoPorcentajeSin.textContent =
-                resumen.porcentajeSinAuditoria
+        if (elementoPorcentajeSinAuditar) {
+
+            elementoPorcentajeSinAuditar.textContent =
+                resumen.porcentajeSinAuditar
                     .toFixed(2)
-                    .replace(/\.00$/, "")
-                    + "%";
-
+                    .replace(/\.00$/, "") +
+                "%";
         }
 
 
-        if (contador) {
-
-            contador.textContent =
-                resumen.totalSinAuditoria.toLocaleString(
-                    "es-CO"
-                );
-
-        }
+        console.log(
+            "📊 RESUMEN GLOBAL:",
+            resumen
+        );
 
 
         return resumen;
-
     }
 
 
@@ -557,6 +622,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     cargarDatosTecnicosGlobales();
 
+
+    /*
+     * Actualizar nuevamente por seguridad.
+     */
 
     actualizarResumenVisual();
 
@@ -595,15 +664,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 elementoOperaciones.textContent.trim();
 
 
-            if (
-                contenidoOperaciones
-            ) {
+            if (contenidoOperaciones) {
 
                 datosOperaciones =
                     JSON.parse(
                         contenidoOperaciones
                     );
-
             }
 
         } catch (error) {
@@ -618,7 +684,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Contenido operaciones:",
                 elementoOperaciones.textContent
             );
-
         }
 
 
@@ -656,7 +721,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             item.nombre_operacion ||
                             "Sin operación"
                         );
-
                     }
                 );
 
@@ -672,7 +736,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             0
 
                         );
-
                     }
                 );
 
@@ -684,7 +747,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         return obtenerNumero(
                             item.cumple
                         );
-
                     }
                 );
 
@@ -696,7 +758,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         return obtenerNumero(
                             item.no_cumple
                         );
-
                     }
                 );
 
@@ -778,39 +839,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-            if (
-                elementoCumple
-            ) {
+            if (elementoCumple) {
 
                 elementoCumple.textContent =
                     totalCumple.toLocaleString(
                         "es-CO"
                     );
-
             }
 
 
-            if (
-                elementoNoCumple
-            ) {
+            if (elementoNoCumple) {
 
                 elementoNoCumple.textContent =
                     totalNoCumple.toLocaleString(
                         "es-CO"
                     );
-
             }
 
 
-            if (
-                elementoTotal
-            ) {
+            if (elementoTotal) {
 
                 elementoTotal.textContent =
                     totalAuditorias.toLocaleString(
                         "es-CO"
                     );
-
             }
 
 
@@ -829,12 +881,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
 
-                if (
-                    graficaExistente
-                ) {
+                if (graficaExistente) {
 
                     graficaExistente.destroy();
-
                 }
 
 
@@ -941,7 +990,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                 }
 
                             ]
-
                         },
 
 
@@ -973,25 +1021,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                             size:
                                                 11
-
                                         }
-
                                     },
 
                                     grid: {
 
                                         color:
                                             "rgba(148, 163, 184, 0.18)"
-
                                     },
 
                                     border: {
 
                                         display:
                                             false
-
                                     }
-
                                 },
 
 
@@ -1009,27 +1052,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                             size:
                                                 12
-
                                         }
-
                                     },
 
                                     grid: {
 
                                         display:
                                             false
-
                                     },
 
                                     border: {
 
                                         display:
                                             false
-
                                     }
-
                                 }
-
                             },
 
 
@@ -1061,7 +1098,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                             weight:
                                                 "bold"
-
                                         },
 
 
@@ -1130,11 +1166,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                                     }
 
                                                 ];
-
                                             }
-
                                     }
-
                                 },
 
 
@@ -1159,7 +1192,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                         size:
                                             11
-
                                     },
 
 
@@ -1179,20 +1211,15 @@ document.addEventListener("DOMContentLoaded", function () {
                                             ) {
 
                                                 return "";
-
                                             }
 
 
                                             return numero.toLocaleString(
                                                 "es-CO"
                                             );
-
                                         }
-
                                 }
-
                             }
-
                         },
 
 
@@ -1207,31 +1234,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     "✅ GRÁFICA DE OPERACIONES CREADA"
                 );
 
-            }
-            else {
+            } else {
 
                 console.warn(
                     "⚠️ Chart.js no está cargado"
                 );
-
             }
 
-        }
-        else {
+        } else {
 
             console.warn(
                 "⚠️ Los datos de operaciones no son un array"
             );
-
         }
 
-    }
-    else {
+    } else {
 
         console.warn(
             "⚠️ No se encontraron los elementos de la gráfica de operaciones"
         );
-
     }
 
 
@@ -1257,7 +1278,6 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
 
                 window.actualizarResultadoTecnicos();
-
             }
 
         }

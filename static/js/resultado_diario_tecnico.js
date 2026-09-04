@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "=== RESULTADO DIARIO POR TÉCNICO - HISTÓRICO ==="
     );
 
-
     // =====================================================
     // ELEMENTOS
     // =====================================================
@@ -36,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "tablaResultadoDiarioTecnicoFoot"
         );
 
-
     if (
         !datosElemento ||
         !tabla ||
@@ -50,7 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         return;
-
     }
 
 
@@ -70,11 +67,9 @@ document.addEventListener("DOMContentLoaded", function () {
             throw new Error(
                 "El elemento de datos está vacío."
             );
-
         }
 
-        datos =
-            JSON.parse(contenido);
+        datos = JSON.parse(contenido);
 
     }
     catch (error) {
@@ -86,17 +81,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         body.innerHTML = `
             <tr>
-                <td
-                    colspan="100"
-                    class="tabla-sin-datos"
-                >
+                <td colspan="100" class="tabla-sin-datos">
                     Error cargando los datos.
                 </td>
             </tr>
         `;
 
         return;
-
     }
 
 
@@ -104,27 +95,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // ORDENAR FECHAS
     // =====================================================
 
-    /*
-     * IMPORTANTE:
-     *
-     * Las fechas quedan:
-     *
-     * 30/08
-     * 29/08
-     * 28/08
-     * ...
-     * 01/08
-     *
-     * Es decir:
-     * MÁS RECIENTE → MÁS ANTIGUA
-     */
-
     const dias =
         Array.isArray(datos.dias)
             ? [...datos.dias].sort(function (a, b) {
-
                 return compararFechas(b, a);
-
             })
             : [];
 
@@ -138,26 +112,19 @@ document.addEventListener("DOMContentLoaded", function () {
             ? [...datos.tecnicos]
             : [];
 
-
     let tecnicos =
         [...tecnicosOriginales];
 
 
     // =====================================================
-    // ESTADO DEL ORDEN
+    // ORDENAMIENTO
     // =====================================================
-
-    /*
-     * null = orden original
-     *
-     * desc = mayor → menor
-     *
-     * asc = menor → mayor
-     */
 
     let ordenActual = {
 
         columna: null,
+
+        indice: null,
 
         direccion: null
 
@@ -165,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // LIMPIAR TABLA
+    // LIMPIAR
     // =====================================================
 
     head.innerHTML = "";
@@ -173,17 +140,6 @@ document.addEventListener("DOMContentLoaded", function () {
     body.innerHTML = "";
 
     foot.innerHTML = "";
-
-
-    console.log(
-        "📅 Días:",
-        dias
-    );
-
-    console.log(
-        "👷 Técnicos:",
-        tecnicos.length
-    );
 
 
     // =====================================================
@@ -195,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
         body.innerHTML = `
             <tr>
                 <td
-                    colspan="${Math.max(dias.length + 5, 1)}"
+                    colspan="${Math.max(dias.length + 4, 1)}"
                     class="tabla-sin-datos"
                 >
                     No hay técnicos para mostrar.
@@ -204,19 +160,18 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
         return;
-
     }
 
 
     // =====================================================
-    // RENDERIZAR
+    // RENDER
     // =====================================================
 
     renderizarTabla();
 
 
     // =====================================================
-    // RENDERIZAR TABLA
+    // RENDERIZAR
     // =====================================================
 
     function renderizarTabla() {
@@ -229,23 +184,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // =================================================
-        // CALCULAR TOTALES
+        // RESUMEN POR DÍA
         // =================================================
 
-        let totalGeneral = 0;
-
-        let erroresGenerales = 0;
-
-
-        const resumenDias =
-            {};
-
+        const resumenDias = {};
 
         dias.forEach(function (dia) {
 
             resumenDias[dia] = {
 
-                auditados: 0,
+                tecnicosAuditados: 0,
 
                 errores: 0
 
@@ -254,22 +202,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
+
+
+        let erroresGenerales = 0;
+
+
+        // =================================================
+        // CALCULAR RESUMEN
+        // =================================================
+
         tecnicos.forEach(function (tecnico) {
-
-            const analisis =
-                analizarHistoricoTecnico(
-                    tecnico,
-                    dias
-                );
-
-
-            totalGeneral +=
-                analisis.diasAuditados;
-
-
-            erroresGenerales +=
-                analisis.totalErrores;
-
 
             dias.forEach(function (dia) {
 
@@ -280,20 +222,34 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
 
+                // -----------------------------------------
+                // TÉCNICO AUDITADO ESE DÍA
+                // -----------------------------------------
+
                 if (
-                    valor.tipo === "ok"
-                ) {
-
-                    resumenDias[dia].auditados++;
-
-                }
-                else if (
+                    valor.tipo === "ok" ||
                     valor.tipo === "error"
                 ) {
 
-                    resumenDias[dia].auditados++;
+                    resumenDias[dia]
+                        .tecnicosAuditados++;
+
+
+                }
+
+
+                // -----------------------------------------
+                // ERRORES
+                // -----------------------------------------
+
+                if (
+                    valor.tipo === "error"
+                ) {
 
                     resumenDias[dia].errores +=
+                        valor.numero;
+
+                    erroresGenerales +=
                         valor.numero;
 
                 }
@@ -301,7 +257,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
         });
-
 
         // =================================================
         // ENCABEZADO
@@ -321,36 +276,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // =================================================
-        // FECHAS
+        // DÍAS
         // =================================================
 
         dias.forEach(function (dia, indice) {
 
             const estadoOrden =
-                obtenerEstadoOrden(indice);
-
-
-            let iconoOrden =
-                "↕";
-
-
-            if (
-                estadoOrden === "asc"
-            ) {
-
-                iconoOrden =
-                    "↑";
-
-            }
-            else if (
-                estadoOrden === "desc"
-            ) {
-
-                iconoOrden =
-                    "↓";
-
-            }
-
+                obtenerEstadoOrden(
+                    "dia",
+                    indice
+                );
 
             encabezadoHtml += `
 
@@ -367,17 +302,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     >
 
                         <span class="dia-texto">
-
                             ${formatearDia(dia)}
-
                         </span>
 
-                        <span
-                            class="icono-orden"
-                        >
-
-                            ${iconoOrden}
-
+                        <span class="icono-orden">
+                            ${obtenerIconoOrden(
+                                estadoOrden
+                            )}
                         </span>
 
                     </button>
@@ -390,25 +321,111 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // =================================================
-        // COLUMNAS FINALES
+        // ERRORES
         // =================================================
+
+        const estadoErrores =
+            obtenerEstadoOrden(
+                "errores"
+            );
 
         encabezadoHtml += `
 
-            <th class="columna-total">
-                Días total
+            <th class="columna-errores">
+
+                <button
+                    type="button"
+                    class="boton-orden-columna"
+                    data-orden-columna="errores"
+                    title="Ordenar por errores"
+                >
+
+                    <span>
+                        Errores
+                    </span>
+
+                    <span class="icono-orden-columna">
+                        ${obtenerIconoOrden(
+                            estadoErrores
+                        )}
+                    </span>
+
+                </button>
+
             </th>
 
-            <th class="columna-errores">
-                Errores
-            </th>
+        `;
+
+
+        // =================================================
+        // ESTADO
+        // =================================================
+
+        const estadoEstado =
+            obtenerEstadoOrden(
+                "estado"
+            );
+
+        encabezadoHtml += `
 
             <th class="columna-estado">
-                Estado
+
+                <button
+                    type="button"
+                    class="boton-orden-columna"
+                    data-orden-columna="estado"
+                    title="Ordenar por estado"
+                >
+
+                    <span>
+                        Estado
+                    </span>
+
+                    <span class="icono-orden-columna">
+                        ${obtenerIconoOrden(
+                            estadoEstado
+                        )}
+                    </span>
+
+                </button>
+
             </th>
 
+        `;
+
+
+        // =================================================
+        // ACCIÓN
+        // =================================================
+
+        const estadoAccion =
+            obtenerEstadoOrden(
+                "accion"
+            );
+
+        encabezadoHtml += `
+
             <th class="columna-accion">
-                Acción
+
+                <button
+                    type="button"
+                    class="boton-orden-columna"
+                    data-orden-columna="accion"
+                    title="Ordenar por acción"
+                >
+
+                    <span>
+                        Acción
+                    </span>
+
+                    <span class="icono-orden-columna">
+                        ${obtenerIconoOrden(
+                            estadoAccion
+                        )}
+                    </span>
+
+                </button>
+
             </th>
 
         `;
@@ -417,100 +434,50 @@ document.addEventListener("DOMContentLoaded", function () {
         encabezado.innerHTML =
             encabezadoHtml;
 
-
         head.appendChild(
             encabezado
         );
 
 
         // =================================================
-        // FILA TOTAL GENERAL SUPERIOR
+        // FILA TÉCNICOS AUDITADOS
         // =================================================
 
-        const filaTotal =
+        const filaAuditados =
             document.createElement("tr");
 
+        filaAuditados.className =
+            "fila-tecnicos-auditados";
 
-        let totalHtml = `
 
-            <td class="nombre-total">
-                TOTAL GENERAL
+        let auditadosHtml = `
+
+            <td class="nombre-tecnicos-auditados">
+                TÉCNICOS AUDITADOS
             </td>
 
         `;
 
 
         // =================================================
-        // TOTAL POR CADA DÍA
+        // CANTIDAD POR CADA DÍA
         // =================================================
 
         dias.forEach(function (dia) {
 
-            const resumen =
-                resumenDias[dia];
+            const cantidad =
+                resumenDias[dia]
+                    .tecnicosAuditados;
 
-
-            // ---------------------------------------------
-            // SIN AUDITORÍAS
-            // ---------------------------------------------
-
-            if (
-                resumen.auditados === 0
-            ) {
-
-                totalHtml += `
-
-                    <td
-                        class="celda-na total-dia"
-                        title="Sin auditorías"
-                    >
-                        N/A
-                    </td>
-
-                `;
-
-                return;
-
-            }
-
-
-            // ---------------------------------------------
-            // SIN ERRORES
-            // ---------------------------------------------
-
-            if (
-                resumen.errores === 0
-            ) {
-
-                totalHtml += `
-
-                    <td
-                        class="celda-ok total-dia"
-                        title="${resumen.auditados} auditorías"
-                    >
-                        OK
-                    </td>
-
-                `;
-
-                return;
-
-            }
-
-
-            // ---------------------------------------------
-            // CON ERRORES
-            // ---------------------------------------------
-
-            totalHtml += `
+            auditadosHtml += `
 
                 <td
-                    class="celda-error total-dia"
-                    title="${resumen.auditados} auditorías"
+                    class="tecnicos-auditados-dia"
+                    title="${cantidad} técnico(s) auditado(s) el ${escapeHtml(dia)}"
                 >
 
                     ${formatearNumero(
-                        resumen.errores
+                        cantidad
                     )}
 
                 </td>
@@ -519,39 +486,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
 
-
-        // =================================================
-        // TOTAL DÍAS
-        // =================================================
-
-        totalHtml += `
-
-            <td
-                class="celda-total-general"
-            >
-
-                ${formatearNumero(
-                    totalGeneral
-                )}
-
-            </td>
-
-        `;
-
-
         // =================================================
         // TOTAL ERRORES
         // =================================================
 
-        totalHtml += `
+        auditadosHtml += `
 
-            <td
-                class="${
-                    erroresGenerales > 0
-                        ? "celda-error"
-                        : "celda-total-general"
-                }"
-            >
+            <td class="total-errores-general">
 
                 ${formatearNumero(
                     erroresGenerales
@@ -568,7 +509,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let estadoGeneral =
             "Todo bien";
-
 
         let claseEstadoGeneral =
             "estado-todo-bien";
@@ -587,9 +527,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        if (
-            totalGeneral === 0
-        ) {
+        const hayAuditorias =
+            dias.some(function (dia) {
+
+                return resumenDias[dia].tecnicosAuditados > 0;
+
+            });
+
+        if (!hayAuditorias) {
 
             estadoGeneral =
                 "Sin auditorías";
@@ -599,10 +544,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
+        auditadosHtml += `
 
-        totalHtml += `
-
-            <td class="resumen-superior">
+            <td class="estado-general">
 
                 <span
                     class="estado-badge ${claseEstadoGeneral}"
@@ -621,9 +565,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // ACCIÓN GENERAL
         // =================================================
 
-        totalHtml += `
+        auditadosHtml += `
 
-            <td class="resumen-superior">
+            <td class="accion-general">
 
                 <span
                     class="accion-badge ${
@@ -646,56 +590,64 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
 
-        filaTotal.innerHTML =
-            totalHtml;
-
-
-        /*
-         * IMPORTANTE:
-         *
-         * El TOTAL GENERAL se agrega al THEAD,
-         * no al TFOOT.
-         *
-         * Por eso queda arriba de los técnicos.
-         */
+        filaAuditados.innerHTML =
+            auditadosHtml;
 
         head.appendChild(
-            filaTotal
+            filaAuditados
         );
 
 
         // =================================================
-        // EVENTOS DE ORDEN
+        // EVENTOS DÍAS
         // =================================================
 
-        const botonesOrden =
-            head.querySelectorAll(
-                ".boton-orden-dia"
-            );
+        head.querySelectorAll(
+            ".boton-orden-dia"
+        ).forEach(function (boton) {
 
+            boton.addEventListener(
+                "click",
+                function () {
 
-        botonesOrden.forEach(
-            function (boton) {
-
-                boton.addEventListener(
-                    "click",
-                    function () {
-
-                        const indice =
-                            Number(
-                                boton.dataset.ordenDia
-                            );
-
-
-                        ordenarPorDia(
-                            indice
+                    const indice =
+                        Number(
+                            boton.dataset.ordenDia
                         );
 
-                    }
-                );
+                    ordenarPorDia(
+                        indice
+                    );
 
-            }
-        );
+                }
+            );
+
+        });
+
+
+        // =================================================
+        // EVENTOS COLUMNAS
+        // =================================================
+
+        head.querySelectorAll(
+            ".boton-orden-columna"
+        ).forEach(function (boton) {
+
+            boton.addEventListener(
+                "click",
+                function () {
+
+                    const columna =
+                        boton.dataset.ordenColumna;
+
+                    ordenarPorColumna(
+                        columna
+                    );
+
+                }
+            );
+
+        });
 
 
         // =================================================
@@ -706,7 +658,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const fila =
                 document.createElement("tr");
-
 
             const analisis =
                 analizarHistoricoTecnico(
@@ -746,35 +697,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
 
-                // ---------------------------------------------
-                // N/A
-                // ---------------------------------------------
-
                 if (
                     valor.tipo === "na"
                 ) {
 
                     html += `
 
-                        <td
-                            class="celda-na"
-                            data-valor-orden="-1"
-                        >
-
+                        <td class="celda-na">
                             N/A
-
                         </td>
 
                     `;
 
                     return;
-
                 }
 
-
-                // ---------------------------------------------
-                // OK
-                // ---------------------------------------------
 
                 if (
                     valor.tipo === "ok"
@@ -782,25 +719,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     html += `
 
-                        <td
-                            class="celda-ok"
-                            data-valor-orden="0"
-                        >
-
+                        <td class="celda-ok">
                             OK
-
                         </td>
 
                     `;
 
                     return;
-
                 }
 
-
-                // ---------------------------------------------
-                // ERROR
-                // ---------------------------------------------
 
                 if (
                     valor.tipo === "error"
@@ -822,36 +749,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     `;
 
                     return;
-
                 }
 
 
-                // ---------------------------------------------
-                // SEGURIDAD
-                // ---------------------------------------------
-
                 html += `
 
-                    <td
-                        class="celda-na"
-                        data-valor-orden="-1"
-                    >
-
+                    <td class="celda-na">
                         N/A
-
                     </td>
 
                 `;
 
             });
-
-
-            // =================================================
-            // DÍAS TOTAL
-            // =================================================
-
-            const total =
-                analisis.diasAuditados;
 
 
             // =================================================
@@ -861,17 +770,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const errores =
                 analisis.totalErrores;
 
-
             html += `
-
-                <td class="celda-total">
-
-                    ${formatearNumero(
-                        total
-                    )}
-
-                </td>
-
 
                 <td class="${
                     errores > 0
@@ -913,7 +812,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }
             else if (
-                analisis.estado === "Sin auditorías"
+                analisis.estado ===
+                "Sin auditorías"
             ) {
 
                 claseEstado =
@@ -991,81 +891,75 @@ document.addEventListener("DOMContentLoaded", function () {
             fila.innerHTML =
                 html;
 
-
             body.appendChild(
                 fila
             );
 
         });
 
-
-        // =================================================
-        // FOOTER
-        // =================================================
-
-        /*
-         * Lo dejamos vacío.
-         *
-         * El TOTAL GENERAL ahora está arriba.
-         */
-
-        foot.innerHTML = "";
-
     }
 
 
     // =====================================================
-    // ORDENAR POR DÍA
+    // ORDENAR
     // =====================================================
 
     function ordenarPorDia(indiceDia) {
 
-        /*
-         * NUEVO DÍA:
-         *
-         * Primer clic:
-         *
-         * MAYOR → MENOR
-         */
+        cambiarOrden(
+            "dia",
+            indiceDia
+        );
 
-        if (
-            ordenActual.columna !== indiceDia
-        ) {
+    }
+
+
+    function ordenarPorColumna(columna) {
+
+        cambiarOrden(
+            columna
+        );
+
+    }
+
+
+    function cambiarOrden(
+        columna,
+        indice = null
+    ) {
+
+        const mismaColumna =
+            ordenActual.columna === columna &&
+            ordenActual.indice === indice;
+
+
+        if (!mismaColumna) {
 
             ordenActual.columna =
-                indiceDia;
+                columna;
+
+            ordenActual.indice =
+                indice;
 
             ordenActual.direccion =
                 "desc";
 
         }
-
-
-        /*
-         * Segundo clic:
-         *
-         * MENOR → MAYOR
-         */
-
         else if (
-            ordenActual.direccion === "desc"
+            ordenActual.direccion ===
+            "desc"
         ) {
 
             ordenActual.direccion =
                 "asc";
 
         }
-
-
-        /*
-         * Tercer clic:
-         *
-         * ORDEN ORIGINAL
-         */
-
         else {
 
             ordenActual.columna =
+                null;
+
+            ordenActual.indice =
                 null;
 
             ordenActual.direccion =
@@ -1073,10 +967,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-
-        // =================================================
-        // ORDEN ORIGINAL
-        // =================================================
 
         if (
             ordenActual.columna === null
@@ -1092,105 +982,241 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // =================================================
-        // FECHA SELECCIONADA
-        // =================================================
+        if (
+            ordenActual.columna ===
+            "dia"
+        ) {
 
-        const diaSeleccionado =
-            dias[indiceDia];
-
-
-        // =================================================
-        // ORDENAR TÉCNICOS
-        // =================================================
-
-        tecnicos.sort(
-            function (a, b) {
-
-                const valorA =
-                    obtenerValorOrden(
-                        a,
-                        diaSeleccionado
-                    );
+            const dia =
+                dias[
+                    ordenActual.indice
+                ];
 
 
-                const valorB =
-                    obtenerValorOrden(
-                        b,
-                        diaSeleccionado
-                    );
+            tecnicos.sort(
+                function (a, b) {
+
+                    const valorA =
+                        obtenerValorOrden(
+                            a,
+                            dia
+                        );
+
+                    const valorB =
+                        obtenerValorOrden(
+                            b,
+                            dia
+                        );
 
 
-                // -----------------------------------------
-                // N/A ABAJO
-                // -----------------------------------------
+                    if (
+                        valorA.na &&
+                        !valorB.na
+                    ) {
 
-                if (
-                    valorA.na &&
-                    !valorB.na
-                ) {
+                        return 1;
 
-                    return 1;
-
-                }
+                    }
 
 
-                if (
-                    !valorA.na &&
-                    valorB.na
-                ) {
+                    if (
+                        !valorA.na &&
+                        valorB.na
+                    ) {
 
-                    return -1;
+                        return -1;
 
-                }
-
-
-                // -----------------------------------------
-                // AMBOS N/A
-                // -----------------------------------------
-
-                if (
-                    valorA.na &&
-                    valorB.na
-                ) {
-
-                    return 0;
-
-                }
+                    }
 
 
-                // -----------------------------------------
-                // MENOR → MAYOR
-                // -----------------------------------------
+                    if (
+                        valorA.na &&
+                        valorB.na
+                    ) {
 
-                if (
-                    ordenActual.direccion === "asc"
-                ) {
+                        return 0;
+
+                    }
+
+
+                    if (
+                        ordenActual.direccion ===
+                        "asc"
+                    ) {
+
+                        return (
+                            valorA.numero -
+                            valorB.numero
+                        );
+
+                    }
+
 
                     return (
-                        valorA.numero -
-                        valorB.numero
+                        valorB.numero -
+                        valorA.numero
                     );
 
                 }
+            );
+
+        }
 
 
-                // -----------------------------------------
-                // MAYOR → MENOR
-                // -----------------------------------------
+        else if (
+            ordenActual.columna ===
+            "errores"
+        ) {
 
-                return (
-                    valorB.numero -
-                    valorA.numero
-                );
+            tecnicos.sort(
+                function (a, b) {
 
-            }
-        );
+                    const analisisA =
+                        analizarHistoricoTecnico(
+                            a,
+                            dias
+                        );
+
+                    const analisisB =
+                        analizarHistoricoTecnico(
+                            b,
+                            dias
+                        );
 
 
-        // =================================================
-        // REDIBUJAR
-        // =================================================
+                    const valorA =
+                        analisisA.totalErrores;
+
+                    const valorB =
+                        analisisB.totalErrores;
+
+
+                    return ordenActual.direccion ===
+                        "asc"
+
+                        ? valorA - valorB
+
+                        : valorB - valorA;
+
+                }
+            );
+
+        }
+
+
+        else if (
+            ordenActual.columna ===
+            "estado"
+        ) {
+
+            const prioridadEstado = {
+
+                "Crítico": 4,
+
+                "Mejora": 3,
+
+                "Todo bien": 2,
+
+                "Sin auditorías": 1
+
+            };
+
+
+            tecnicos.sort(
+                function (a, b) {
+
+                    const analisisA =
+                        analizarHistoricoTecnico(
+                            a,
+                            dias
+                        );
+
+                    const analisisB =
+                        analizarHistoricoTecnico(
+                            b,
+                            dias
+                        );
+
+
+                    const valorA =
+                        prioridadEstado[
+                            analisisA.estado
+                        ] || 0;
+
+                    const valorB =
+                        prioridadEstado[
+                            analisisB.estado
+                        ] || 0;
+
+
+                    return ordenActual.direccion ===
+                        "asc"
+
+                        ? valorA - valorB
+
+                        : valorB - valorA;
+
+                }
+            );
+
+        }
+
+
+        else if (
+            ordenActual.columna ===
+            "accion"
+        ) {
+
+            const prioridadAccion = {
+
+                "Volver a auditar": 3,
+
+                "Mantener seguimiento": 2,
+
+                "Auditar": 1
+
+            };
+
+
+            tecnicos.sort(
+                function (a, b) {
+
+                    const analisisA =
+                        analizarHistoricoTecnico(
+                            a,
+                            dias
+                        );
+
+                    const analisisB =
+                        analizarHistoricoTecnico(
+                            b,
+                            dias
+                        );
+
+
+                    const valorA =
+                        prioridadAccion[
+                            analisisA.accion
+                        ] || 0;
+
+                    const valorB =
+                        prioridadAccion[
+                            analisisB.accion
+                        ] || 0;
+
+
+                    return ordenActual.direccion ===
+                        "asc"
+
+                        ? valorA - valorB
+
+                        : valorB - valorA;
+
+                }
+            );
+
+        }
+
 
         renderizarTabla();
 
@@ -1198,7 +1224,505 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // OBTENER VALOR PARA ORDENAR
+    // ICONOS
+    // =====================================================
+
+    function obtenerIconoOrden(
+        estado
+    ) {
+
+        if (
+            estado === "asc"
+        ) {
+
+            return "↑";
+
+        }
+
+
+        if (
+            estado === "desc"
+        ) {
+
+            return "↓";
+
+        }
+
+
+        return "↕";
+
+    }
+
+
+    function obtenerEstadoOrden(
+        columna,
+        indice = null
+    ) {
+
+        if (
+            ordenActual.columna !==
+            columna
+        ) {
+
+            return null;
+
+        }
+
+
+        if (
+            columna === "dia" &&
+            ordenActual.indice !== indice
+        ) {
+
+            return null;
+
+        }
+
+
+        return ordenActual.direccion;
+
+    }
+
+
+    // =====================================================
+    // ANÁLISIS HISTÓRICO
+    // =====================================================
+
+    function analizarHistoricoTecnico(
+        tecnico,
+        dias
+    ) {
+
+        const historico = [];
+
+
+        dias.forEach(function (dia) {
+
+            const valor =
+                obtenerValorDia(
+                    tecnico,
+                    dia
+                );
+
+
+            if (
+                valor.tipo === "na"
+            ) {
+
+                return;
+
+            }
+
+
+            historico.push({
+
+                dia: dia,
+
+                errores:
+                    valor.tipo === "error"
+                        ? valor.numero
+                        : 0,
+
+                auditado: true
+
+            });
+
+        });
+
+
+        if (
+            historico.length === 0
+        ) {
+
+            return {
+
+                estado:
+                    "Sin auditorías",
+
+                accion:
+                    "Auditar",
+
+                tecnicosAuditados:
+                    0,
+
+                diasConErrores:
+                    0,
+
+                totalErrores:
+                    0,
+
+                porcentajeDiasConErrores:
+                    0,
+
+                tendencia:
+                    "sin-datos"
+
+            };
+
+        }
+
+
+        const diasAuditados =
+            historico.length;
+
+
+        const diasConErrores =
+            historico.filter(
+                function (item) {
+
+                    return item.errores > 0;
+
+                }
+            ).length;
+
+
+        const totalErrores =
+            historico.reduce(
+                function (
+                    acumulado,
+                    item
+                ) {
+
+                    return acumulado +
+                        item.errores;
+
+                },
+                0
+            );
+
+
+        const porcentajeDiasConErrores =
+            (
+                diasConErrores /
+                diasAuditados
+            ) * 100;
+
+
+        const ultimas =
+            historico.slice(-3);
+
+
+        const ultimasSinErrores =
+            ultimas.length >= 2 &&
+            ultimas.every(
+                function (item) {
+
+                    return item.errores === 0;
+
+                }
+            );
+
+
+        const anteriores =
+            historico.slice(
+                0,
+                Math.max(
+                    historico.length - 3,
+                    0
+                )
+            );
+
+
+        const erroresAnteriores =
+            anteriores.reduce(
+                function (
+                    acumulado,
+                    item
+                ) {
+
+                    return acumulado +
+                        item.errores;
+
+                },
+                0
+            );
+
+
+        const promedioAnterior =
+            anteriores.length > 0
+                ? erroresAnteriores /
+                    anteriores.length
+                : 0;
+
+
+        const erroresRecientes =
+            ultimas.reduce(
+                function (
+                    acumulado,
+                    item
+                ) {
+
+                    return acumulado +
+                        item.errores;
+
+                },
+                0
+            );
+
+
+        const promedioReciente =
+            ultimas.length > 0
+                ? erroresRecientes /
+                    ultimas.length
+                : 0;
+
+
+        let estaMejorando =
+            false;
+
+
+        if (
+            anteriores.length >= 2 &&
+            promedioAnterior > 0 &&
+            promedioReciente <
+                promedioAnterior
+        ) {
+
+            estaMejorando = true;
+
+        }
+
+
+        if (
+            ultimasSinErrores &&
+            diasConErrores > 0
+        ) {
+
+            estaMejorando = true;
+
+        }
+
+
+        if (
+            porcentajeDiasConErrores >= 70
+        ) {
+
+            if (
+                estaMejorando &&
+                ultimasSinErrores
+            ) {
+
+                return {
+
+                    estado:
+                        "Mejora",
+
+                    accion:
+                        "Mantener seguimiento",
+
+                    tecnicosAuditados:
+                        1,
+
+                    diasConErrores:
+                        diasConErrores,
+
+                    totalErrores:
+                        totalErrores,
+
+                    porcentajeDiasConErrores:
+                        porcentajeDiasConErrores,
+
+                    tendencia:
+                        "mejorando"
+
+                };
+
+            }
+
+
+            return {
+
+                estado:
+                    "Crítico",
+
+                accion:
+                    "Volver a auditar",
+
+                tecnicosAuditados:
+                    1,
+
+                diasConErrores:
+                    diasConErrores,
+
+                totalErrores:
+                    totalErrores,
+
+                porcentajeDiasConErrores:
+                    porcentajeDiasConErrores,
+
+                tendencia:
+                    "critica"
+
+            };
+
+        }
+
+
+        if (
+            estaMejorando
+        ) {
+
+            return {
+
+                estado:
+                    "Mejora",
+
+                accion:
+                    "Mantener seguimiento",
+
+                tecnicosAuditados:
+                    1,
+
+                diasConErrores:
+                    diasConErrores,
+
+                totalErrores:
+                    totalErrores,
+
+                porcentajeDiasConErrores:
+                    porcentajeDiasConErrores,
+
+                tendencia:
+                    "mejorando"
+
+            };
+
+        }
+
+
+        return {
+
+            estado:
+                "Todo bien",
+
+            accion:
+                "Auditar",
+
+            tecnicosAuditados:
+                1,
+
+            diasConErrores:
+                diasConErrores,
+
+            totalErrores:
+                totalErrores,
+
+            porcentajeDiasConErrores:
+                porcentajeDiasConErrores,
+
+            tendencia:
+                "estable"
+
+        };
+
+    }
+
+
+    // =====================================================
+    // OBTENER VALOR DEL DÍA
+    // =====================================================
+
+    function obtenerValorDia(
+        tecnico,
+        dia
+    ) {
+
+        if (
+            !tecnico ||
+            !tecnico.dias
+        ) {
+
+            return {
+                tipo: "na"
+            };
+
+        }
+
+
+        const valor =
+            tecnico.dias[dia];
+
+
+        if (
+            valor === undefined ||
+            valor === null ||
+            valor === "" ||
+            String(valor)
+                .trim()
+                .toUpperCase() === "N/A" ||
+            String(valor)
+                .trim()
+                .toUpperCase() === "NA" ||
+            valor === "-"
+        ) {
+
+            return {
+                tipo: "na"
+            };
+
+        }
+
+
+        if (
+            String(valor)
+                .trim()
+                .toUpperCase() === "OK"
+        ) {
+
+            return {
+
+                tipo: "ok",
+
+                numero: 0
+
+            };
+
+        }
+
+
+        const numero =
+            convertirNumero(valor);
+
+
+        if (
+            numero > 0
+        ) {
+
+            return {
+
+                tipo: "error",
+
+                numero: numero
+
+            };
+
+        }
+
+
+        if (
+            numero === 0
+        ) {
+
+            return {
+
+                tipo: "ok",
+
+                numero: 0
+
+            };
+
+        }
+
+
+        return {
+            tipo: "na"
+        };
+
+    }
+
+
+    // =====================================================
+    // VALOR PARA ORDENAR
     // =====================================================
 
     function obtenerValorOrden(
@@ -1273,613 +1797,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // ESTADO DEL ORDEN
-    // =====================================================
-
-    function obtenerEstadoOrden(indiceDia) {
-
-        if (
-            ordenActual.columna !== indiceDia
-        ) {
-
-            return null;
-
-        }
-
-
-        return ordenActual.direccion;
-
-    }
-
-
-    // =====================================================
-    // ANALIZAR HISTÓRICO
-    // =====================================================
-
-    function analizarHistoricoTecnico(
-        tecnico,
-        dias
-    ) {
-
-        const historico = [];
-
-
-        dias.forEach(function (dia) {
-
-            const valor =
-                obtenerValorDia(
-                    tecnico,
-                    dia
-                );
-
-
-            if (
-                valor.tipo === "na"
-            ) {
-
-                return;
-
-            }
-
-
-            if (
-                valor.tipo === "ok"
-            ) {
-
-                historico.push({
-
-                    dia: dia,
-
-                    errores: 0,
-
-                    auditado: true
-
-                });
-
-                return;
-
-            }
-
-
-            if (
-                valor.tipo === "error"
-            ) {
-
-                historico.push({
-
-                    dia: dia,
-
-                    errores:
-                        valor.numero,
-
-                    auditado: true
-
-                });
-
-            }
-
-        });
-
-
-        // =================================================
-        // SIN AUDITORÍAS
-        // =================================================
-
-        if (
-            historico.length === 0
-        ) {
-
-            return {
-
-                estado:
-                    "Sin auditorías",
-
-                accion:
-                    "Auditar",
-
-                diasAuditados:
-                    0,
-
-                diasConErrores:
-                    0,
-
-                totalErrores:
-                    0,
-
-                porcentajeDiasConErrores:
-                    0,
-
-                tendencia:
-                    "sin-datos"
-
-            };
-
-        }
-
-
-        // =================================================
-        // DÍAS AUDITADOS
-        // =================================================
-
-        const diasAuditados =
-            historico.length;
-
-
-        // =================================================
-        // DÍAS CON ERRORES
-        // =================================================
-
-        const diasConErrores =
-            historico.filter(
-                function (item) {
-
-                    return (
-                        item.errores > 0
-                    );
-
-                }
-            ).length;
-
-
-        // =================================================
-        // TOTAL ERRORES
-        // =================================================
-
-        const totalErrores =
-            historico.reduce(
-                function (
-                    acumulado,
-                    item
-                ) {
-
-                    return (
-                        acumulado +
-                        item.errores
-                    );
-
-                },
-                0
-            );
-
-
-        // =================================================
-        // PORCENTAJE
-        // =================================================
-
-        const porcentajeDiasConErrores =
-            (
-                diasConErrores /
-                diasAuditados
-            ) * 100;
-
-
-        // =================================================
-        // ÚLTIMAS AUDITORÍAS
-        // =================================================
-
-        const ultimas =
-            historico.slice(-3);
-
-
-        const ultimasSinErrores =
-            ultimas.length >= 2 &&
-            ultimas.every(
-                function (item) {
-
-                    return (
-                        item.errores === 0
-                    );
-
-                }
-            );
-
-
-        // =================================================
-        // HISTÓRICO ANTERIOR
-        // =================================================
-
-        const anteriores =
-            historico.slice(
-                0,
-                Math.max(
-                    historico.length - 3,
-                    0
-                )
-            );
-
-
-        // =================================================
-        // PROMEDIO ANTERIOR
-        // =================================================
-
-        const erroresAnteriores =
-            anteriores.reduce(
-                function (
-                    acumulado,
-                    item
-                ) {
-
-                    return (
-                        acumulado +
-                        item.errores
-                    );
-
-                },
-                0
-            );
-
-
-        const promedioAnterior =
-            anteriores.length > 0
-                ? (
-                    erroresAnteriores /
-                    anteriores.length
-                )
-                : 0;
-
-
-        // =================================================
-        // PROMEDIO RECIENTE
-        // =================================================
-
-        const erroresRecientes =
-            ultimas.reduce(
-                function (
-                    acumulado,
-                    item
-                ) {
-
-                    return (
-                        acumulado +
-                        item.errores
-                    );
-
-                },
-                0
-            );
-
-
-        const promedioReciente =
-            ultimas.length > 0
-                ? (
-                    erroresRecientes /
-                    ultimas.length
-                )
-                : 0;
-
-
-        // =================================================
-        // DETECTAR MEJORA
-        // =================================================
-
-        let estaMejorando =
-            false;
-
-
-        if (
-            anteriores.length >= 2 &&
-            promedioAnterior > 0 &&
-            promedioReciente <
-                promedioAnterior
-        ) {
-
-            estaMejorando =
-                true;
-
-        }
-
-
-        if (
-            ultimasSinErrores &&
-            diasConErrores > 0
-        ) {
-
-            estaMejorando =
-                true;
-
-        }
-
-
-        // =================================================
-        // CRÍTICO
-        // =================================================
-
-        if (
-            porcentajeDiasConErrores >= 70
-        ) {
-
-            if (
-                estaMejorando &&
-                ultimasSinErrores
-            ) {
-
-                return {
-
-                    estado:
-                        "Mejora",
-
-                    accion:
-                        "Mantener seguimiento",
-
-                    diasAuditados:
-                        diasAuditados,
-
-                    diasConErrores:
-                        diasConErrores,
-
-                    totalErrores:
-                        totalErrores,
-
-                    porcentajeDiasConErrores:
-                        porcentajeDiasConErrores,
-
-                    tendencia:
-                        "mejorando"
-
-                };
-
-            }
-
-
-            return {
-
-                estado:
-                    "Crítico",
-
-                accion:
-                    "Volver a auditar",
-
-                diasAuditados:
-                    diasAuditados,
-
-                diasConErrores:
-                    diasConErrores,
-
-                totalErrores:
-                    totalErrores,
-
-                porcentajeDiasConErrores:
-                    porcentajeDiasConErrores,
-
-                tendencia:
-                    "critica"
-
-            };
-
-        }
-
-
-        // =================================================
-        // MEJORA
-        // =================================================
-
-        if (
-            estaMejorando
-        ) {
-
-            return {
-
-                estado:
-                    "Mejora",
-
-                accion:
-                    "Mantener seguimiento",
-
-                diasAuditados:
-                    diasAuditados,
-
-                diasConErrores:
-                    diasConErrores,
-
-                totalErrores:
-                    totalErrores,
-
-                porcentajeDiasConErrores:
-                    porcentajeDiasConErrores,
-
-                tendencia:
-                    "mejorando"
-
-            };
-
-        }
-
-
-        // =================================================
-        // TODO BIEN
-        // =================================================
-
-        if (
-            totalErrores === 0
-        ) {
-
-            return {
-
-                estado:
-                    "Todo bien",
-
-                accion:
-                    "Auditar",
-
-                diasAuditados:
-                    diasAuditados,
-
-                diasConErrores:
-                    0,
-
-                totalErrores:
-                    0,
-
-                porcentajeDiasConErrores:
-                    0,
-
-                tendencia:
-                    "estable"
-
-            };
-
-        }
-
-
-        // =================================================
-        // TIENE ERRORES
-        // =================================================
-
-        return {
-
-            estado:
-                "Todo bien",
-
-            accion:
-                "Auditar",
-
-            diasAuditados:
-                diasAuditados,
-
-            diasConErrores:
-                diasConErrores,
-
-            totalErrores:
-                totalErrores,
-
-            porcentajeDiasConErrores:
-                porcentajeDiasConErrores,
-
-            tendencia:
-                "estable"
-
-        };
-
-    }
-
-
-    // =====================================================
-    // OBTENER VALOR DE UN DÍA
-    // =====================================================
-
-    function obtenerValorDia(
-        tecnico,
-        dia
-    ) {
-
-        if (
-            !tecnico ||
-            !tecnico.dias
-        ) {
-
-            return {
-
-                tipo: "na"
-
-            };
-
-        }
-
-
-        const valor =
-            tecnico.dias[dia];
-
-
-        // =================================================
-        // N/A
-        // =================================================
-
-        if (
-            valor === undefined ||
-            valor === null ||
-            valor === "" ||
-            String(valor)
-                .trim()
-                .toUpperCase() === "N/A" ||
-            String(valor)
-                .trim()
-                .toUpperCase() === "NA" ||
-            valor === "-"
-        ) {
-
-            return {
-
-                tipo: "na"
-
-            };
-
-        }
-
-
-        // =================================================
-        // OK
-        // =================================================
-
-        if (
-            String(valor)
-                .trim()
-                .toUpperCase() === "OK"
-        ) {
-
-            return {
-
-                tipo: "ok",
-
-                numero: 0
-
-            };
-
-        }
-
-
-        // =================================================
-        // NÚMERO
-        // =================================================
-
-        const numero =
-            convertirNumero(valor);
-
-
-        if (
-            numero > 0
-        ) {
-
-            return {
-
-                tipo: "error",
-
-                numero: numero
-
-            };
-
-        }
-
-
-        // =================================================
-        // CERO = OK
-        // =================================================
-
-        if (
-            numero === 0
-        ) {
-
-            return {
-
-                tipo: "ok",
-
-                numero: 0
-
-            };
-
-        }
-
-
-        return {
-
-            tipo: "na"
-
-        };
-
-    }
-
-
-    // =====================================================
-    // CONVERTIR NÚMERO
+    // NÚMERO
     // =====================================================
 
     function convertirNumero(valor) {
@@ -1974,7 +1892,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // FORMATEAR FECHA
+    // FORMATEAR DÍA
     // =====================================================
 
     function formatearDia(fecha) {
@@ -2024,7 +1942,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const partesA =
             String(fechaA).split("-");
 
-
         const partesB =
             String(fechaB).split("-");
 
@@ -2040,7 +1957,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     Number(partesA[1]) - 1,
                     Number(partesA[2])
                 );
-
 
             const fechaObjB =
                 new Date(
@@ -2102,12 +2018,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =====================================================
-    // FINAL
-    // =====================================================
-
     console.log(
-        "✅ Tabla histórica de técnicos cargada correctamente."
+        "✅ Tabla histórica cargada correctamente."
     );
 
 });

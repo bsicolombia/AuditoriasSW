@@ -10,9 +10,9 @@ body {
 }
 
 .sidebar {
-    width: 170px;
+    width: 150px;
     padding: 25px;
-    background: linear-gradient(180deg,#aac5d3,#0a1d38);
+    background: linear-gradient(180deg,#b5c8d1,rgb(146, 250, 210));
     color: white;
     box-shadow: 4px 0 15px rgba(0,0,0,0.2);
 }
@@ -34,7 +34,7 @@ body {
 .sidebar h2 {
     text-align: center;
     margin-bottom: 30px;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .sidebar ul {
@@ -51,10 +51,12 @@ body {
     padding: 12px 15px;
     color: rgb(7, 7, 7);
     text-decoration: none;
-    font-size: 17px;
+    font-size: 20px;
+    font-weight: bold;
     border-radius: 10px;
-    transition: background 0.3s ease,transform 0.3s ease,padding-left 0.3s ease;
+    transition: background 0.3s ease, transform 0.3s ease, padding-left 0.3s ease;
 }
+
 
 .sidebar a:hover {
     background-color: rgba(20, 68, 88, 0.15);

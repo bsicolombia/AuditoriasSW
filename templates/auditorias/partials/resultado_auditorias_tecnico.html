@@ -1,5 +1,9 @@
 <div class="grafica-card resultado-tecnico-card">
 
+    <!-- ============================================================
+         TÍTULO
+         ============================================================ -->
+
     <div class="resultado-tecnico-header">
 
         <div class="resultado-tecnico-titulo">
@@ -15,96 +19,18 @@
 
         </div>
 
-
-        <div class="resumen-comparacion">
-
-            <div class="resumen-comparacion-item">
-
-                <span>
-                    Técnicos Contratados
-                </span>
-
-                <strong id="totalTecnicos">
-                    0
-                </strong>
-
-            </div>
-
-
-            <div class="resumen-comparacion-item resumen-verde">
-
-                <span>
-                    Técnicos auditados
-                </span>
-
-                <strong
-                    id="totalTecnicosAuditados"
-                    class="verde"
-                >
-                    0
-                </strong>
-
-            </div>
-
-
-            <div class="resumen-comparacion-item resumen-verde">
-
-                <span>
-                    % Auditados
-                </span>
-
-                <strong
-                    id="porcentajeCobertura"
-                    class="verde"
-                >
-                    0%
-                </strong>
-
-            </div>
-
-
-            <div class="resumen-comparacion-item resumen-rojo">
-
-                <span>
-                    Técnicos sin auditoría
-                </span>
-
-                <strong
-                    id="totalTecnicosSinAuditoria"
-                    class="rojo"
-                >
-                    0
-                </strong>
-
-            </div>
-
-
-            <div class="resumen-comparacion-item resumen-rojo">
-
-                <span>
-                    % sin auditar
-                </span>
-
-                <strong
-                    id="porcentajeTecnicosSinAuditoria"
-                    class="rojo"
-                >
-                    0%
-                </strong>
-
-            </div>
-
-        </div>
-
     </div>
 
+
+    <!-- ============================================================
+         TABLA
+         ============================================================ -->
 
     <div class="tabla-responsive">
 
         <table class="tabla-resultado-tecnico">
 
             <colgroup>
-
                 <col style="width:16%">
                 <col style="width:17%">
                 <col style="width:11%">
@@ -113,11 +39,13 @@
                 <col style="width:11%">
                 <col style="width:11%">
                 <col style="width:12%">
-
             </colgroup>
 
-
             <thead>
+
+                <!-- ==================================================
+                     FILA DE CONTROLES Y ORDENAMIENTO
+                     ================================================== -->
 
                 <tr class="fila-ordenamiento">
 
@@ -128,6 +56,8 @@
 
                         <div class="resultado-tecnico-controles">
 
+                            <!-- Todos -->
+
                             <button
                                 type="button"
                                 id="btnVerTodosTecnicos"
@@ -137,12 +67,13 @@
                             </button>
 
 
+                            <!-- Sin auditorías -->
+
                             <button
                                 type="button"
                                 id="btnVerSinAuditorias"
                                 class="btn-vista btn-sin-auditorias"
                             >
-
                                 ⚠️ Técnicos sin auditorías
 
                                 <span id="contadorSinAuditorias">
@@ -155,6 +86,8 @@
 
                     </th>
 
+
+                    <!-- N° Auditorías -->
 
                     <th>
 
@@ -170,6 +103,8 @@
                     </th>
 
 
+                    <!-- % Error -->
+
                     <th>
 
                         <button
@@ -183,6 +118,8 @@
 
                     </th>
 
+
+                    <!-- No Cumple -->
 
                     <th>
 
@@ -198,6 +135,8 @@
                     </th>
 
 
+                    <!-- Cumple -->
+
                     <th>
 
                         <button
@@ -211,6 +150,8 @@
 
                     </th>
 
+
+                    <!-- Días -->
 
                     <th>
 
@@ -227,6 +168,10 @@
 
                 </tr>
 
+
+                <!-- ==================================================
+                     ENCABEZADOS
+                     ================================================== -->
 
                 <tr class="fila-encabezados">
 
@@ -268,7 +213,6 @@
 
 
             <tbody id="tablaResultadoAuditoriasTecnico">
-
             </tbody>
 
         </table>
@@ -286,17 +230,15 @@
 
 
     /* ============================================================
-       ESTADO GLOBAL DE LA TABLA
+       ESTADO GLOBAL
        ============================================================ */
 
     window.estadoResultadoTecnicos =
         window.estadoResultadoTecnicos || {
 
-            orden:
-                "porcentaje_error",
+            orden: "porcentaje_error",
 
-            vista:
-                "todos"
+            vista: "todos"
 
         };
 
@@ -374,9 +316,7 @@
         }
 
 
-        if (
-            typeof valor === "number"
-        ) {
+        if (typeof valor === "number") {
 
             return Number.isFinite(valor)
                 ? valor
@@ -403,6 +343,7 @@
                     .replace(",", ".");
 
         }
+
         else if (
             valorLimpio.includes(",")
         ) {
@@ -551,7 +492,7 @@
 
 
     /* ============================================================
-       DÍAS
+       DÍAS AUDITADOS
        ============================================================ */
 
     function obtenerDias(item) {
@@ -671,9 +612,8 @@
 
     function formatearNumero(valor) {
 
-        return numero(valor).toLocaleString(
-            "es-CO"
-        );
+        return numero(valor)
+            .toLocaleString("es-CO");
 
     }
 
@@ -684,10 +624,16 @@
 
     function formatearPorcentaje(valor) {
 
-        return numero(valor)
-            .toFixed(2)
+        const numeroFormateado =
+            numero(valor).toFixed(2);
+
+
+        return numeroFormateado
+
             .replace(/\.00$/, "")
+
             .replace(/(\.\d)0$/, "$1")
+
             + "%";
 
     }
@@ -906,15 +852,17 @@
 
 
     /* ============================================================
-       BOTONES DE ORDEN
+       ACTUALIZAR BOTONES DE ORDEN
        ============================================================ */
 
     function actualizarBotonesOrden() {
 
         document
+
             .querySelectorAll(
                 ".resultado-tecnico-card .btn-orden"
             )
+
             .forEach(function (boton) {
 
                 boton.classList.toggle(
@@ -932,7 +880,7 @@
 
 
     /* ============================================================
-       BOTONES DE VISTA
+       ACTUALIZAR BOTONES DE VISTA
        ============================================================ */
 
     function actualizarBotonesVista() {
@@ -980,7 +928,7 @@
 
 
     /* ============================================================
-       ORDENAR
+       ORDENAR TÉCNICOS
        ============================================================ */
 
     function ordenarTecnicos(campo) {
@@ -1061,6 +1009,10 @@
             obtenerDatosTecnicos();
 
 
+        /* ========================================================
+           SIN DATOS
+           ======================================================== */
+
         if (
             !Array.isArray(datosOriginales) ||
             datosOriginales.length === 0
@@ -1093,9 +1045,9 @@
             datosOriginales.slice();
 
 
-        /* --------------------------------------------------------
+        /* ========================================================
            FILTRO
-           -------------------------------------------------------- */
+           ======================================================== */
 
         if (
             window.estadoResultadoTecnicos.vista ===
@@ -1112,9 +1064,9 @@
         }
 
 
-        /* --------------------------------------------------------
+        /* ========================================================
            ORDENAMIENTO
-           -------------------------------------------------------- */
+           ======================================================== */
 
         const campo =
             window.estadoResultadoTecnicos.orden;
@@ -1162,14 +1114,16 @@
                 );
 
 
-            if (
-                valorA !== valorB
-            ) {
+            if (valorA !== valorB) {
 
                 return valorB - valorA;
 
             }
 
+
+            /* ====================================================
+               SEGUNDO ORDEN: SUPERVISOR
+               ==================================================== */
 
             const supervisorA =
                 obtenerSupervisor(a);
@@ -1181,11 +1135,15 @@
 
             const comparacionSupervisor =
                 supervisorA.localeCompare(
+
                     supervisorB,
+
                     "es",
+
                     {
                         sensitivity: "base"
                     }
+
                 );
 
 
@@ -1198,21 +1156,29 @@
             }
 
 
+            /* ====================================================
+               TERCER ORDEN: TÉCNICO
+               ==================================================== */
+
             return obtenerTecnico(a)
                 .localeCompare(
+
                     obtenerTecnico(b),
+
                     "es",
+
                     {
                         sensitivity: "base"
                     }
+
                 );
 
         });
 
 
-        /* --------------------------------------------------------
+        /* ========================================================
            SIN RESULTADOS
-           -------------------------------------------------------- */
+           ======================================================== */
 
         if (datos.length === 0) {
 
@@ -1239,9 +1205,9 @@
         }
 
 
-        /* --------------------------------------------------------
+        /* ========================================================
            CREAR HTML
-           -------------------------------------------------------- */
+           ======================================================== */
 
         let html = "";
 
@@ -1295,22 +1261,19 @@
                 <tr class="${claseFila}">
 
                     <td>
-                        ${escaparHTML(
-                            supervisor
-                        )}
+                        ${escaparHTML(supervisor)}
                     </td>
 
-                    <td>
-                        ${escaparHTML(
-                            tecnico
-                        )}
-                    </td>
 
                     <td>
-                        ${escaparHTML(
-                            cedula
-                        )}
+                        ${escaparHTML(tecnico)}
                     </td>
+
+
+                    <td>
+                        ${escaparHTML(cedula)}
+                    </td>
+
 
                     <td class="valor-total">
 
@@ -1319,11 +1282,13 @@
 
                             ? formatearNumero(total)
 
-                            : `<span class="valor-na">N/A</span>`
-
+                            : `<span class="valor-na">
+                                N/A
+                              </span>`
                         }
 
                     </td>
+
 
                     <td class="porcentaje-error">
 
@@ -1332,11 +1297,13 @@
 
                             ? formatearPorcentaje(error)
 
-                            : `<span class="valor-na">N/A</span>`
-
+                            : `<span class="valor-na">
+                                N/A
+                              </span>`
                         }
 
                     </td>
+
 
                     <td class="valor-no-cumple">
 
@@ -1345,11 +1312,13 @@
 
                             ? formatearNumero(noCumple)
 
-                            : `<span class="valor-na">N/A</span>`
-
+                            : `<span class="valor-na">
+                                N/A
+                              </span>`
                         }
 
                     </td>
+
 
                     <td class="valor-cumple">
 
@@ -1358,11 +1327,13 @@
 
                             ? formatearNumero(cumple)
 
-                            : `<span class="valor-na">N/A</span>`
-
+                            : `<span class="valor-na">
+                                N/A
+                              </span>`
                         }
 
                     </td>
+
 
                     <td class="valor-dias">
 
@@ -1371,8 +1342,9 @@
 
                             ? formatearNumero(dias)
 
-                            : `<span class="valor-na">N/A</span>`
-
+                            : `<span class="valor-na">
+                                N/A
+                              </span>`
                         }
 
                     </td>
@@ -1455,18 +1427,22 @@
             "true";
 
 
-        /* --------------------------------------------------------
-           ORDEN
-           -------------------------------------------------------- */
+        /* ========================================================
+           BOTONES DE ORDEN
+           ======================================================== */
 
         card
+
             .querySelectorAll(
                 ".btn-orden"
             )
+
             .forEach(function (boton) {
 
                 boton.addEventListener(
+
                     "click",
+
                     function () {
 
                         ordenarTecnicos(
@@ -1474,14 +1450,15 @@
                         );
 
                     }
+
                 );
 
             });
 
 
-        /* --------------------------------------------------------
+        /* ========================================================
            TODOS
-           -------------------------------------------------------- */
+           ======================================================== */
 
         const btnTodos =
             document.getElementById(
@@ -1492,7 +1469,9 @@
         if (btnTodos) {
 
             btnTodos.addEventListener(
+
                 "click",
+
                 function () {
 
                     cambiarVistaTecnicos(
@@ -1500,14 +1479,15 @@
                     );
 
                 }
+
             );
 
         }
 
 
-        /* --------------------------------------------------------
+        /* ========================================================
            SIN AUDITORÍAS
-           -------------------------------------------------------- */
+           ======================================================== */
 
         const btnSin =
             document.getElementById(
@@ -1518,7 +1498,9 @@
         if (btnSin) {
 
             btnSin.addEventListener(
+
                 "click",
+
                 function () {
 
                     cambiarVistaTecnicos(
@@ -1526,6 +1508,7 @@
                     );
 
                 }
+
             );
 
         }
@@ -1557,6 +1540,7 @@
         );
 
     }
+
     else {
 
         inicializar();
@@ -1578,22 +1562,25 @@
 .resultado-tecnico-card {
 
     width: 100%;
+
     max-width: 100%;
+
     min-width: 0;
+
     box-sizing: border-box;
 
 }
 
 
 /* ============================================================
-   ENCABEZADO
+   ENCABEZADO / TÍTULO
    ============================================================ */
 
 .resultado-tecnico-header {
 
     width: 100%;
 
-    margin-bottom: 18px;
+    margin-bottom: 10px;
 
     display: flex;
 
@@ -1604,6 +1591,8 @@
     gap: 30px;
 
     box-sizing: border-box;
+
+    padding: 12px 0;
 
 }
 
@@ -1646,6 +1635,31 @@
 
 
 /* ============================================================
+   RESUMEN FIJO
+   ============================================================ */
+
+.resumen-fijo {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    width: 100%;
+
+    background: #ffffff;
+
+    padding: 8px 0 12px;
+
+    margin-bottom: 12px;
+
+    box-sizing: border-box;
+
+}
+
+
+/* ============================================================
    RESUMEN
    ============================================================ */
 
@@ -1658,9 +1672,11 @@
 
     gap: 10px;
 
-    width: 50%;
+    width: 100%;
 
-    flex-shrink: 0;
+    max-width: 100%;
+
+    box-sizing: border-box;
 
 }
 
@@ -1792,7 +1808,7 @@
 
 
 /* ============================================================
-   BOTONES VISTA
+   BOTONES DE VISTA
    ============================================================ */
 
 .btn-vista {
@@ -1914,8 +1930,7 @@
 }
 
 
-.btn-sin-auditorias.activo
-#contadorSinAuditorias {
+.btn-sin-auditorias.activo #contadorSinAuditorias {
 
     background: #ffffff;
 
@@ -1925,7 +1940,7 @@
 
 
 /* ============================================================
-   TABLA
+   TABLA RESPONSIVE
    ============================================================ */
 
 .tabla-responsive {
@@ -1982,9 +1997,15 @@
 }
 
 
+/* ============================================================
+   TABLA
+   ============================================================ */
+
 .tabla-resultado-tecnico {
 
     width: 100%;
+
+    min-width: 850px;
 
     table-layout: fixed;
 
@@ -2014,6 +2035,10 @@
 }
 
 
+/* ============================================================
+   PRIMERA FILA STICKY
+   ============================================================ */
+
 .fila-ordenamiento th {
 
     position: sticky;
@@ -2030,6 +2055,10 @@
 
 }
 
+
+/* ============================================================
+   SEGUNDA FILA STICKY
+   ============================================================ */
 
 .fila-encabezados th {
 
@@ -2169,8 +2198,7 @@
 }
 
 
-.tabla-resultado-tecnico
-td:nth-child(n+4) {
+.tabla-resultado-tecnico td:nth-child(n+4) {
 
     font-weight: 800;
 
@@ -2207,8 +2235,7 @@ td:nth-child(n+4) {
 }
 
 
-.tabla-resultado-tecnico
-tbody tr:hover td {
+.tabla-resultado-tecnico tbody tr:hover td {
 
     background: #f8fafc;
 
@@ -2257,51 +2284,15 @@ tbody tr:hover td {
 
 
 /* ============================================================
-   TABLET
+   RESPONSIVE - TABLET
    ============================================================ */
 
 @media (max-width: 900px) {
 
-    .resultado-tecnico-header {
-
-        flex-direction: column;
-
-        align-items: stretch;
-
-    }
-
-
     .resumen-comparacion {
-
-        width: 100%;
 
         grid-template-columns:
             repeat(3, minmax(0, 1fr));
-
-    }
-
-
-    .fila-encabezados th {
-
-        top: 36px;
-
-    }
-
-
-    .tabla-resultado-tecnico th {
-
-        font-size: 11px;
-
-        padding: 9px 5px;
-
-    }
-
-
-    .tabla-resultado-tecnico td {
-
-        font-size: 12px;
-
-        padding: 9px 5px;
 
     }
 
@@ -2309,10 +2300,17 @@ tbody tr:hover td {
 
 
 /* ============================================================
-   MÓVIL
+   RESPONSIVE - MÓVIL
    ============================================================ */
 
 @media (max-width: 600px) {
+
+    .resultado-tecnico-header {
+
+        padding: 10px 0;
+
+    }
+
 
     .resultado-tecnico-header h2 {
 
@@ -2323,7 +2321,14 @@ tbody tr:hover td {
 
     .grafica-descripcion {
 
-        font-size: 12px;
+        font-size: 13px;
+
+    }
+
+
+    .resumen-fijo {
+
+        padding: 6px 0 10px;
 
     }
 
@@ -2359,22 +2364,6 @@ tbody tr:hover td {
     }
 
 
-    .th-controles .resultado-tecnico-controles {
-
-        flex-direction: column;
-
-        align-items: stretch;
-
-    }
-
-
-    .th-controles .btn-vista {
-
-        width: 100%;
-
-    }
-
-
     .tabla-responsive {
 
         max-height: 450px;
@@ -2382,52 +2371,27 @@ tbody tr:hover td {
     }
 
 
-    .fila-ordenamiento th {
+    .resultado-tecnico-controles {
 
-        top: 0;
-
-    }
-
-
-    .fila-encabezados th {
-
-        top: 34px;
+        flex-wrap: wrap;
 
     }
 
 
-    .tabla-resultado-tecnico th {
+    .th-controles .resultado-tecnico-controles {
 
-        padding: 8px 3px;
-
-        font-size: 9px;
-
-        line-height: 1.15;
+        flex-wrap: wrap;
 
     }
 
 
-    .tabla-resultado-tecnico td {
+    .btn-vista {
 
-        padding: 8px 3px;
+        font-size: 11px;
 
-        font-size: 10px;
-
-        line-height: 1.2;
-
-    }
-
-
-    .btn-orden {
-
-        min-height: 25px;
-
-        padding: 4px 2px;
-
-        font-size: 8px;
+        padding: 6px 9px;
 
     }
 
 }
-
 </style>

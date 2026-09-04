@@ -2,6 +2,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("=== ERRORES POR TÉCNICO + HALLAZGOS ===");
 
+
+    // =====================================================
+    // ELEMENTOS
+    // =====================================================
+
     const elemento =
         document.getElementById(
             "datos-Errores-Detallados-Tecnico"
@@ -41,9 +46,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
 
-        datos = JSON.parse(
-            elemento.textContent.trim()
-        );
+        datos =
+            JSON.parse(
+                elemento.textContent.trim()
+            );
 
     } catch (error) {
 
@@ -79,33 +85,202 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
+    // FUNCIÓN:
+    // OBTENER CANTIDAD DE UN HALLAZGO
+    // =====================================================
+
+    function obtenerCantidadHallazgo(hallazgo) {
+
+        const cantidad =
+            Number(
+                hallazgo &&
+                hallazgo.cantidad
+            );
+
+
+        return Number.isFinite(cantidad)
+            ? cantidad
+            : 0;
+
+    }
+
+
+    // =====================================================
+    // FUNCIÓN:
+    // CALCULAR TOTAL REAL DEL TÉCNICO
+    //
+    // IMPORTANTE:
+    // NO usamos tecnico.total.
+    //
+    // El total se calcula sumando todos los hallazgos.
+    // =====================================================
+
+    function obtenerTotalTecnico(tecnico) {
+
+        if (
+            !tecnico ||
+            !Array.isArray(tecnico.hallazgos)
+        ) {
+
+            return 0;
+
+        }
+
+
+        return tecnico.hallazgos.reduce(
+            function (total, hallazgo) {
+
+                return (
+                    total +
+                    obtenerCantidadHallazgo(
+                        hallazgo
+                    )
+                );
+
+            },
+            0
+        );
+
+    }
+
+
+    // =====================================================
+    // PREPARAR DATOS
+    //
+    // Creamos una copia para no modificar el JSON original.
+    // =====================================================
+
+    const tecnicos =
+        datos.map(
+            function (tecnico, indice) {
+
+                const hallazgos =
+                    Array.isArray(
+                        tecnico.hallazgos
+                    )
+                        ? tecnico.hallazgos
+                            .map(
+                                function (hallazgo) {
+
+                                    return {
+
+                                        hallazgo:
+                                            String(
+                                                hallazgo.hallazgo ||
+                                                "Sin hallazgo"
+                                            ).trim(),
+
+                                        cantidad:
+                                            obtenerCantidadHallazgo(
+                                                hallazgo
+                                            )
+
+                                    };
+
+                                }
+                            )
+                            .filter(
+                                function (hallazgo) {
+
+                                    return (
+                                        hallazgo.cantidad > 0
+                                    );
+
+                                }
+                            )
+                            .sort(
+                                function (a, b) {
+
+                                    return (
+                                        b.cantidad -
+                                        a.cantidad
+                                    );
+
+                                }
+                            )
+                        : [];
+
+
+                return {
+
+                    tecnico:
+                        String(
+                            tecnico.tecnico ||
+                            "Sin técnico"
+                        ).trim(),
+
+                    hallazgos:
+                        hallazgos,
+
+                    total:
+                        hallazgos.reduce(
+                            function (total, hallazgo) {
+
+                                return (
+                                    total +
+                                    hallazgo.cantidad
+                                );
+
+                            },
+                            0
+                        ),
+
+                    indiceOriginal:
+                        indice
+
+                };
+
+            }
+        );
+
+
+    // =====================================================
+    // ORDENAR TÉCNICOS
+    //
+    // MAYOR → MENOR
+    //
+    // En caso de empate:
+    // conservar orden original.
+    // =====================================================
+
+    tecnicos.sort(
+        function (a, b) {
+
+            if (
+                a.total !== b.total
+            ) {
+
+                return (
+                    b.total -
+                    a.total
+                );
+
+            }
+
+
+            return (
+                a.indiceOriginal -
+                b.indiceOriginal
+            );
+
+        }
+    );
+
+
+    // =====================================================
     // CONTADOR
     // =====================================================
 
     if (contador) {
 
         contador.textContent =
-            `${datos.length} técnicos`;
+            `${tecnicos.length} técnicos`;
 
     }
 
 
     // =====================================================
-    // ORDENAR TÉCNICOS
-    // =====================================================
-
-    datos.sort(function (a, b) {
-
-        return (
-            Number(b.total || 0) -
-            Number(a.total || 0)
-        );
-
-    });
-
-
-    // =====================================================
-    // DATOS
+    // ARRAYS PARA CHART.JS
     // =====================================================
 
     const labels = [];
@@ -119,131 +294,89 @@ document.addEventListener("DOMContentLoaded", function () {
     const informacion = [];
 
 
-    datos.forEach(function (tecnico) {
+    // =====================================================
+    // CONSTRUIR DATOS DE LA GRÁFICA
+    // =====================================================
 
-        const nombre =
-            String(
-                tecnico.tecnico ||
-                "Sin técnico"
-            ).trim();
+    tecnicos.forEach(
+        function (tecnico) {
 
-
-        const total =
-            Number(
-                tecnico.total
-            ) || 0;
-
-
-        // =================================================
-        // TÉCNICO
-        // =================================================
-
-        labels.push(
-            nombre
-        );
-
-        valores.push(
-            total
-        );
-
-        colores.push(
-            "#172554"
-        );
-
-        tipos.push(
-            "tecnico"
-        );
-
-        informacion.push({
-
-            tecnico:
-                nombre,
-
-            hallazgo:
-                null,
-
-            cantidad:
-                total
-
-        });
-
-
-        // =================================================
-        // HALLAZGOS
-        // =================================================
-
-        const hallazgos =
-            Array.isArray(
-                tecnico.hallazgos
-            )
-                ? [...tecnico.hallazgos]
-                : [];
-
-
-        hallazgos.sort(function (a, b) {
-
-            return (
-                Number(b.cantidad || 0) -
-                Number(a.cantidad || 0)
-            );
-
-        });
-
-
-        hallazgos.forEach(function (hallazgo) {
-
-            const nombreHallazgo =
-                String(
-                    hallazgo.hallazgo ||
-                    "Sin hallazgo"
-                ).trim();
-
-
-            const cantidad =
-                Number(
-                    hallazgo.cantidad
-                ) || 0;
-
-
-            if (cantidad <= 0) {
-
-                return;
-
-            }
-
+            // =================================================
+            // TÉCNICO
+            // =================================================
 
             labels.push(
-                "↳ " + nombreHallazgo
+                tecnico.tecnico
             );
 
             valores.push(
-                cantidad
+                tecnico.total
             );
 
             colores.push(
-                "#64748b"
+                "#dc2626"
             );
 
             tipos.push(
-                "hallazgo"
+                "tecnico"
             );
 
             informacion.push({
 
                 tecnico:
-                    nombre,
+                    tecnico.tecnico,
 
                 hallazgo:
-                    nombreHallazgo,
+                    null,
 
                 cantidad:
-                    cantidad
+                    tecnico.total
 
             });
 
-        });
 
-    });
+            // =================================================
+            // HALLAZGOS
+            // =================================================
+
+            tecnico.hallazgos.forEach(
+                function (hallazgo) {
+
+                    labels.push(
+                        "↳ " +
+                        hallazgo.hallazgo
+                    );
+
+                    valores.push(
+                        hallazgo.cantidad
+                    );
+
+                    colores.push(
+                        "#64748b"
+                    );
+
+                    tipos.push(
+                        "hallazgo"
+                    );
+
+                    informacion.push({
+
+                        tecnico:
+                            tecnico.tecnico,
+
+                        hallazgo:
+                            hallazgo.hallazgo,
+
+                        cantidad:
+                            hallazgo.cantidad
+
+                    });
+
+                }
+            );
+
+        }
+    );
 
 
     // =====================================================
@@ -262,14 +395,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // ALTURA
+    // ALTURA DE LA GRÁFICA
     // =====================================================
 
-    const alturaPorFila = 52;
+    const alturaPorFila =
+        52;
 
-    const alturaMinima = 500;
+    const alturaMinima =
+        500;
 
-    const alturaMaxima = 6000;
+    const alturaMaxima =
+        6000;
 
 
     const altura =
@@ -277,7 +413,8 @@ document.addEventListener("DOMContentLoaded", function () {
             alturaMaxima,
             Math.max(
                 alturaMinima,
-                labels.length * alturaPorFila
+                labels.length *
+                alturaPorFila
             )
         );
 
@@ -293,13 +430,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // FUNCIÓN PARA NOMBRES EN 2 LÍNEAS
+    // FUNCIÓN PARA DIVIDIR TEXTO
     // =====================================================
 
-    function dividirTexto(texto, maximo) {
+    function dividirTexto(
+        texto,
+        maximo
+    ) {
 
         texto =
-            String(texto || "").trim();
+            String(
+                texto || ""
+            ).trim();
 
 
         if (
@@ -310,10 +452,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-
-        // -----------------------------------------------
-        // Buscar espacio cercano al centro
-        // -----------------------------------------------
 
         const limite =
             Math.min(
@@ -379,7 +517,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================================
-    // PLUGIN PARA CANTIDADES
+    // PLUGIN PARA MOSTRAR CANTIDADES
     // =====================================================
 
     const cantidadesPlugin = {
@@ -458,7 +596,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                         // ---------------------------------
-                        // FONDO DEL NÚMERO
+                        // FONDO
                         // ---------------------------------
 
                         ctx.fillStyle =
@@ -528,508 +666,549 @@ document.addEventListener("DOMContentLoaded", function () {
     // CREAR GRÁFICA
     // =====================================================
 
-    new Chart(canvas, {
+    new Chart(
+        canvas,
+        {
 
-        type:
-            "bar",
-
-
-        data: {
-
-            labels:
-                labels,
+            type:
+                "bar",
 
 
-            datasets: [
+            data: {
 
-                {
+                labels:
+                    labels,
 
-                    label:
-                        "Cantidad",
 
-                    data:
-                        valores,
+                datasets: [
 
-                    backgroundColor:
-                        colores,
+                    {
 
-                    hoverBackgroundColor:
-                        colores,
+                        label:
+                            "Cantidad",
 
-                    borderRadius:
-                        7,
+                        data:
+                            valores,
 
-                    borderSkipped:
-                        false,
+                        backgroundColor:
+                            colores,
 
-                    barThickness:
-                        22,
+                        hoverBackgroundColor:
+                            colores,
 
-                    maxBarThickness:
-                        22
+                        borderRadius:
+                            7,
+
+                        borderSkipped:
+                            false,
+
+                        barThickness:
+                            22,
+
+                        maxBarThickness:
+                            22
+
+                    }
+
+                ]
+
+            },
+
+
+            // =================================================
+            // OPCIONES
+            // =================================================
+
+            options: {
+
+                responsive:
+                    true,
+
+                maintainAspectRatio:
+                    false,
+
+                indexAxis:
+                    "y",
+
+
+                animation: {
+
+                    duration:
+                        700,
+
+                    easing:
+                        "easeOutQuart"
+
+                },
+
+
+                interaction: {
+
+                    mode:
+                        "nearest",
+
+                    axis:
+                        "y",
+
+                    intersect:
+                        false
+
+                },
+
+
+                layout: {
+
+                    padding: {
+
+                        top:
+                            15,
+
+                        right:
+                            90,
+
+                        bottom:
+                            25,
+
+                        left:
+                            10
+
+                    }
+
+                },
+
+
+                // =================================================
+                // EJES
+                // =================================================
+
+                scales: {
+
+                    x: {
+
+                        beginAtZero:
+                            true,
+
+                        grace:
+                            "18%",
+
+
+                        border: {
+
+                            display:
+                                false
+
+                        },
+
+
+                        grid: {
+
+                            color:
+                                "rgba(148, 163, 184, 0.15)",
+
+                            drawTicks:
+                                false
+
+                        },
+
+
+                        ticks: {
+
+                            precision:
+                                0,
+
+                            color:
+                                "#64748b",
+
+                            padding:
+                                8,
+
+                            font: {
+
+                                size:
+                                    11,
+
+                                weight:
+                                    "500"
+
+                            },
+
+
+                            callback:
+                                function (value) {
+
+                                    return Number(
+                                        value
+                                    ).toLocaleString(
+                                        "es-CO"
+                                    );
+
+                                }
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        offset:
+                            true,
+
+
+                        border: {
+
+                            display:
+                                false
+
+                        },
+
+
+                        grid: {
+
+                            display:
+                                false
+
+                        },
+
+
+                        // =================================================
+                        // ANCHO NOMBRES
+                        // =================================================
+
+                        afterFit:
+                            function (scale) {
+
+                                scale.width =
+                                    window.innerWidth <= 600
+                                        ? 190
+                                        : 300;
+
+                            },
+
+
+                        ticks: {
+
+                            color:
+                                "#172554",
+
+                            padding:
+                                10,
+
+                            autoSkip:
+                                false,
+
+
+                            font:
+                                function (context) {
+
+                                    const index =
+                                        context.index;
+
+
+                                    return {
+
+                                        size:
+                                            tipos[index] ===
+                                            "tecnico"
+                                                ? 11
+                                                : 10,
+
+                                        weight:
+                                            tipos[index] ===
+                                            "tecnico"
+                                                ? "800"
+                                                : "600"
+
+                                    };
+
+                                },
+
+
+                            // =================================================
+                            // TEXTO
+                            // =================================================
+
+                            callback:
+                                function (value) {
+
+                                    const texto =
+                                        this.getLabelForValue(
+                                            value
+                                        );
+
+
+                                    if (!texto) {
+
+                                        return "";
+
+                                    }
+
+
+                                    // -----------------------------------------
+                                    // HALLAZGO
+                                    // -----------------------------------------
+
+                                    if (
+                                        tipos[value] ===
+                                        "hallazgo"
+                                    ) {
+
+                                        return texto;
+
+                                    }
+
+
+                                    // -----------------------------------------
+                                    // TÉCNICO
+                                    // -----------------------------------------
+
+                                    return dividirTexto(
+                                        texto,
+                                        window.innerWidth <= 600
+                                            ? 24
+                                            : 38
+                                    );
+
+                                }
+
+                        }
+
+                    }
+
+                },
+
+
+                // =================================================
+                // PLUGINS
+                // =================================================
+
+                plugins: {
+
+                    // =================================================
+                    // LEYENDA
+                    // =================================================
+
+                    legend: {
+
+                        display:
+                            false
+
+                    },
+
+
+                    // =================================================
+                    // TOOLTIP
+                    // =================================================
+
+                    tooltip: {
+
+                        backgroundColor:
+                            "rgba(15, 23, 42, 0.97)",
+
+                        titleColor:
+                            "#ffffff",
+
+                        bodyColor:
+                            "#e2e8f0",
+
+                        borderColor:
+                            "rgba(148, 163, 184, 0.30)",
+
+                        borderWidth:
+                            1,
+
+                        cornerRadius:
+                            10,
+
+                        padding:
+                            13,
+
+                        displayColors:
+                            true,
+
+                        boxPadding:
+                            5,
+
+
+                        callbacks: {
+
+                            // -----------------------------------------
+                            // TÍTULO
+                            // -----------------------------------------
+
+                            title:
+                                function (items) {
+
+                                    if (
+                                        !items.length
+                                    ) {
+
+                                        return "";
+
+                                    }
+
+
+                                    const index =
+                                        items[0]
+                                            .dataIndex;
+
+
+                                    const info =
+                                        informacion[
+                                            index
+                                        ];
+
+
+                                    if (
+                                        tipos[index] ===
+                                        "tecnico"
+                                    ) {
+
+                                        return (
+                                            "👷 " +
+                                            info.tecnico
+                                        );
+
+                                    }
+
+
+                                    return (
+                                        "🔎 " +
+                                        info.hallazgo
+                                    );
+
+                                },
+
+
+                            // -----------------------------------------
+                            // CANTIDAD
+                            // -----------------------------------------
+
+                            label:
+                                function (context) {
+
+                                    const valor =
+                                        Number(
+                                            context.raw
+                                        ) || 0;
+
+
+                                    return (
+                                        ` Cantidad: ` +
+                                        valor.toLocaleString(
+                                            "es-CO"
+                                        )
+                                    );
+
+                                },
+
+
+                            // -----------------------------------------
+                            // INFORMACIÓN EXTRA
+                            // -----------------------------------------
+
+                            afterBody:
+                                function (items) {
+
+                                    if (
+                                        !items.length
+                                    ) {
+
+                                        return "";
+
+                                    }
+
+
+                                    const index =
+                                        items[0]
+                                            .dataIndex;
+
+
+                                    const info =
+                                        informacion[
+                                            index
+                                        ];
+
+
+                                    if (
+                                        tipos[index] ===
+                                        "hallazgo"
+                                    ) {
+
+                                        return [
+
+                                            "",
+
+                                            "Técnico:",
+
+                                            info.tecnico
+
+                                        ];
+
+                                    }
+
+
+                                    return "";
+
+                                }
+
+                        }
+
+                    },
+
+
+                    // =================================================
+                    // DATALABELS
+                    // =================================================
+
+                    datalabels: {
+
+                        display:
+                            false
+
+                    }
 
                 }
+
+            },
+
+
+            plugins: [
+
+                cantidadesPlugin
 
             ]
 
-        },
+        }
+    );
 
 
-        // =====================================================
-        // OPCIONES
-        // =====================================================
+    // =====================================================
+    // LOG FINAL
+    // =====================================================
 
-        options: {
-
-            responsive:
-                true,
-
-            maintainAspectRatio:
-                false,
-
-            indexAxis:
-                "y",
-
-
-            animation: {
-
-                duration:
-                    700,
-
-                easing:
-                    "easeOutQuart"
-
-            },
-
-
-            interaction: {
-
-                mode:
-                    "nearest",
-
-                axis:
-                    "y",
-
-                intersect:
-                    false
-
-            },
-
-
-            layout: {
-
-                padding: {
-
-                    top:
-                        15,
-
-                    right:
-                        90,
-
-                    bottom:
-                        25,
-
-                    left:
-                        10
-
-                }
-
-            },
-
-
-            // =====================================================
-            // EJES
-            // =====================================================
-
-            scales: {
-
-                x: {
-
-                    beginAtZero:
-                        true,
-
-                    grace:
-                        "18%",
-
-
-                    border: {
-
-                        display:
-                            false
-
-                    },
-
-
-                    grid: {
-
-                        color:
-                            "rgba(148, 163, 184, 0.15)",
-
-                        drawTicks:
-                            false
-
-                    },
-
-
-                    ticks: {
-
-                        precision:
-                            0,
-
-                        color:
-                            "#64748b",
-
-                        padding:
-                            8,
-
-                        font: {
-
-                            size:
-                                11,
-
-                            weight:
-                                "500"
-
-                        },
-
-
-                        callback:
-                            function (value) {
-
-                                return Number(
-                                    value
-                                ).toLocaleString(
-                                    "es-CO"
-                                );
-
-                            }
-
-                    }
-
-                },
-
-
-                y: {
-
-                    offset:
-                        true,
-
-
-                    border: {
-
-                        display:
-                            false
-
-                    },
-
-
-                    grid: {
-
-                        display:
-                            false
-
-                    },
-
-
-                    // =================================================
-                    // ESPACIO PARA LOS NOMBRES
-                    // =================================================
-
-                    afterFit:
-                        function (scale) {
-
-                            scale.width =
-                                window.innerWidth <= 600
-                                    ? 190
-                                    : 300;
-
-                        },
-
-
-                    ticks: {
-
-                        color:
-                            "#172554",
-
-                        padding:
-                            10,
-
-                        autoSkip:
-                            false,
-
-
-                        font:
-                            function (context) {
-
-                                const index =
-                                    context.index;
-
-
-                                return {
-
-                                    size:
-                                        tipos[index] === "tecnico"
-                                            ? 11
-                                            : 10,
-
-                                    weight:
-                                        tipos[index] === "tecnico"
-                                            ? "800"
-                                            : "600"
-
-                                };
-
-                            },
-
-
-                        // =================================================
-                        // TEXTO DEL EJE Y
-                        // =================================================
-
-                        callback:
-                            function (value) {
-
-                                const texto =
-                                    this.getLabelForValue(
-                                        value
-                                    );
-
-
-                                if (!texto) {
-
-                                    return "";
-
-                                }
-
-
-                                // -----------------------------------------
-                                // HALLAZGO
-                                // -----------------------------------------
-
-                                if (
-                                    tipos[value] ===
-                                    "hallazgo"
-                                ) {
-
-                                    return texto;
-
-                                }
-
-
-                                // -----------------------------------------
-                                // TÉCNICO
-                                // -----------------------------------------
-
-                                return dividirTexto(
-                                    texto,
-                                    window.innerWidth <= 600
-                                        ? 24
-                                        : 38
-                                );
-
-                            }
-
-                    }
-
-                }
-
-            },
-
-
-            // =====================================================
-            // PLUGINS
-            // =====================================================
-
-            plugins: {
-
-                // =================================================
-                // LEYENDA
-                // =================================================
-
-                legend: {
-
-                    display:
-                        false
-
-                },
-
-
-                // =================================================
-                // TOOLTIP
-                // =================================================
-
-                tooltip: {
-
-                    backgroundColor:
-                        "rgba(15, 23, 42, 0.97)",
-
-                    titleColor:
-                        "#ffffff",
-
-                    bodyColor:
-                        "#e2e8f0",
-
-                    borderColor:
-                        "rgba(148, 163, 184, 0.30)",
-
-                    borderWidth:
-                        1,
-
-                    cornerRadius:
-                        10,
-
-                    padding:
-                        13,
-
-                    displayColors:
-                        true,
-
-                    boxPadding:
-                        5,
-
-
-                    callbacks: {
-
-                        title:
-                            function (items) {
-
-                                if (
-                                    !items.length
-                                ) {
-
-                                    return "";
-
-                                }
-
-
-                                const index =
-                                    items[0]
-                                        .dataIndex;
-
-
-                                const info =
-                                    informacion[
-                                        index
-                                    ];
-
-
-                                if (
-                                    tipos[index] ===
-                                    "tecnico"
-                                ) {
-
-                                    return (
-                                        "👷 " +
-                                        info.tecnico
-                                    );
-
-                                }
-
-
-                                return (
-                                    "🔎 " +
-                                    info.hallazgo
-                                );
-
-                            },
-
-
-                        label:
-                            function (context) {
-
-                                const valor =
-                                    Number(
-                                        context.raw
-                                    ) || 0;
-
-
-                                return (
-                                    ` Cantidad: ` +
-                                    valor.toLocaleString(
-                                        "es-CO"
-                                    )
-                                );
-
-                            },
-
-
-                        afterBody:
-                            function (items) {
-
-                                if (
-                                    !items.length
-                                ) {
-
-                                    return "";
-
-                                }
-
-
-                                const index =
-                                    items[0]
-                                        .dataIndex;
-
-
-                                const info =
-                                    informacion[
-                                        index
-                                    ];
-
-
-                                if (
-                                    tipos[index] ===
-                                    "hallazgo"
-                                ) {
-
-                                    return [
-
-                                        "",
-
-                                        "Técnico:",
-
-                                        info.tecnico
-
-                                    ];
-
-                                }
-
-
-                                return "";
-
-                            }
-
-                    }
-
-                },
-
-
-                // =================================================
-                // DATALABELS
-                // =================================================
-
-                datalabels: {
-
-                    display:
-                        false
-
-                }
-
-            }
-
-        },
-
-
-        plugins: [
-
-            cantidadesPlugin
-
-        ]
-
-    });
+    console.log(
+        `✅ ${tecnicos.length} técnicos cargados`
+    );
 
 
     console.log(
-        `✅ ${datos.length} técnicos cargados`
+        "📊 Totales calculados desde los hallazgos:",
+        tecnicos.map(
+            function (tecnico) {
+
+                return {
+
+                    tecnico:
+                        tecnico.tecnico,
+
+                    total:
+                        tecnico.total
+
+                };
+
+            }
+        )
     );
 
 });

@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const elemento =
         document.getElementById(
-            "datos-Auditoria_Dia"
+            "datos-Auditoria-Dia"
         );
 
     const canvas =

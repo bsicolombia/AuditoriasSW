@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Reauditar / Auditar
+{% endblock %}
+
+{% block content %}
+
+<!-- tu contenido -->
+
+
+<section class="panel-tecnicos-pendientes">
+
+    <h2 class="panel-titulo">
+        Técnicos sin auditar y técnicos para re-auditar
+    </h2>
+
+    <!-- ============================================================
+         RESUMEN / PORCENTAJES
+         ============================================================ -->
+
+    <div class="resumen-pendientes-grid">
+
+        <div class="tarjeta-resumen tarjeta-total">
+            <span class="resumen-titulo">Técnicos contratados</span>
+            <span class="resumen-valor" id="resumenTotalTecnicos">0</span>
+        </div>
+
+        <div class="tarjeta-resumen tarjeta-auditados">
+            <span class="resumen-titulo">Técnicos auditados</span>
+            <span class="resumen-valor" id="resumenAuditados">0</span>
+            <span class="resumen-porcentaje" id="resumenPorcentajeAuditados">0%</span>
+        </div>
+
+        <div class="tarjeta-resumen tarjeta-sin-auditar">
+            <span class="resumen-titulo">Sin auditar</span>
+            <span class="resumen-valor" id="resumenSinAuditar">0</span>
+            <span class="resumen-porcentaje" id="resumenPorcentajeSinAuditar">0%</span>
+        </div>
+
+        <div class="tarjeta-resumen tarjeta-reauditar">
+            <span class="resumen-titulo">Para re-auditar (&ge;65% error)</span>
+            <span class="resumen-valor" id="resumenParaReauditar">0</span>
+            <span class="resumen-porcentaje" id="resumenPorcentajeReauditar">0%</span>
+        </div>
+
+        <div class="tarjeta-resumen tarjeta-al-dia">
+            <span class="resumen-titulo">Al día (&lt;65% error)</span>
+            <span class="resumen-valor" id="resumenAlDia">0</span>
+            <span class="resumen-porcentaje" id="resumenPorcentajeAlDia">0%</span>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         TABLA 1: TÉCNICOS SIN AUDITAR
+         ============================================================ -->
+
+    <div class="bloque-tabla">
+
+        <h3>Técnicos sin auditar</h3>
+
+        <div class="tabla-scroll">
+            <table class="tabla-pendientes" id="tablaSinAuditar">
+                <thead>
+                    <tr>
+                        <th>Supervisor</th>
+                        <th>Técnico</th>
+                        <th>Cédula</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaSinAuditarBody">
+                    <tr>
+                        <td colspan="5" class="tabla-sin-datos">
+                            Cargando...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         TABLA 2: TÉCNICOS PARA RE-AUDITAR (REGLA 65%)
+         ============================================================ -->
+
+    <div class="bloque-tabla">
+
+        <h3>Técnicos para re-auditar (regla del 65% de errores)</h3>
+
+        <div class="tabla-scroll">
+            <table class="tabla-pendientes" id="tablaReauditar">
+                <thead>
+                    <tr>
+                        <th>Supervisor</th>
+                        <th>Técnico</th>
+                        <th>Cédula</th>
+                        <th>Auditorías</th>
+                        <th>No cumple</th>
+                        <th>% Error</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaReauditarBody">
+                    <tr>
+                        <td colspan="8" class="tabla-sin-datos">
+                            Cargando...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</section>
+
+<script type="application/json" id="datos-Resultado-Auditorias-Tecnico">
+    {{ Resultado_Auditorias_Tecnico|safe }}
+</script>
+
+
+<section class="panel-tecnicos-pendientes">
+
+    <h2 class="panel-titulo">
+        Técnicos sin auditar y técnicos para re-auditar
+    </h2>
+<!-- ================================================================
+     ESTILOS MÍNIMOS (bórralos si ya tienes las clases estado-badge /
+     accion-badge / tabla-sin-datos definidas en tu CSS global, como
+     ocurre con tu tabla "Resultado_Diario_Tecnico").
+     ================================================================ -->
+
+<style>
+
+    .panel-tecnicos-pendientes {
+        margin-top: 24px;
+    }
+
+    .panel-titulo {
+        margin-bottom: 12px;
+    }
+
+    .resumen-pendientes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .tarjeta-resumen {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .resumen-titulo {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .resumen-valor {
+        font-size: 24px;
+        font-weight: 700;
+        color: #172554;
+    }
+
+    .resumen-porcentaje {
+        font-size: 13px;
+        color: #475569;
+    }
+
+    .tarjeta-sin-auditar .resumen-valor {
+        color: #b45309;
+    }
+
+    .tarjeta-reauditar .resumen-valor {
+        color: #dc2626;
+    }
+
+    .tarjeta-al-dia .resumen-valor {
+        color: #16a34a;
+    }
+
+    .bloque-tabla {
+        margin-bottom: 28px;
+    }
+
+    .tabla-scroll {
+        overflow-x: auto;
+    }
+
+    .tabla-pendientes {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .tabla-pendientes th,
+    .tabla-pendientes td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .tabla-pendientes thead th {
+        background: #f1f5f9;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .tabla-sin-datos {
+        text-align: center;
+        color: #94a3b8;
+        padding: 16px;
+    }
+
+    .estado-badge,
+    .accion-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .estado-critico {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .estado-mejora {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .estado-todo-bien {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .estado-sin-auditorias {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .accion-reauditar {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .accion-ok {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .accion-auditar {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+</style>
+
+<!-- Carga el JS DESPUÉS del JSON de datos -->
+<script src="{% static 'js/tecnicos_pendientes.js' %}"></script>
+
+
+{% endblock %}

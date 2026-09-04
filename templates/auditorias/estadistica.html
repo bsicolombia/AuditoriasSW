@@ -9,10 +9,14 @@ Estadísticas
 
 {% block content %}
 
+<!-- =========================================================
+     ENCABEZADO
+========================================================= -->
+
 <div class="estadisticas-header">
 
     <h1>
-        ESTADISTICAS DE AUDITORIAS
+        ESTADÍSTICAS DE AUDITORÍAS
     </h1>
 
 </div>
@@ -23,23 +27,131 @@ Estadísticas
 </h4>
 
 
-<!-- ================================================= -->
-<!-- FILTROS -->
-<!-- ================================================= -->
+<!-- =========================================================
+     FILTROS
+========================================================= -->
 
 {% include "auditorias/partials/filtros_estadisticas.html" %}
 
 
-<!-- ================================================= -->
-<!-- GRÁFICAS -->
-<!-- ================================================= -->
+<!-- =========================================================
+     RESUMEN GLOBAL DE TÉCNICOS
+     
+     ESTE BLOQUE QUEDA FIJO AL HACER SCROLL
+========================================================= -->
+
+<div
+    id="resumenTecnicosGlobal"
+    class="resumen-tecnicos-global"
+    style="display: none;"
+>
+
+    <div class="resumen-comparacion">
+
+        <!-- Técnicos contratados -->
+
+        <div class="resumen-item resumen-total">
+
+            <span class="resumen-label">
+                Técnicos Contratados
+            </span>
+
+            <strong
+                id="contadorTotalTecnicosGlobal"
+                class="resumen-valor"
+            >
+                0
+            </strong>
+
+        </div>
+
+
+        <!-- Técnicos auditados -->
+
+        <div class="resumen-item resumen-auditados">
+
+            <span class="resumen-label">
+                Técnicos auditados
+            </span>
+
+            <strong
+                id="contadorTecnicosAuditadosGlobal"
+                class="resumen-valor"
+            >
+                0
+            </strong>
+
+        </div>
+
+
+        <!-- % auditados -->
+
+        <div class="resumen-item resumen-porcentaje">
+
+            <span class="resumen-label">
+                % Auditados
+            </span>
+
+            <strong
+                id="contadorPorcentajeAuditadosGlobal"
+                class="resumen-valor"
+            >
+                0%
+            </strong>
+
+        </div>
+
+
+        <!-- Técnicos sin auditoría -->
+
+        <div class="resumen-item resumen-sin-auditoria">
+
+            <span class="resumen-label">
+                Técnicos sin auditoría
+            </span>
+
+            <strong
+                id="contadorTecnicosSinAuditoriaGlobal"
+                class="resumen-valor"
+            >
+                0
+            </strong>
+
+        </div>
+
+
+        <!-- % sin auditar -->
+
+        <div class="resumen-item resumen-porcentaje-sin">
+
+            <span class="resumen-label">
+                % sin auditar
+            </span>
+
+            <strong
+                id="contadorPorcentajeSinAuditarGlobal"
+                class="resumen-valor"
+            >
+                0%
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     GRÁFICAS
+========================================================= -->
 
 <div class="estadisticas-grid">
 
 
-    <!-- ================================================= -->
-    <!-- ESTADÍSTICAS NORMALES -->
-    <!-- ================================================= -->
+    <!-- =====================================================
+         ESTADÍSTICAS NORMALES
+    ====================================================== -->
 
     {% include "auditorias/partials/no_cumplen.html" %}
 
@@ -58,19 +170,16 @@ Estadísticas
     {% include "auditorias/partials/auditorias_digitador.html" %}
 
 
-    <!-- ================================================= -->
-    <!-- RESULTADOS POR TÉCNICO -->
-    <!-- ================================================= -->
+    <!-- =====================================================
+         RESULTADOS POR TÉCNICO
+    ====================================================== -->
 
     <div
         class="resultado-auditorias-tecnico-container"
         style="display: none;"
     >
 
-
-        <!-- ================================================= -->
-        <!-- RESULTADO AUDITORÍAS POR TÉCNICO -->
-        <!-- ================================================= -->
+        <!-- Resultado auditorías por técnico -->
 
         <div class="tabla-scroll tabla-resultado-tecnico">
 
@@ -79,9 +188,7 @@ Estadísticas
         </div>
 
 
-        <!-- ================================================= -->
-        <!-- ERRORES POR TÉCNICO -->
-        <!-- ================================================= -->
+        <!-- Errores por técnico -->
 
         <div class="tabla-scroll tabla-errores-tecnico">
 
@@ -90,9 +197,7 @@ Estadísticas
         </div>
 
 
-        <!-- ================================================= -->
-        <!-- RESULTADO DIARIO POR TÉCNICO -->
-        <!-- ================================================= -->
+        <!-- Resultado diario por técnico -->
 
         <div class="tabla-scroll tabla-resultado-diario-tecnico">
 
@@ -100,19 +205,17 @@ Estadísticas
 
         </div>
 
-
     </div>
 
 
-    <!-- ================================================= -->
-    <!-- RESULTADOS POR DIGITADOR -->
-    <!-- ================================================= -->
+    <!-- =====================================================
+         RESULTADOS POR DIGITADOR
+    ====================================================== -->
 
     <div
         class="resultado-auditorias-digitador-container"
         style="display: none;"
     >
-
 
         <div class="tabla-scroll tabla-resultado-digitador">
 
@@ -120,17 +223,14 @@ Estadísticas
 
         </div>
 
-
     </div>
-
 
 </div>
 
 
-
-<!-- ================================================= -->
-<!-- EXPORTAR -->
-<!-- ================================================= -->
+<!-- =========================================================
+     EXPORTAR
+========================================================= -->
 
 <div class="exportar-container">
 
@@ -145,14 +245,13 @@ Estadísticas
 </div>
 
 
-
-<!-- ================================================= -->
-<!-- DATOS DJANGO -->
-<!-- ================================================= -->
+<!-- =========================================================
+     DATOS DJANGO
+========================================================= -->
 
 {{ datos_operaciones|json_script:"datos-operaciones" }}
 
-{{ Auditoria_Dia|json_script:"datos-Auditoria_Dia" }}
+{{ Auditoria_Dia|json_script:"datos-Auditoria-Dia" }}
 
 {{ Datos_No_Cumplen|json_script:"datos-No-Cumplen" }}
 
@@ -177,10 +276,9 @@ Estadísticas
 {{ Resultado_Diario_Tecnico|json_script:"datos-Resultado-Diario-Tecnico" }}
 
 
-
-<!-- ================================================= -->
-<!-- LIBRERÍAS -->
-<!-- ================================================= -->
+<!-- =========================================================
+     LIBRERÍAS
+========================================================= -->
 
 <link
     href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css"
@@ -194,10 +292,9 @@ Estadísticas
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 
-
-<!-- ================================================= -->
-<!-- JAVASCRIPT -->
-<!-- ================================================= -->
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
 
 <script src="{% static 'js/operaciones.js' %}"></script>
 
@@ -224,282 +321,267 @@ Estadísticas
 <script src="{% static 'js/resultado_diario_tecnico.js' %}"></script>
 
 
-
-<!-- ================================================= -->
-<!-- CONTROL DE VISTAS -->
-<!-- ================================================= -->
+<!-- =========================================================
+     CONTROL DE VISTAS
+========================================================= -->
 
 <script>
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-        console.log(
-            "=== ESTADÍSTICAS DE AUDITORÍAS ==="
+    "use strict";
+
+    console.log("=== ESTADÍSTICAS DE AUDITORÍAS ===");
+
+
+    const filtroResultado =
+        document.getElementById("filtroResultado");
+
+
+    const resumenTecnicosGlobal =
+        document.getElementById("resumenTecnicosGlobal");
+
+
+    const tablaTecnicos =
+        document.querySelector(
+            ".resultado-auditorias-tecnico-container"
         );
 
 
-        /* =====================================================
-           FILTRO
-           ===================================================== */
+    const tablaDigitadores =
+        document.querySelector(
+            ".resultado-auditorias-digitador-container"
+        );
 
-        const filtroResultado =
-            document.getElementById(
-                "filtroResultado"
+
+    const grid =
+        document.querySelector(".estadisticas-grid");
+
+
+    if (!grid) {
+
+        console.error(
+            "❌ No se encontró .estadisticas-grid"
+        );
+
+        return;
+
+    }
+
+
+    const elementosEstadisticas =
+        Array.from(grid.children).filter(function (elemento) {
+
+            return (
+                !elemento.classList.contains(
+                    "resultado-auditorias-tecnico-container"
+                )
+                &&
+                !elemento.classList.contains(
+                    "resultado-auditorias-digitador-container"
+                )
             );
 
-
-        /* =====================================================
-           CONTENEDOR TÉCNICOS
-           ===================================================== */
-
-        const tablaTecnicos =
-            document.querySelector(
-                ".resultado-auditorias-tecnico-container"
-            );
+        });
 
 
-        /* =====================================================
-           CONTENEDOR DIGITADORES
-           ===================================================== */
+    function mostrarVista() {
 
-        const tablaDigitadores =
-            document.querySelector(
-                ".resultado-auditorias-digitador-container"
-            );
+        if (!filtroResultado) {
 
+            elementosEstadisticas.forEach(function (elemento) {
 
-        /* =====================================================
-           GRID
-           ===================================================== */
+                elemento.style.display = "";
 
-        const grid =
-            document.querySelector(
-                ".estadisticas-grid"
-            );
+            });
 
 
-        if (!grid) {
+            if (tablaTecnicos) {
+                tablaTecnicos.style.display = "none";
+            }
 
-            console.error(
-                "❌ No se encontró .estadisticas-grid"
-            );
+
+            if (tablaDigitadores) {
+                tablaDigitadores.style.display = "none";
+            }
+
+
+            if (resumenTecnicosGlobal) {
+                resumenTecnicosGlobal.style.display = "none";
+            }
+
 
             return;
 
         }
 
 
-        /* =====================================================
-           ESTADÍSTICAS NORMALES
-           ===================================================== */
-
-        const elementosEstadisticas =
-            Array.from(
-                grid.children
-            ).filter(
-                function (elemento) {
-
-                    return (
-                        !elemento.classList.contains(
-                            "resultado-auditorias-tecnico-container"
-                        )
-                        &&
-                        !elemento.classList.contains(
-                            "resultado-auditorias-digitador-container"
-                        )
-                    );
-
-                }
-            );
-
-
-        /* =====================================================
-           MOSTRAR VISTA
-           ===================================================== */
-
-        function mostrarVista() {
-
-            /*
-             * Si no existe filtro,
-             * mostramos estadísticas normales.
-             */
-
-            if (!filtroResultado) {
-
-                elementosEstadisticas.forEach(
-                    function (elemento) {
-
-                        elemento.style.display = "";
-
-                    }
-                );
-
-                if (tablaTecnicos) {
-
-                    tablaTecnicos.style.display = "none";
-
-                }
-
-                if (tablaDigitadores) {
-
-                    tablaDigitadores.style.display = "none";
-
-                }
-
-                return;
-
-            }
-
-
-            const valor =
-                filtroResultado.value;
-
-
-            console.log(
-                "Filtro resultado:",
-                valor
-            );
-
-
-            /* =================================================
-               TÉCNICOS
-               ================================================= */
-
-            if (valor === "tecnicos") {
-
-                elementosEstadisticas.forEach(
-                    function (elemento) {
-
-                        elemento.style.display = "none";
-
-                    }
-                );
-
-
-                if (tablaTecnicos) {
-
-                    tablaTecnicos.style.display = "block";
-
-                }
-
-
-                if (tablaDigitadores) {
-
-                    tablaDigitadores.style.display = "none";
-
-                }
-
-            }
-
-
-            /* =================================================
-               DIGITADORES
-               ================================================= */
-
-            else if (valor === "digitadores") {
-
-                elementosEstadisticas.forEach(
-                    function (elemento) {
-
-                        elemento.style.display = "none";
-
-                    }
-                );
-
-
-                if (tablaTecnicos) {
-
-                    tablaTecnicos.style.display = "none";
-
-                }
-
-
-                if (tablaDigitadores) {
-
-                    tablaDigitadores.style.display = "block";
-
-                }
-
-            }
-
-
-            /* =================================================
-               TODAS
-               ================================================= */
-
-            else {
-
-                elementosEstadisticas.forEach(
-                    function (elemento) {
-
-                        elemento.style.display = "";
-
-                    }
-                );
-
-
-                if (tablaTecnicos) {
-
-                    tablaTecnicos.style.display = "none";
-
-                }
-
-
-                if (tablaDigitadores) {
-
-                    tablaDigitadores.style.display = "none";
-
-                }
-
-            }
-
-        }
-
-
-        /* =====================================================
-           CAMBIO FILTRO
-           ===================================================== */
-
-        if (filtroResultado) {
-
-            filtroResultado.addEventListener(
-                "change",
-                mostrarVista
-            );
-
-        }
-
-
-        /* =====================================================
-           ESTADO INICIAL
-           ===================================================== */
-
-        mostrarVista();
+        const valor =
+            filtroResultado.value;
 
 
         console.log(
-            "✅ Control de vistas cargado"
+            "Filtro resultado:",
+            valor
+        );
+
+
+        /* =====================================================
+           TÉCNICOS
+        ====================================================== */
+
+        if (valor === "tecnicos") {
+
+            elementosEstadisticas.forEach(function (elemento) {
+
+                elemento.style.display = "none";
+
+            });
+
+
+            if (tablaTecnicos) {
+
+                tablaTecnicos.style.display = "block";
+
+            }
+
+
+            if (tablaDigitadores) {
+
+                tablaDigitadores.style.display = "none";
+
+            }
+
+
+            if (resumenTecnicosGlobal) {
+
+                resumenTecnicosGlobal.style.display = "block";
+
+            }
+
+
+            /*
+             * Actualizar resumen cada vez que
+             * se selecciona la vista de técnicos.
+             */
+
+            if (
+                typeof window.actualizarResumenTecnicosGlobal ===
+                "function"
+            ) {
+
+                window.actualizarResumenTecnicosGlobal();
+
+            }
+
+        }
+
+
+        /* =====================================================
+           DIGITADORES
+        ====================================================== */
+
+        else if (valor === "digitadores") {
+
+            elementosEstadisticas.forEach(function (elemento) {
+
+                elemento.style.display = "none";
+
+            });
+
+
+            if (tablaTecnicos) {
+
+                tablaTecnicos.style.display = "none";
+
+            }
+
+
+            if (tablaDigitadores) {
+
+                tablaDigitadores.style.display = "block";
+
+            }
+
+
+            if (resumenTecnicosGlobal) {
+
+                resumenTecnicosGlobal.style.display = "none";
+
+            }
+
+        }
+
+
+        /* =====================================================
+           ESTADÍSTICAS
+        ====================================================== */
+
+        else {
+
+            elementosEstadisticas.forEach(function (elemento) {
+
+                elemento.style.display = "";
+
+            });
+
+
+            if (tablaTecnicos) {
+
+                tablaTecnicos.style.display = "none";
+
+            }
+
+
+            if (tablaDigitadores) {
+
+                tablaDigitadores.style.display = "none";
+
+            }
+
+
+            if (resumenTecnicosGlobal) {
+
+                resumenTecnicosGlobal.style.display = "none";
+
+            }
+
+        }
+
+    }
+
+
+    if (filtroResultado) {
+
+        filtroResultado.addEventListener(
+            "change",
+            mostrarVista
         );
 
     }
-);
+
+
+    mostrarVista();
+
+
+    console.log(
+        "✅ Control de vistas cargado"
+    );
+
+});
 
 </script>
 
 
-
-<!-- ================================================= -->
-<!-- CSS -->
-<!-- ================================================= -->
+<!-- =========================================================
+     CSS
+========================================================= -->
 
 <style>
 
-
 /* =========================================================
    GRID PRINCIPAL
-   ========================================================= */
+========================================================= */
 
 .estadisticas-grid {
 
@@ -520,7 +602,7 @@ document.addEventListener(
 
 /* =========================================================
    TARJETAS
-   ========================================================= */
+========================================================= */
 
 .grafica-card {
 
@@ -543,15 +625,14 @@ document.addEventListener(
         rgba(15, 23, 42, 0.06);
 
     border:
-        1px solid
-        #e2e8f0;
+        1px solid #e2e8f0;
 
 }
 
 
 /* =========================================================
    TÍTULOS
-   ========================================================= */
+========================================================= */
 
 .grafica-card h2 {
 
@@ -563,8 +644,8 @@ document.addEventListener(
 
 
 /* =========================================================
-   DESCRIPCIONES
-   ========================================================= */
+   DESCRIPCIÓN
+========================================================= */
 
 .grafica-descripcion {
 
@@ -577,7 +658,7 @@ document.addEventListener(
 
 /* =========================================================
    CHART
-   ========================================================= */
+========================================================= */
 
 .chart-container {
 
@@ -605,8 +686,8 @@ document.addEventListener(
 
 
 /* =========================================================
-   CONTENEDORES RESULTADOS
-   ========================================================= */
+   RESULTADOS
+========================================================= */
 
 .resultado-auditorias-tecnico-container,
 .resultado-auditorias-digitador-container {
@@ -619,12 +700,6 @@ document.addEventListener(
 
     box-sizing: border-box;
 
-}
-
-
-.resultado-auditorias-tecnico-container,
-.resultado-auditorias-digitador-container {
-
     grid-column: 1 / -1;
 
 }
@@ -632,7 +707,7 @@ document.addEventListener(
 
 /* =========================================================
    TABLAS
-   ========================================================= */
+========================================================= */
 
 .tabla-scroll {
 
@@ -646,37 +721,6 @@ document.addEventListener(
 
 }
 
-
-.tabla-errores-tecnico {
-
-    width: 100%;
-
-    max-width: 100%;
-
-    min-width: 0;
-
-    box-sizing: border-box;
-
-}
-
-
-.tabla-errores-tecnico
-.tabla-responsive {
-
-    width: 100%;
-
-    max-width: 100%;
-
-    min-width: 0;
-
-    box-sizing: border-box;
-
-}
-
-
-/* =========================================================
-   RESULTADO DIARIO
-   ========================================================= */
 
 .tabla-resultado-diario-tecnico {
 
@@ -693,19 +737,9 @@ document.addEventListener(
 }
 
 
-.tabla-resultado-diario-tecnico
-.grafica-card {
-
-    width: 100%;
-
-    max-width: 100%;
-
-}
-
-
 /* =========================================================
    FILTROS
-   ========================================================= */
+========================================================= */
 
 .filtros-card {
 
@@ -757,7 +791,7 @@ document.addEventListener(
 
 /* =========================================================
    GRID FILTROS
-   ========================================================= */
+========================================================= */
 
 .filtros-grid {
 
@@ -770,10 +804,6 @@ document.addEventListener(
 
 }
 
-
-/* =========================================================
-   LABELS
-   ========================================================= */
 
 .filtros-grid label {
 
@@ -789,10 +819,6 @@ document.addEventListener(
 
 }
 
-
-/* =========================================================
-   SELECT
-   ========================================================= */
 
 .filtros-grid select {
 
@@ -817,7 +843,7 @@ document.addEventListener(
 
 /* =========================================================
    BOTONES
-   ========================================================= */
+========================================================= */
 
 .filtros-botones {
 
@@ -882,7 +908,7 @@ document.addEventListener(
 
 /* =========================================================
    EXPORTAR
-   ========================================================= */
+========================================================= */
 
 .exportar-container {
 
@@ -917,12 +943,212 @@ document.addEventListener(
 
 
 /* =========================================================
+   ⭐ RESUMEN GLOBAL STICKY
+========================================================= */
+
+.resumen-tecnicos-global {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 1000;
+
+    background: #ffffff;
+
+    padding: 10px 0 12px 0;
+
+    margin-top: 15px;
+
+    margin-bottom: 15px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 3px 12px
+        rgba(15, 23, 42, 0.08);
+
+}
+
+
+/* =========================================================
+   GRID DEL RESUMEN
+========================================================= */
+
+.resumen-tecnicos-global .resumen-comparacion {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 10px;
+
+    width: 100%;
+
+}
+
+
+/* =========================================================
+   TARJETAS DEL RESUMEN
+========================================================= */
+
+.resumen-tecnicos-global .resumen-item {
+
+    min-width: 0;
+
+    min-height: 65px;
+
+    padding: 8px 12px;
+
+    box-sizing: border-box;
+
+    border-radius: 10px;
+
+    border: 1px solid #dbe3ec;
+
+    background: #ffffff;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+}
+
+
+/* =========================================================
+   TEXTO DEL RESUMEN
+========================================================= */
+
+.resumen-tecnicos-global .resumen-label {
+
+    display: block;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #64748b;
+
+    margin-bottom: 3px;
+
+}
+
+
+.resumen-tecnicos-global .resumen-valor {
+
+    display: block;
+
+    font-size: 22px;
+
+    line-height: 1.1;
+
+    font-weight: 700;
+
+    color: #0f172a;
+
+}
+
+
+/* =========================================================
+   COLORES
+========================================================= */
+
+.resumen-tecnicos-global .resumen-auditados {
+
+    background: #f0fdf4;
+
+    border-color: #bbf7d0;
+
+}
+
+
+.resumen-tecnicos-global .resumen-auditados .resumen-valor {
+
+    color: #16a34a;
+
+}
+
+
+.resumen-tecnicos-global .resumen-porcentaje {
+
+    background: #f0fdf4;
+
+    border-color: #bbf7d0;
+
+}
+
+
+.resumen-tecnicos-global .resumen-porcentaje .resumen-valor {
+
+    color: #16a34a;
+
+}
+
+
+.resumen-tecnicos-global .resumen-sin-auditoria {
+
+    background: #fef2f2;
+
+    border-color: #fecaca;
+
+}
+
+
+.resumen-tecnicos-global .resumen-sin-auditoria .resumen-valor {
+
+    color: #dc2626;
+
+}
+
+
+.resumen-tecnicos-global .resumen-porcentaje-sin {
+
+    background: #fef2f2;
+
+    border-color: #fecaca;
+
+}
+
+
+.resumen-tecnicos-global .resumen-porcentaje-sin .resumen-valor {
+
+    color: #dc2626;
+
+}
+
+
+/* =========================================================
    RESPONSIVE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 1000px) {
 
     .filtros-grid {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .resumen-tecnicos-global .resumen-comparacion {
 
         grid-template-columns:
             repeat(3, minmax(0, 1fr));
@@ -944,6 +1170,32 @@ document.addEventListener(
 }
 
 
+@media (max-width: 600px) {
+
+    .resumen-tecnicos-global .resumen-comparacion {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+
+    .resumen-tecnicos-global .resumen-item {
+
+        min-height: 60px;
+
+    }
+
+
+    .resumen-tecnicos-global .resumen-valor {
+
+        font-size: 19px;
+
+    }
+
+}
+
+
 @media (max-width: 450px) {
 
     .filtros-grid {
@@ -955,6 +1207,5 @@ document.addEventListener(
 }
 
 </style>
-
 
 {% endblock %}

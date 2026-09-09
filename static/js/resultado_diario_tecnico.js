@@ -1245,6 +1245,121 @@ document.addEventListener("DOMContentLoaded", function () {
             filaAuditados
         );
 
+        // =====================================================
+        // FILA TOTAL DE ERRORES
+        // =====================================================
+
+        const filaTotalErrores =
+            document.createElement(
+                "tr"
+            );
+
+        filaTotalErrores.className =
+            "fila-total-errores";
+
+        let totalErroresHtml = `
+            <td class="nombre-total-errores">
+                TOTAL DE ERRORES
+            </td>
+        `;
+
+        dias.forEach(function (dia) {
+
+            const cantidadErrores =
+                resumenDias[dia].errores;
+
+            totalErroresHtml += `
+                <td
+                    class="${
+                        cantidadErrores > 0
+                            ? "total-errores-dia"
+                            : "total-errores-dia-cero"
+                    }"
+                    title="${formatearNumero(
+                        cantidadErrores
+                    )} error(es) el ${escapeHtml(
+                        dia
+                    )}"
+                >
+                    ${formatearNumero(
+                        cantidadErrores
+                    )}
+                </td>
+            `;
+        });
+
+        // =====================================================
+        // TOTAL GENERAL
+        // =====================================================
+
+        totalErroresHtml += `
+            <td class="${
+                erroresGenerales > 0
+                    ? "total-errores-general"
+                    : "total-errores-general-cero"
+            }">
+                ${formatearNumero(
+                    erroresGenerales
+                )}
+            </td>
+        `;
+
+        // =====================================================
+        // ESTADO GENERAL
+        // =====================================================
+
+        let estadoErroresGeneral =
+            "Todo bien";
+
+        let claseEstadoErroresGeneral =
+            "estado-todo-bien";
+
+        if (erroresGenerales > 0) {
+            estadoErroresGeneral =
+                "Revisar";
+
+            claseEstadoErroresGeneral =
+                "estado-mejora";
+        }
+
+        totalErroresHtml += `
+            <td class="estado-general">
+                <span
+                    class="estado-badge ${claseEstadoErroresGeneral}"
+                >
+                    ${estadoErroresGeneral}
+                </span>
+            </td>
+        `;
+
+        // =====================================================
+        // ACCIÓN GENERAL
+        // =====================================================
+
+        totalErroresHtml += `
+            <td class="accion-general">
+                <span
+                    class="accion-badge ${
+                        erroresGenerales > 0
+                            ? "accion-reauditar"
+                            : "accion-ok"
+                    }"
+                >
+                    ${
+                        erroresGenerales > 0
+                            ? "Revisar"
+                            : "OK"
+                    }
+                </span>
+            </td>
+        `;
+
+        filaTotalErrores.innerHTML =
+            totalErroresHtml;
+
+        head.appendChild(
+            filaTotalErrores
+        );
 
         // =================================================
         // EVENTOS DE ORDENAMIENTO

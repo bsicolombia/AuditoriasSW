@@ -2327,7 +2327,339 @@ def obtener_resultado_diario_tecnico(
 
 
 # ============================================================
-# CONTEXT PROCESSOR PRINCIPAL
+# AGREGAR ESTA FUNCIÓN AL context_processors.py EXISTENTE
+# (usa las mismas funciones auxiliares: texto_seguro,
+#  normalizar_texto, normalizar_cedula,
+#  extraer_cedula_nombre_tecnico, obtener_nombre_sin_cedula)
+# ============================================================
+
+
+def obtener_auditorias_totales_diario_tecnico(
+    queryset,
+    supervisor=""
+):
+    """
+    Obtiene las auditorías totales por técnico y día.
+
+    Además calcula:
+    - Total de auditorías realizadas.
+    - Total de auditorías que cumplen.
+    - Técnicos auditados por día.
+    """
+
+    supervisor = texto_seguro(
+        supervisor
+    )
+
+    tecnicos_query = (
+        Tecnicos.objects
+        .exclude(
+            tecnico_apellido_nombres__isnull=True
+        )
+        .exclude(
+            tecnico_apellido_nombres__exact=""
+        )
+    )
+
+    if supervisor:
+        tecnicos_query = (
+            tecnicos_query
+            .filter(
+                supervisor__iexact=supervisor
+            )
+        )
+
+    tecnicos_query = (
+        tecnicos_query
+        .values(
+            "supervisor",
+            "tecnico_cedula",
+            "tecnico_apellido_nombres"
+        )
+        .order_by(
+            "supervisor",
+            "tecnico_apellido_nombres"
+        )
+    )
+
+    # ========================================================
+    # AUDITORÍAS
+    # ========================================================
+
+    auditorias = (
+        queryset
+        .exclude(
+            fecha__isnull=True
+        )
+        .values(
+            "nombre_tecnico",
+            "fecha",
+            "resultado_auditoria"
+        )
+        .order_by(
+            "fecha",
+            "nombre_tecnico"
+        )
+    )
+
+    auditorias_por_clave = {}
+
+    dias = set()
+
+    for auditoria in auditorias:
+
+        nombre_original = texto_seguro(
+            auditoria.get(
+                "nombre_tecnico"
+            )
+        )
+
+        cedula = (
+            extraer_cedula_nombre_tecnico(
+                nombre_original
+            )
+        )
+
+        nombre_limpio = (
+            obtener_nombre_sin_cedula(
+                nombre_original
+            )
+        )
+
+        nombre_normalizado = (
+            normalizar_texto(
+                nombre_limpio
+            )
+        )
+
+        clave = (
+            cedula
+            or nombre_normalizado
+        )
+
+        if not clave:
+            continue
+
+        fecha = auditoria.get(
+            "fecha"
+        )
+
+        if not fecha:
+            continue
+
+        dia = fecha.strftime(
+            "%Y-%m-%d"
+        )
+
+        dias.add(dia)
+
+        if clave not in auditorias_por_clave:
+            auditorias_por_clave[clave] = {
+                "dias": {},
+                "cumplen": {}
+            }
+
+        datos_tecnico = (
+            auditorias_por_clave[
+                clave
+            ]
+        )
+
+        # ====================================================
+        # TOTAL DE AUDITORÍAS DEL DÍA
+        # ====================================================
+
+        if dia not in datos_tecnico["dias"]:
+            datos_tecnico["dias"][dia] = 1
+        else:
+            datos_tecnico["dias"][dia] += 1
+
+        # ====================================================
+        # TOTAL DE AUDITORÍAS QUE CUMPLEN
+        # ====================================================
+
+        resultado = texto_seguro(
+            auditoria.get(
+                "resultado_auditoria"
+            )
+        ).lower()
+
+        if resultado == "cumple":
+
+            if (
+                dia
+                not in datos_tecnico["cumplen"]
+            ):
+                datos_tecnico["cumplen"][dia] = 1
+
+            else:
+                datos_tecnico["cumplen"][dia] += 1
+
+    # ========================================================
+    # ARMAR RESULTADO POR TÉCNICO
+    # ========================================================
+
+    resultado = []
+
+    for tecnico in tecnicos_query:
+
+        supervisor_tecnico = texto_seguro(
+            tecnico.get(
+                "supervisor"
+            ),
+            "Sin supervisor"
+        )
+
+        cedula = normalizar_cedula(
+            tecnico.get(
+                "tecnico_cedula"
+            )
+        )
+
+        nombre = texto_seguro(
+            tecnico.get(
+                "tecnico_apellido_nombres"
+            ),
+            "Sin técnico"
+        )
+
+        nombre_normalizado = (
+            normalizar_texto(
+                nombre
+            )
+        )
+
+        # ----------------------------------------------------
+        # BUSCAR POR CÉDULA
+        # ----------------------------------------------------
+
+        datos = None
+
+        if cedula:
+
+            datos = (
+                auditorias_por_clave.get(
+                    cedula
+                )
+            )
+
+        # ----------------------------------------------------
+        # FALLBACK POR NOMBRE
+        # ----------------------------------------------------
+
+        if not datos:
+
+            datos = (
+                auditorias_por_clave.get(
+                    nombre_normalizado
+                )
+            )
+
+        if not datos:
+
+            datos = {
+                "dias": {},
+                "cumplen": {}
+            }
+
+        dias_tecnico = (
+            datos.get(
+                "dias",
+                {}
+            )
+        )
+
+        cumplen_tecnico = (
+            datos.get(
+                "cumplen",
+                {}
+            )
+        )
+
+        total_auditorias = sum(
+            dias_tecnico.values()
+        )
+
+        total_cumplen = sum(
+            cumplen_tecnico.values()
+        )
+
+        dias_auditados = len(
+            dias_tecnico
+        )
+
+        estado = (
+            "Auditado"
+            if dias_auditados > 0
+            else "Sin auditorías"
+        )
+
+        resultado.append({
+
+            "supervisor":
+                supervisor_tecnico,
+
+            "tecnico":
+                nombre,
+
+            "cedula":
+                cedula,
+
+            "dias":
+                dias_tecnico,
+
+            "cumplen":
+                cumplen_tecnico,
+
+            "total":
+                total_auditorias,
+
+            "total_cumplen":
+                total_cumplen,
+
+            "dias_auditados":
+                dias_auditados,
+
+            "estado":
+                estado,
+
+            "tiene_auditorias":
+                dias_auditados > 0,
+        })
+
+    # ========================================================
+    # ORDENAMIENTO
+    # ========================================================
+
+    resultado.sort(
+        key=lambda x: (
+            x["supervisor"].lower(),
+            not x["tiene_auditorias"],
+            -x["total"],
+            x["tecnico"].lower()
+        )
+    )
+
+    return {
+        "dias":
+            sorted(dias),
+
+        "tecnicos":
+            resultado,
+    }
+
+
+# ============================================================
+# EN estadisticas_auditorias(request), DENTRO DEL DICCIONARIO
+# "contexto", AGREGAR:
+# ============================================================
+#
+#   "Auditorias_Totales_Diario_Tecnico":
+#       obtener_auditorias_totales_diario_tecnico(
+#           queryset,
+#           filtros["supervisor"]
+#       ),
+#
 # ============================================================
 
 def estadisticas_auditorias(request):
@@ -2464,6 +2796,12 @@ def estadisticas_auditorias(request):
 
         "Resultado_Diario_Tecnico":
             obtener_resultado_diario_tecnico(
+                queryset,
+                filtros["supervisor"]
+            ),
+            
+        "Resultado_Total_Diario_Tecnico":
+            obtener_auditorias_totales_diario_tecnico(
                 queryset,
                 filtros["supervisor"]
             ),

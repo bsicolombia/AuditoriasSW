@@ -1,0 +1,1848 @@
+<div class="grafica-card auditorias-totales-diario-tecnico-card">
+
+    <div class="auditorias-totales-header">
+
+        <div>
+
+            <h2>
+                Total de Auditorías por Día - Técnico
+            </h2>
+
+            <p class="grafica-descripcion">
+                Cantidad total de auditorías realizadas por técnico en cada día, sin distinguir resultado.
+            </p>
+
+        </div>
+
+        <div class="auditorias-totales-leyenda">
+
+            <span class="leyenda-item">
+                <span class="leyenda-color leyenda-cantidad"></span>
+                Auditorías realizadas
+            </span>
+
+            <span class="leyenda-item">
+                <span class="leyenda-color leyenda-na"></span>
+                Sin auditar
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="tabla-responsive tabla-responsive-auditorias-totales-diario-tecnico">
+
+        <table
+            id="tablaAuditoriasTotalesDiarioTecnico"
+            class="tabla-estadisticas"
+        >
+
+            <thead id="tablaAuditoriasTotalesDiarioTecnicoHead"></thead>
+
+            <tbody id="tablaAuditoriasTotalesDiarioTecnicoBody"></tbody>
+
+            <tfoot id="tablaAuditoriasTotalesDiarioTecnicoFoot"></tfoot>
+
+        </table>
+
+    </div>
+
+</div>
+
+<style>
+
+/* =========================================================
+   TOTAL DE AUDITORÍAS POR DÍA - TÉCNICO
+   TABLA CON ENCABEZADOS Y RESÚMENES FIJOS
+   ========================================================= */
+
+
+/* =========================================================
+   TARJETA
+   ========================================================= */
+
+.auditorias-totales-diario-tecnico-card {
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    padding: 12px;
+
+    box-shadow:
+        0 2px 10px rgba(15, 23, 42, 0.06);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   HEADER DE LA TARJETA
+   ========================================================= */
+
+.auditorias-totales-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 30px;
+
+    margin-bottom: 10px;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px 0;
+}
+
+
+.auditorias-totales-diario-tecnico-card h2 {
+
+    margin: 0 0 6px;
+
+    color: #0f172a;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+
+.auditorias-totales-diario-tecnico-card
+.grafica-descripcion {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   LEYENDA
+   ========================================================= */
+
+.auditorias-totales-leyenda {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+
+    font-size: 12px;
+
+    color: #475569;
+}
+
+
+.auditorias-totales-leyenda
+.leyenda-item {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    white-space: nowrap;
+}
+
+
+.auditorias-totales-leyenda
+.leyenda-color {
+
+    width: 12px;
+
+    height: 12px;
+
+    flex: 0 0 12px;
+
+    border-radius: 3px;
+
+    display: inline-block;
+
+    box-sizing: border-box;
+}
+
+
+.auditorias-totales-leyenda
+.leyenda-cantidad {
+
+    background: #dbeafe;
+
+    border: 1px solid #bfdbfe;
+}
+
+
+.auditorias-totales-leyenda
+.leyenda-na {
+
+    background: #f1f5f9;
+
+    border: 1px solid #cbd5e1;
+}
+
+
+/* =========================================================
+   CONTENEDOR DEL SCROLL
+   ========================================================= */
+
+.tabla-responsive-auditorias-totales-diario-tecnico {
+
+    position: relative;
+
+    width: 100%;
+
+    max-width: 100%;
+
+    min-width: 0;
+
+    height: 500px;
+
+    max-height: 500px;
+
+    box-sizing: border-box;
+
+    /*
+       PERMITE:
+
+       - desplazamiento vertical de los datos
+       - desplazamiento horizontal de las fechas
+    */
+
+    overflow-x: auto;
+
+    overflow-y: auto;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    isolation: isolate;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #94a3b8
+        #f1f5f9;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.tabla-responsive-auditorias-totales-diario-tecnico::-webkit-scrollbar {
+
+    width: 9px;
+
+    height: 9px;
+}
+
+
+.tabla-responsive-auditorias-totales-diario-tecnico::-webkit-scrollbar-track {
+
+    background: #f1f5f9;
+}
+
+
+.tabla-responsive-auditorias-totales-diario-tecnico::-webkit-scrollbar-thumb {
+
+    background: #94a3b8;
+
+    border-radius: 10px;
+}
+
+
+.tabla-responsive-auditorias-totales-diario-tecnico::-webkit-scrollbar-thumb:hover {
+
+    background: #64748b;
+}
+
+
+/* =========================================================
+   TABLA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico {
+
+    width: max-content;
+
+    min-width: 100%;
+
+    margin: 0;
+
+    padding: 0;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    table-layout: fixed;
+
+    background: #ffffff;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   PRIMERA COLUMNA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+th:first-child,
+
+#tablaAuditoriasTotalesDiarioTecnico
+td:first-child {
+
+    width: 180px;
+
+    min-width: 180px;
+
+    max-width: 180px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   THEAD
+   IMPORTANTE:
+   TODAS LAS FILAS DEL RESUMEN ESTÁN DENTRO DE THEAD
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+thead {
+
+    position: relative;
+
+    z-index: 20;
+}
+
+
+/* =========================================================
+   ENCABEZADO PRINCIPAL
+   Técnico | Fechas | Total | Estado
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+thead
+th {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 30;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    padding: 5px 5px;
+
+    background: #0f172a !important;
+
+    color: #ffffff !important;
+
+    text-align: center;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    vertical-align: middle;
+
+    line-height: 1.25;
+
+    border: 0;
+
+    border-right:
+        1px solid
+        rgba(255, 255, 255, 0.15);
+
+    border-bottom:
+        2px solid
+        #0f172a;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ENCABEZADO - TÉCNICO
+   FIJO ARRIBA Y A LA IZQUIERDA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+thead
+th.columna-tecnico {
+
+    position: sticky;
+
+    left: 0;
+
+    top: 0;
+
+    z-index: 100;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    max-width: 180px;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    background: #0f172a !important;
+
+    color: #ffffff !important;
+
+    text-align: left;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.35);
+}
+
+
+/* =========================================================
+   COLUMNAS DE DÍA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.dia-header {
+
+    width: 55px;
+
+    min-width: 55px;
+
+    max-width: 55px;
+
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   COLUMNA TOTAL
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.columna-total {
+
+    width: 80px;
+
+    min-width: 80px;
+
+    max-width: 80px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   COLUMNA ESTADO
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.columna-estado {
+
+    width: 140px;
+
+    min-width: 140px;
+
+    max-width: 140px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   FILA 1 DEL RESUMEN
+   TÉCNICOS AUDITADOS
+   FIJA EN top: 39px
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-tecnicos-auditados
+td {
+
+    position: sticky;
+
+    top: 39px;
+
+    z-index: 80;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    padding: 10px 7px;
+
+    background: #e2e8f0 !important;
+
+    color: #0f172a !important;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    vertical-align: middle;
+
+    border: 0;
+
+    border-right:
+        1px solid
+        #cbd5e1;
+
+    border-bottom:
+        2px solid
+        #94a3b8;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TÉCNICOS AUDITADOS - PRIMERA COLUMNA
+   FIJA ARRIBA Y A LA IZQUIERDA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-tecnicos-auditados
+.nombre-tecnicos-auditados {
+
+    position: sticky;
+
+    left: 0;
+
+    top: 39px;
+
+    z-index: 95;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    max-width: 180px;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    background: #cbd5e1 !important;
+
+    color: #0f172a !important;
+
+    text-align: left;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.20);
+}
+
+
+/* =========================================================
+   TÉCNICOS AUDITADOS - DÍAS
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-tecnicos-auditados
+.tecnicos-auditados-dia {
+
+    background: #dbeafe !important;
+
+    color: #1d4ed8 !important;
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TÉCNICOS AUDITADOS - TOTAL GENERAL
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-tecnicos-auditados
+.total-auditorias-general {
+
+    background: #2563eb !important;
+
+    color: #ffffff !important;
+
+    font-size: 15px;
+
+    font-weight: 900;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TÉCNICOS AUDITADOS - ESTADO
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-tecnicos-auditados
+.estado-general {
+
+    background: #f1f5f9 !important;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   FILA 2 DEL RESUMEN
+   TOTAL AUDITORÍAS
+   FIJA EN top: 78px
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-dia
+td {
+
+    position: sticky;
+
+    top: 78px;
+
+    z-index: 70;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    padding: 10px 7px;
+
+    background: #f1f5f9 !important;
+
+    color: #0f172a !important;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    vertical-align: middle;
+
+    border: 0;
+
+    border-right:
+        1px solid
+        #cbd5e1;
+
+    border-bottom:
+        2px solid
+        #94a3b8;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TOTAL AUDITORÍAS - PRIMERA COLUMNA
+   FIJA ARRIBA Y A LA IZQUIERDA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-dia
+.nombre-total-auditorias {
+
+    position: sticky;
+
+    left: 0;
+
+    top: 78px;
+
+    z-index: 90;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    max-width: 180px;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    background: #cbd5e1 !important;
+
+    color: #0f172a !important;
+
+    text-align: left;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.20);
+}
+
+
+/* =========================================================
+   TOTAL AUDITORÍAS - POR DÍA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-dia
+.total-auditorias-dia {
+
+    background: #dbeafe !important;
+
+    color: #1d4ed8 !important;
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TOTAL AUDITORÍAS - TOTAL GENERAL
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-dia
+.total-auditorias-general {
+
+    background: #2563eb !important;
+
+    color: #ffffff !important;
+
+    font-size: 15px;
+
+    font-weight: 900;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TOTAL AUDITORÍAS - ESTADO
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-dia
+.estado-general {
+
+    background: #f1f5f9 !important;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   FILA 3 DEL RESUMEN
+   TOTAL AUDITORÍAS CUMPLEN
+   ESTA ES LA CLASE REAL QUE TIENES EN TU JS:
+
+   fila-total-auditorias-cumplen-dia
+
+   FIJA EN top: 117px
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-cumplen-dia
+td {
+
+    position: sticky;
+
+    top: 117px;
+
+    z-index: 60;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    padding: 10px 7px;
+
+    background: #f1f5f9 !important;
+
+    color: #0f172a !important;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    vertical-align: middle;
+
+    border: 0;
+
+    border-right:
+        1px solid
+        #cbd5e1;
+
+    border-bottom:
+        2px solid
+        #94a3b8;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TOTAL AUDITORÍAS CUMPLEN
+   PRIMERA COLUMNA
+   FIJA ARRIBA Y A LA IZQUIERDA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-cumplen-dia
+.nombre-total-auditorias-cumplen {
+
+    position: sticky;
+
+    left: 0;
+
+    top: 117px;
+
+    z-index: 85;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    max-width: 180px;
+
+    height: 39px;
+
+    min-height: 39px;
+
+    max-height: 39px;
+
+    box-sizing: border-box;
+
+    padding: 10px 7px;
+
+    background: #cbd5e1 !important;
+
+    color: #0f172a !important;
+
+    text-align: left;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.20);
+}
+
+
+/* =========================================================
+   TOTAL CUMPLEN - POR DÍA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-cumplen-dia
+.total-auditorias-cumplen-dia {
+
+    background: #dbeafe !important;
+
+    color: #1d4ed8 !important;
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TOTAL CUMPLEN - TOTAL GENERAL
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-cumplen-dia
+.total-auditorias-cumplen-general {
+
+    background: #2563eb !important;
+
+    color: #ffffff !important;
+
+    font-size: 15px;
+
+    font-weight: 900;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TOTAL CUMPLEN - ESTADO
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-cumplen-dia
+.estado-general {
+
+    background: #f1f5f9 !important;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   CUERPO DE LA TABLA
+   LOS DATOS SÍ SE PUEDEN DESPLAZAR
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody
+td {
+
+    position: relative;
+
+    z-index: 1;
+
+    padding: 6px 5px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    text-align: center;
+
+    vertical-align: middle;
+
+    border: 0;
+
+    border-bottom:
+        1px solid
+        #e2e8f0;
+
+    border-right:
+        1px solid
+        #f1f5f9;
+
+    white-space: nowrap;
+
+    box-sizing: border-box;
+
+    font-size: 12px;
+
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   NOMBRE DEL TÉCNICO
+   PRIMERA COLUMNA FIJA HORIZONTALMENTE
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody
+td.nombre-tecnico {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 20;
+
+    width: 180px;
+
+    min-width: 180px;
+
+    max-width: 180px;
+
+    box-sizing: border-box;
+
+    background: #ffffff !important;
+
+    color: #0f172a;
+
+    text-align: left;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================================================
+   FILAS PARES
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody
+tr:nth-child(even)
+td {
+
+    background: #f8fafc;
+}
+
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody
+tr:nth-child(even)
+td.nombre-tecnico {
+
+    background: #f8fafc !important;
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody
+tr:hover
+td {
+
+    background: #eff6ff;
+}
+
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody
+tr:hover
+td.nombre-tecnico {
+
+    background: #eff6ff !important;
+}
+
+
+/* =========================================================
+   CELDAS SIN AUDITORÍA
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.celda-na {
+
+    background: #ffffff !important;
+
+    color: transparent !important;
+}
+
+
+#tablaAuditoriasTotalesDiarioTecnico
+.celda-na
+* {
+
+    display: none !important;
+}
+
+
+/* =========================================================
+   CELDAS CON CANTIDAD
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.celda-cantidad {
+
+    background: #dbeafe !important;
+
+    color: #1d4ed8 !important;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   BADGE AUDITADO
+   ========================================================= */
+
+.estado-badge-auditado {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    background: #dcfce7;
+
+    color: #15803d;
+}
+
+
+/* =========================================================
+   BADGE SIN AUDITORÍAS
+   ========================================================= */
+
+.estado-badge-sin-auditorias {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    background: #f1f5f9;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   BOTONES DE ORDENAMIENTO
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.boton-orden-dia,
+
+#tablaAuditoriasTotalesDiarioTecnico
+.boton-orden-columna {
+
+    width: 100%;
+
+    min-height: 24px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 0;
+
+    margin: 0;
+
+    border: 0;
+
+    outline: 0;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    font: inherit;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+#tablaAuditoriasTotalesDiarioTecnico
+.boton-orden-dia:hover,
+
+#tablaAuditoriasTotalesDiarioTecnico
+.boton-orden-columna:hover {
+
+    color: #bfdbfe;
+}
+
+
+/* =========================================================
+   ICONO DE ORDENAMIENTO
+   ========================================================= */
+
+.icono-orden-auditorias-totales {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 16px;
+
+    height: 16px;
+
+    font-size: 13px;
+
+    line-height: 1;
+
+    opacity: 0.9;
+}
+
+
+/* =========================================================
+   SIN DATOS
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.tabla-sin-datos {
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-weight: 600;
+
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .auditorias-totales-diario-tecnico-card {
+
+        padding: 10px;
+    }
+
+
+    .auditorias-totales-header {
+
+        padding: 10px 0;
+
+        flex-direction: column;
+
+        gap: 10px;
+
+        margin-bottom: 10px;
+    }
+
+
+    .auditorias-totales-diario-tecnico-card h2 {
+
+        font-size: 19px;
+    }
+
+
+    .auditorias-totales-diario-tecnico-card
+    .grafica-descripcion {
+
+        font-size: 13px;
+    }
+
+
+    .auditorias-totales-leyenda {
+
+        justify-content: flex-start;
+    }
+
+
+    /* CONTENEDOR */
+
+    .tabla-responsive-auditorias-totales-diario-tecnico {
+
+        height: 450px;
+
+        max-height: 450px;
+    }
+
+
+    /* TABLA */
+
+    #tablaAuditoriasTotalesDiarioTecnico {
+
+        min-width: 800px;
+
+        font-size: 12px;
+    }
+
+
+    /* PRIMERA COLUMNA */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    th:first-child,
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    td:first-child,
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    thead
+    th.columna-tecnico,
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    tbody
+    td.nombre-tecnico,
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-tecnicos-auditados
+    .nombre-tecnicos-auditados,
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-total-auditorias-dia
+    .nombre-total-auditorias,
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-total-auditorias-cumplen-dia
+    .nombre-total-auditorias-cumplen {
+
+        width: 150px;
+
+        min-width: 150px;
+
+        max-width: 150px;
+    }
+
+
+    /* ENCABEZADO */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    thead
+    th {
+
+        height: 39px;
+
+        min-height: 39px;
+
+        max-height: 39px;
+
+        padding: 5px 7px;
+
+        top: 0;
+
+        line-height: 1.1;
+    }
+
+
+    /* TÉCNICO */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    thead
+    th.columna-tecnico {
+
+        width: 150px;
+
+        min-width: 150px;
+
+        max-width: 150px;
+
+        height: 39px;
+
+        top: 0;
+
+        z-index: 100;
+    }
+
+
+    /* TÉCNICOS AUDITADOS */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-tecnicos-auditados
+    td {
+
+        height: 39px;
+
+        min-height: 39px;
+
+        max-height: 39px;
+
+        padding: 8px 6px;
+
+        top: 39px;
+
+        z-index: 80;
+    }
+
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-tecnicos-auditados
+    .nombre-tecnicos-auditados {
+
+        width: 150px;
+
+        min-width: 150px;
+
+        max-width: 150px;
+
+        height: 39px;
+
+        top: 39px;
+
+        z-index: 95;
+    }
+
+
+    /* TOTAL AUDITORÍAS */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-total-auditorias-dia
+    td {
+
+        top: 78px;
+
+        height: 39px;
+
+        min-height: 39px;
+
+        max-height: 39px;
+
+        padding: 8px 6px;
+
+        z-index: 70;
+    }
+
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-total-auditorias-dia
+    .nombre-total-auditorias {
+
+        width: 150px;
+
+        min-width: 150px;
+
+        max-width: 150px;
+
+        height: 39px;
+
+        top: 78px;
+
+        z-index: 90;
+    }
+
+
+    /* TOTAL AUDITORÍAS CUMPLEN */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-total-auditorias-cumplen-dia
+    td {
+
+        top: 117px;
+
+        height: 39px;
+
+        min-height: 39px;
+
+        max-height: 39px;
+
+        padding: 8px 6px;
+
+        z-index: 60;
+    }
+
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .fila-total-auditorias-cumplen-dia
+    .nombre-total-auditorias-cumplen {
+
+        width: 150px;
+
+        min-width: 150px;
+
+        max-width: 150px;
+
+        height: 39px;
+
+        min-height: 39px;
+
+        max-height: 39px;
+
+        top: 117px;
+
+        z-index: 85;
+
+        background: #cbd5e1 !important;
+    }
+
+
+    /* DÍAS */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .dia-header {
+
+        width: 60px;
+
+        min-width: 60px;
+
+        max-width: 60px;
+    }
+
+
+    /* TOTAL */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .columna-total {
+
+        width: 90px;
+
+        min-width: 90px;
+
+        max-width: 90px;
+    }
+
+
+    /* ESTADO */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    .columna-estado {
+
+        width: 150px;
+
+        min-width: 150px;
+
+        max-width: 150px;
+    }
+
+
+    /* CUERPO */
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    thead
+    th,
+
+    #tablaAuditoriasTotalesDiarioTecnico
+    tbody
+    td {
+
+        padding: 7px 6px;
+    }
+
+}
+
+/* =========================================================
+   ENCABEZADO Y RESÚMENES COMPLETAMENTE FIJOS
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   ENCABEZADO: TÉCNICO + DÍAS + TOTAL + ESTADO
+   --------------------------------------------------------- */
+
+#tablaAuditoriasTotalesDiarioTecnico thead th {
+
+    position: sticky !important;
+
+    top: 0 !important;
+
+    z-index: 100 !important;
+
+    height: 39px !important;
+    min-height: 39px !important;
+    max-height: 39px !important;
+
+    background: #0f172a !important;
+    color: #ffffff !important;
+}
+
+
+/* ---------------------------------------------------------
+   ENCABEZADO TÉCNICO
+   FIJO ARRIBA + FIJO A LA IZQUIERDA
+   --------------------------------------------------------- */
+
+#tablaAuditoriasTotalesDiarioTecnico
+thead
+th.columna-tecnico {
+
+    position: sticky !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    z-index: 200 !important;
+
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+
+    height: 39px !important;
+
+    background: #0f172a !important;
+    color: #ffffff !important;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.35);
+}
+
+
+/* =========================================================
+   FILA: TÉCNICOS AUDITADOS
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-tecnicos-auditados
+td {
+
+    position: sticky !important;
+
+    top: 39px !important;
+
+    z-index: 120 !important;
+
+    height: 39px !important;
+    min-height: 39px !important;
+    max-height: 39px !important;
+
+    background: #e2e8f0 !important;
+}
+
+
+/* TÉCNICOS AUDITADOS - COLUMNA TÉCNICO */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-tecnicos-auditados
+.nombre-tecnicos-auditados {
+
+    position: sticky !important;
+
+    top: 39px !important;
+    left: 0 !important;
+
+    z-index: 190 !important;
+
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+
+    background: #cbd5e1 !important;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.20);
+}
+
+
+/* =========================================================
+   FILA: TOTAL AUDITORÍAS
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-dia
+td {
+
+    position: sticky !important;
+
+    top: 78px !important;
+
+    z-index: 110 !important;
+
+    height: 39px !important;
+    min-height: 39px !important;
+    max-height: 39px !important;
+
+    background: #f1f5f9 !important;
+}
+
+
+/* TOTAL AUDITORÍAS - COLUMNA TÉCNICO */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-dia
+.nombre-total-auditorias {
+
+    position: sticky !important;
+
+    top: 78px !important;
+    left: 0 !important;
+
+    z-index: 180 !important;
+
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+
+    background: #cbd5e1 !important;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.20);
+}
+
+
+/* =========================================================
+   FILA: TOTAL AUDITORÍAS CUMPLEN
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-cumplen-dia
+td {
+
+    position: sticky !important;
+
+    top: 117px !important;
+
+    z-index: 100 !important;
+
+    height: 39px !important;
+    min-height: 39px !important;
+    max-height: 39px !important;
+
+    background: #f1f5f9 !important;
+}
+
+
+/* TOTAL CUMPLEN - COLUMNA TÉCNICO */
+
+#tablaAuditoriasTotalesDiarioTecnico
+.fila-total-auditorias-cumplen-dia
+.nombre-total-auditorias-cumplen {
+
+    position: sticky !important;
+
+    top: 117px !important;
+    left: 0 !important;
+
+    z-index: 170 !important;
+
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+
+    background: #cbd5e1 !important;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.20);
+}
+
+
+/* =========================================================
+   CUERPO - NOMBRE DEL TÉCNICO
+   SOLO FIJO HORIZONTALMENTE
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody
+td.nombre-tecnico {
+
+    position: sticky !important;
+
+    left: 0 !important;
+
+    z-index: 50 !important;
+
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15, 23, 42, 0.12);
+}
+
+
+/* FILAS PARES */
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody tr:nth-child(even)
+td.nombre-tecnico {
+
+    background: #f8fafc !important;
+}
+
+
+/* HOVER */
+
+#tablaAuditoriasTotalesDiarioTecnico
+tbody tr:hover
+td.nombre-tecnico {
+
+    background: #eff6ff !important;
+}
+
+
+/* =========================================================
+   ASEGURAR QUE LAS FILAS SUPERIORES TAPEN LOS DATOS
+   ========================================================= */
+
+#tablaAuditoriasTotalesDiarioTecnico
+thead {
+
+    position: relative;
+
+    z-index: 100;
+}
+
+</style>

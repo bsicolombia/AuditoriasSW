@@ -205,6 +205,14 @@ Estadísticas
 
         </div>
 
+        <!-- Resultado total diario por técnico -->
+
+        <div class="tabla-scroll tabla-resultado-total-diario-tecnico">
+
+            {% include "auditorias/partials/resultado_total_diario_tecnico.html" %}
+
+        </div>
+
     </div>
 
 
@@ -275,6 +283,7 @@ Estadísticas
 
 {{ Resultado_Diario_Tecnico|json_script:"datos-Resultado-Diario-Tecnico" }}
 
+{{ Resultado_Total_Diario_Tecnico|json_script:"datos-Resultado-Total-Diario-Tecnico" }}
 
 <!-- =========================================================
      LIBRERÍAS
@@ -320,6 +329,7 @@ Estadísticas
 
 <script src="{% static 'js/resultado_diario_tecnico.js' %}"></script>
 
+<script src="{% static 'js/resultado_total_diario_tecnico.js' %}"></script>
 
 <!-- =========================================================
      CONTROL DE VISTAS

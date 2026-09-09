@@ -346,19 +346,23 @@ td:first-child {
 thead
 th {
 
-    position: sticky;
+    position: sticky !important;
 
-    top: 0;
+    top: 0 !important;
 
-    z-index: 30;
+    z-index: 100 !important;
 
-    height: 44px;
+    height: 44px !important;
+
+    min-height: 44px !important;
+
+    max-height: 44px !important;
 
     box-sizing: border-box;
 
     padding: 10px 8px;
 
-    background: #0f172a;
+    background: #0f172a !important;
 
     color: #ffffff;
 
@@ -392,25 +396,25 @@ th {
 thead
 th.columna-tecnico {
 
-    position: sticky;
+    position: sticky !important;
 
-    left: 0;
+    left: 0 !important;
 
-    top: 0;
+    top: 0 !important;
 
-    z-index: 60;
+    z-index: 200 !important;
 
-    width: 180px;
+    width: 180px !important;
 
-    min-width: 180px;
+    min-width: 180px !important;
 
-    max-width: 180px;
+    max-width: 180px !important;
 
-    height: 44px;
+    height: 44px !important;
 
     box-sizing: border-box;
 
-    background: #0f172a;
+    background: #0f172a !important;
 
     color: #ffffff;
 
@@ -497,40 +501,33 @@ th.columna-tecnico {
 
 
 /* =========================================================
-   FILA GRIS - TÉCNICOS AUDITADOS
-   =========================================================
-   
-   IMPORTANTE:
-
-   Encabezado azul:
-       top: 0
-
-   Fila gris:
-       top: 44px
-
-   Así la fila gris queda fija justo debajo
-   del encabezado azul al hacer scroll vertical.
+   TÉCNICOS AUDITADOS
+   POSICIÓN 1 DE LAS FILAS FIJAS
    ========================================================= */
 
 #tablaResultadoDiarioTecnico
 .fila-tecnicos-auditados
 td {
 
-    position: sticky;
+    position: sticky !important;
 
-    top: 44px;
+    top: 44px !important;
 
-    z-index: 25;
+    z-index: 90 !important;
 
-    height: 43px;
+    height: 43px !important;
+
+    min-height: 43px !important;
+
+    max-height: 43px !important;
 
     box-sizing: border-box;
 
     padding: 9px 8px;
 
-    background: #e2e8f0;
+    background: #e2e8f0 !important;
 
-    color: #0f172a;
+    color: #0f172a !important;
 
     font-weight: 900;
 
@@ -553,28 +550,28 @@ td {
 
 
 /* =========================================================
-   TÉCNICO - FILA GRIS FIJA
+   TÉCNICO - TÉCNICOS AUDITADOS
    ========================================================= */
 
 #tablaResultadoDiarioTecnico
 .fila-tecnicos-auditados
 .nombre-tecnicos-auditados {
 
-    position: sticky;
+    position: sticky !important;
 
-    left: 0;
+    left: 0 !important;
 
-    top: 44px;
+    top: 44px !important;
 
-    z-index: 55;
+    z-index: 190 !important;
 
-    width: 180px;
+    width: 180px !important;
 
-    min-width: 180px;
+    min-width: 180px !important;
 
-    max-width: 180px;
+    max-width: 180px !important;
 
-    height: 43px;
+    height: 43px !important;
 
     box-sizing: border-box;
 
@@ -635,7 +632,7 @@ td {
 
 
 /* =========================================================
-   TOTAL ERRORES
+   TOTAL ERRORES DENTRO DE TÉCNICOS AUDITADOS
    ========================================================= */
 
 #tablaResultadoDiarioTecnico
@@ -679,6 +676,113 @@ td {
     text-align: center;
 }
 
+
+/* =========================================================
+   TOTAL ERRORES
+   POSICIÓN 2 DE LAS FILAS FIJAS
+   ========================================================= */
+
+/* =========================================================
+   TOTAL DE ERRORES
+   FILA FIJA ROJA
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.fila-total-errores
+td {
+
+    position: sticky !important;
+
+    top: 87px !important;
+
+    z-index: 80 !important;
+
+    height: 43px !important;
+
+    min-height: 43px !important;
+
+    max-height: 43px !important;
+
+    box-sizing: border-box;
+
+    padding: 9px 8px;
+
+    /* FONDO ROJO */
+    background: #fee2e2 !important;
+
+    /* TEXTO ROJO */
+    color: #b91c1c !important;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    vertical-align: middle;
+
+    border: 0;
+
+    border-right:
+        1px solid
+        #fecaca !important;
+
+    border-bottom:
+        2px solid
+        #fca5a5 !important;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TÉCNICO - TOTAL DE ERRORES
+   PRIMERA COLUMNA FIJA
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.fila-total-errores
+.nombre-total-errores {
+
+    position: sticky !important;
+
+    left: 0 !important;
+
+    top: 87px !important;
+
+    z-index: 180 !important;
+
+    width: 180px !important;
+
+    min-width: 180px !important;
+
+    max-width: 180px !important;
+
+    height: 43px !important;
+
+    box-sizing: border-box;
+
+    /* ROJO MÁS FUERTE PARA LA PRIMERA COLUMNA */
+    background: #fecaca !important;
+
+    color: #b91c1c !important;
+
+    text-align: left;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+
+    border-right:
+        1px solid
+        #fca5a5 !important;
+
+    border-bottom:
+        2px solid
+        #fca5a5 !important;
+
+    box-shadow:
+        4px 0 8px
+        rgba(15,23,42,0.20);
+}
 
 /* =========================================================
    CUERPO
@@ -726,21 +830,21 @@ td {
 tbody
 td.nombre-tecnico {
 
-    position: sticky;
+    position: sticky !important;
 
-    left: 0;
+    left: 0 !important;
 
-    z-index: 20;
+    z-index: 50 !important;
 
-    width: 180px;
+    width: 180px !important;
 
-    min-width: 180px;
+    min-width: 180px !important;
 
-    max-width: 180px;
+    max-width: 180px !important;
 
     box-sizing: border-box;
 
-    background: #ffffff;
+    background: #ffffff !important;
 
     color: #0f172a;
 
@@ -778,7 +882,7 @@ tbody
 tr:nth-child(even)
 td.nombre-tecnico {
 
-    background: #f8fafc;
+    background: #f8fafc !important;
 }
 
 
@@ -800,7 +904,7 @@ tbody
 tr:hover
 td.nombre-tecnico {
 
-    background: #eff6ff;
+    background: #eff6ff !important;
 }
 
 
@@ -818,9 +922,18 @@ td.nombre-tecnico {
 
     background: #ffffff !important;
 
-    color: #afb1b3 !important;
+    color: transparent !important;
+
+    font-size: 0 !important;
 
     font-weight: 700;
+}
+
+
+#tablaResultadoDiarioTecnico
+.celda-na * {
+
+    display: none !important;
 }
 
 
@@ -1115,7 +1228,7 @@ td.nombre-tecnico {
 
 
     /* =====================================================
-       TÉCNICO
+       ANCHOS DEL TÉCNICO
        ===================================================== */
 
     #tablaResultadoDiarioTecnico
@@ -1134,13 +1247,17 @@ td.nombre-tecnico {
 
     #tablaResultadoDiarioTecnico
     .fila-tecnicos-auditados
-    .nombre-tecnicos-auditados {
+    .nombre-tecnicos-auditados,
 
-        width: 150px;
+    #tablaResultadoDiarioTecnico
+    .fila-total-errores
+    .nombre-total-errores {
 
-        min-width: 150px;
+        width: 150px !important;
 
-        max-width: 150px;
+        min-width: 150px !important;
+
+        max-width: 150px !important;
     }
 
 
@@ -1152,79 +1269,173 @@ td.nombre-tecnico {
     thead
     th {
 
-        height: 42px;
+        position: sticky !important;
+
+        top: 0 !important;
+
+        z-index: 100 !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        max-height: 42px !important;
 
         padding: 8px 6px;
 
-        top: 0;
-
         line-height: 1.1;
+
+        background: #0f172a !important;
     }
 
 
     /* =====================================================
-       TÉCNICO AZUL
+       TÉCNICO - ENCABEZADO AZUL
        ===================================================== */
 
     #tablaResultadoDiarioTecnico
     thead
     th.columna-tecnico {
 
-        width: 150px;
+        position: sticky !important;
 
-        min-width: 150px;
+        left: 0 !important;
 
-        max-width: 150px;
+        top: 0 !important;
 
-        height: 42px;
+        z-index: 200 !important;
 
-        top: 0;
+        width: 150px !important;
 
-        z-index: 60;
+        min-width: 150px !important;
+
+        max-width: 150px !important;
+
+        height: 42px !important;
     }
 
 
     /* =====================================================
-       FILA GRIS FIJA
+       TÉCNICOS AUDITADOS
+       DEBAJO DEL ENCABEZADO
        ===================================================== */
 
     #tablaResultadoDiarioTecnico
     .fila-tecnicos-auditados
     td {
 
-        height: 42px;
+        position: sticky !important;
 
-        min-height: 42px;
+        top: 42px !important;
 
-        max-height: 42px;
+        z-index: 90 !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        max-height: 42px !important;
 
         padding: 8px 6px;
-
-        top: 42px;
-
-        z-index: 25;
     }
 
 
     /* =====================================================
-       TÉCNICO GRIS FIJO
+       TÉCNICO - TÉCNICOS AUDITADOS
        ===================================================== */
 
     #tablaResultadoDiarioTecnico
     .fila-tecnicos-auditados
     .nombre-tecnicos-auditados {
 
-        width: 150px;
+        position: sticky !important;
 
-        min-width: 150px;
+        left: 0 !important;
 
-        max-width: 150px;
+        top: 42px !important;
 
-        height: 42px;
+        z-index: 190 !important;
 
-        top: 42px;
+        width: 150px !important;
 
-        z-index: 55;
+        min-width: 150px !important;
+
+        max-width: 150px !important;
+
+        height: 42px !important;
+    }
+
+
+    /* =====================================================
+       TOTAL ERRORES
+       DEBAJO DE TÉCNICOS AUDITADOS
+       ===================================================== */
+
+    #tablaResultadoDiarioTecnico
+    .fila-total-errores
+    td {
+
+        position: sticky !important;
+
+        top: 84px !important;
+
+        z-index: 80 !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        max-height: 42px !important;
+
+        padding: 8px 6px;
+    }
+
+
+    /* =====================================================
+       TÉCNICO - TOTAL ERRORES
+       ===================================================== */
+
+    #tablaResultadoDiarioTecnico
+    .fila-total-errores
+    .nombre-total-errores {
+
+        position: sticky !important;
+
+        left: 0 !important;
+
+        top: 84px !important;
+
+        z-index: 180 !important;
+
+        width: 150px !important;
+
+        min-width: 150px !important;
+
+        max-width: 150px !important;
+
+        height: 42px !important;
+    }
+
+
+    /* =====================================================
+       TÉCNICO DEL CUERPO
+       ===================================================== */
+
+    #tablaResultadoDiarioTecnico
+    tbody
+    td.nombre-tecnico {
+
+        position: sticky !important;
+
+        left: 0 !important;
+
+        z-index: 50 !important;
+
+        width: 150px !important;
+
+        min-width: 150px !important;
+
+        max-width: 150px !important;
     }
 
 
@@ -1305,19 +1516,185 @@ td.nombre-tecnico {
 
 }
 
+
 /* =========================================================
-   OCULTAR TEXTO N/A
+   REGLAS FINALES DE SEGURIDAD PARA STICKY
    ========================================================= */
 
-#tablaResultadoDiarioTecnico .celda-na {
-    color: transparent !important;
+
+/* ENCABEZADO */
+
+#tablaResultadoDiarioTecnico
+thead
+th {
+
+    position: sticky !important;
+
+    top: 0 !important;
+
+    z-index: 100 !important;
+
+    background: #0f172a !important;
+}
+
+
+/* =========================================================
+   TÉCNICOS AUDITADOS
+   SIEMPRE ARRIBA DE TOTAL ERRORES
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.fila-tecnicos-auditados
+td {
+
+    position: sticky !important;
+
+    top: 44px !important;
+
+    z-index: 90 !important;
+}
+
+
+#tablaResultadoDiarioTecnico
+.fila-tecnicos-auditados
+.nombre-tecnicos-auditados {
+
+    position: sticky !important;
+
+    left: 0 !important;
+
+    top: 44px !important;
+
+    z-index: 190 !important;
+}
+
+
+/* =========================================================
+   TOTAL ERRORES
+   SIEMPRE DEBAJO DE TÉCNICOS AUDITADOS
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+.fila-total-errores
+td {
+
+    position: sticky !important;
+
+    top: 87px !important;
+
+    z-index: 80 !important;
+}
+
+
+#tablaResultadoDiarioTecnico
+.fila-total-errores
+.nombre-total-errores {
+
+    position: sticky !important;
+
+    left: 0 !important;
+
+    top: 87px !important;
+
+    z-index: 180 !important;
+}
+
+
+/* =========================================================
+   PRIMERA COLUMNA DEL CUERPO
+   ========================================================= */
+
+#tablaResultadoDiarioTecnico
+tbody
+td.nombre-tecnico {
+
+    position: sticky !important;
+
+    left: 0 !important;
+
+    z-index: 50 !important;
+
     background: #ffffff !important;
-    font-size: 0 !important;
 }
 
-#tablaResultadoDiarioTecnico .celda-na * {
-    display: none !important;
-}
 
+/* =========================================================
+   SEGURIDAD MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    /* ENCABEZADO */
+
+    #tablaResultadoDiarioTecnico
+    thead
+    th {
+
+        top: 0 !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        max-height: 42px !important;
+    }
+
+
+    /* TÉCNICOS AUDITADOS */
+
+    #tablaResultadoDiarioTecnico
+    .fila-tecnicos-auditados
+    td {
+
+        top: 42px !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        max-height: 42px !important;
+    }
+
+
+    #tablaResultadoDiarioTecnico
+    .fila-tecnicos-auditados
+    .nombre-tecnicos-auditados {
+
+        top: 42px !important;
+
+        left: 0 !important;
+
+        height: 42px !important;
+    }
+
+
+    /* TOTAL ERRORES */
+
+    #tablaResultadoDiarioTecnico
+    .fila-total-errores
+    td {
+
+        top: 84px !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        max-height: 42px !important;
+    }
+
+
+    #tablaResultadoDiarioTecnico
+    .fila-total-errores
+    .nombre-total-errores {
+
+        top: 84px !important;
+
+        left: 0 !important;
+
+        height: 42px !important;
+    }
+
+}
 
 </style>

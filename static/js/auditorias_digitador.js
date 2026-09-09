@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("=== AUDITORÍAS POR DIGITADOR ===");
-
-
     // =====================================================
     // ELEMENTOS
     // =====================================================
@@ -24,19 +21,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!elemento) {
 
-        console.error(
-            "❌ No existe #datos-Auditorias-Por-Digitador"
-        );
-
         return;
     }
 
 
     if (!canvas) {
-
-        console.error(
-            "❌ No existe #graficaAuditoriasDigitador"
-        );
 
         return;
     }
@@ -57,10 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!contenido) {
 
-            console.warn(
-                "⚠️ El elemento de datos está vacío"
-            );
-
             return;
         }
 
@@ -70,16 +55,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     } catch (error) {
-
-        console.error(
-            "❌ Error leyendo JSON:",
-            error
-        );
-
-        console.error(
-            "Contenido recibido:",
-            elemento.textContent
-        );
 
         return;
     }
@@ -91,10 +66,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!Array.isArray(datos)) {
 
-        console.error(
-            "❌ Los datos recibidos NO son un Array:",
-            datos
-        );
 
         return;
     }
@@ -196,10 +167,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (datos.length === 0) {
 
-        console.warn(
-            "⚠️ No existen datos de digitadores para mostrar"
-        );
-
         return;
     }
 
@@ -288,34 +255,6 @@ document.addEventListener("DOMContentLoaded", function () {
             ) || 0;
 
         });
-
-
-    // =====================================================
-    // LOG
-    // =====================================================
-
-    console.log(
-        "👤 Digitadores:",
-        labels.map(
-            item => item.auditor
-        )
-    );
-
-    console.log(
-        "🔵 Total:",
-        total
-    );
-
-    console.log(
-        "🟢 Cumple:",
-        cumple
-    );
-
-    console.log(
-        "🔴 No cumple:",
-        noCumple
-    );
-
 
     // =====================================================
     // DESTRUIR GRÁFICA ANTERIOR
@@ -1338,14 +1277,5 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
 
     });
-
-
-    // =====================================================
-    // FINAL
-    // =====================================================
-
-    console.log(
-        `✅ Gráfica de auditorías por digitador creada correctamente: ${datos.length} registros`
-    );
 
 });

@@ -1,10 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log(
-        "=== CANTIDAD DE HALLAZGOS ==="
-    );
-
-
     // =====================================================
     // ELEMENTOS
     // =====================================================
@@ -33,19 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!elemento) {
 
-        console.error(
-            "❌ NO EXISTE #datos-Cantidad-Por-Hallazgo"
-        );
-
         return;
     }
 
 
     if (!canvas) {
-
-        console.error(
-            "❌ NO EXISTE #graficaCantidadHallazgos"
-        );
 
         return;
     }
@@ -53,19 +40,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!contenedor) {
 
-        console.error(
-            "❌ NO EXISTE .chart-container-hallazgos"
-        );
-
         return;
     }
 
 
     if (typeof Chart === "undefined") {
 
-        console.error(
-            "❌ Chart.js no está cargado"
-        );
 
         return;
     }
@@ -85,24 +65,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error(
-            "❌ ERROR LEYENDO JSON:",
-            error
-        );
-
-        console.error(
-            elemento.textContent
-        );
 
         return;
     }
-
-
-    console.log(
-        "📦 DATOS RECIBIDOS:",
-        datos
-    );
-
 
     // =====================================================
     // VALIDAR DATOS
@@ -110,19 +75,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!Array.isArray(datos)) {
 
-        console.error(
-            "❌ LOS DATOS NO SON UN ARRAY"
-        );
-
         return;
     }
 
 
     if (datos.length === 0) {
-
-        console.warn(
-            "⚠️ NO HAY HALLAZGOS PARA MOSTRAR"
-        );
 
         return;
     }
@@ -173,13 +130,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
     );
-
-
-    console.table(
-        estadisticas
-    );
-
-
     // =====================================================
     // LABELS
     // =====================================================
@@ -224,19 +174,6 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             0
         );
-
-
-    console.log(
-        "📊 TOTAL HALLAZGOS:",
-        totalGeneral
-    );
-
-
-    console.log(
-        "🔎 HALLAZGOS DIFERENTES:",
-        estadisticas.length
-    );
-
 
     // =====================================================
     // DESTRUIR GRÁFICA ANTERIOR
@@ -284,10 +221,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     if (ancho <= 0) {
-
-        console.error(
-            "❌ EL CONTENEDOR NO TIENE ANCHO"
-        );
 
         return;
     }
@@ -906,11 +839,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
         }
-    );
-
-
-    console.log(
-        `✅ GRÁFICA CREADA: ${estadisticas.length} hallazgos`
     );
 
 });

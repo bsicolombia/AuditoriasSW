@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("=== HALLAZGOS_TECNICO.JS INICIADO ===");
-
-
     // =====================================================
     // ELEMENTOS
     // =====================================================
@@ -25,10 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!elemento || !canvas) {
 
-        console.error(
-            "❌ No se encontró el elemento de datos o el canvas"
-        );
-
         return;
 
     }
@@ -49,10 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!texto) {
 
-            console.warn(
-                "⚠️ El elemento de datos está vacío"
-            );
-
             return;
 
         }
@@ -64,10 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error(
-            "❌ ERROR LEYENDO JSON:",
-            error
-        );
 
         return;
 
@@ -79,10 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
 
     if (!Array.isArray(datos)) {
-
-        console.error(
-            "❌ Los datos no son un array"
-        );
 
         return;
 
@@ -183,28 +164,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
 
-
-    console.log(
-        "👷 TÉCNICOS:",
-        labels
-    );
-
-
-    console.log(
-        "🔢 TOTALES:",
-        totales
-    );
-
-
     // =====================================================
     // SI NO HAY DATOS
     // =====================================================
 
     if (datosOrdenados.length === 0) {
-
-        console.warn(
-            "⚠️ No existen datos de técnicos para mostrar."
-        );
 
         return;
 
@@ -1038,14 +1002,5 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
 
     });
-
-
-    // =====================================================
-    // FINAL
-    // =====================================================
-
-    console.log(
-        `✅ GRÁFICA CREADA: ${datosOrdenados.length} técnicos`
-    );
 
 });

@@ -1,7 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-
-    console.log("=== OPERACIONES.JS INICIADO ===");
-
     const elemento =
         document.getElementById("datos-operaciones");
 
@@ -14,20 +11,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
 
     if (!elemento) {
-
-        console.error(
-            "❌ NO EXISTE #datos-operaciones"
-        );
-
         return;
     }
 
 
     if (!canvas) {
-
-        console.error(
-            "❌ NO EXISTE #graficaOperaciones"
-        );
 
         return;
     }
@@ -47,11 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error(
-            "❌ ERROR JSON:",
-            error
-        );
-
         return;
     }
 
@@ -61,10 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
 
     if (!Array.isArray(datos)) {
-
-        console.error(
-            "❌ datos_operaciones NO ES ARRAY"
-        );
 
         return;
     }
@@ -141,31 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             0
         );
-
-
-    console.log(
-        "================================"
-    );
-
-    console.log(
-        "TOTAL AUDITORÍAS:",
-        totalAuditorias
-    );
-
-    console.log(
-        "TOTAL CUMPLE:",
-        totalCumple
-    );
-
-    console.log(
-        "TOTAL NO CUMPLE:",
-        totalNoCumple
-    );
-
-    console.log(
-        "================================"
-    );
-
 
     // =====================================================
     // MOSTRAR TOTALES
@@ -693,10 +647,5 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
 
     });
-
-
-    console.log(
-        "✅ GRÁFICA CREADA CORRECTAMENTE"
-    );
 
 });

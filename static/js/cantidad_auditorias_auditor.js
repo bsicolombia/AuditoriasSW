@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("=== CANTIDAD DE AUDITORÍAS POR AUDITOR ===");
-
-
     // =====================================================
     // ELEMENTOS
     // =====================================================
@@ -25,20 +22,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!elemento) {
 
-        console.error(
-            "❌ No existe #datos-Cantidad-Auditorias-Auditor"
-        );
-
         return;
 
     }
 
 
     if (!canvas) {
-
-        console.error(
-            "❌ No existe #graficaCantidadAuditoriasAuditor"
-        );
 
         return;
 
@@ -60,10 +49,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!contenido) {
 
-            console.warn(
-                "⚠️ El elemento de datos está vacío"
-            );
-
             return;
 
         }
@@ -75,15 +60,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error(
-            "❌ Error leyendo JSON:",
-            error
-        );
-
-        console.error(
-            "Contenido recibido:",
-            elemento.textContent
-        );
 
         return;
 
@@ -96,11 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!Array.isArray(datos)) {
 
-        console.error(
-            "❌ Los datos no son un Array:",
-            datos
-        );
-
         return;
 
     }
@@ -108,22 +79,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (datos.length === 0) {
 
-        console.warn(
-            "⚠️ No hay datos de auditorías por auditor"
-        );
-
         return;
 
     }
-
-
-    console.log(
-        "📊 Datos recibidos:",
-        datos
-    );
-
-    console.table(datos);
-
 
     // =====================================================
     // PREPARAR DATOS
@@ -216,32 +174,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return item.no_cumple;
 
         });
-
-
-    // =====================================================
-    // VERIFICAR DATOS
-    // =====================================================
-
-    console.log(
-        "👤 Auditores:",
-        labels
-    );
-
-    console.log(
-        "🔵 Total:",
-        total
-    );
-
-    console.log(
-        "🟢 Cumple:",
-        cumple
-    );
-
-    console.log(
-        "🔴 No cumple:",
-        noCumple
-    );
-
 
     // =====================================================
     // DESTRUIR GRÁFICA ANTERIOR
@@ -1298,13 +1230,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-
-    // =====================================================
-    // FINAL
-    // =====================================================
-
-    console.log(
-        `✅ Gráfica creada correctamente: ${datosOrdenados.length} auditores`
-    );
 
 });

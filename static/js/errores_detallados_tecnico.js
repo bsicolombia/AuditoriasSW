@@ -23,11 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error(
-            "Error leyendo los datos:",
-            error
-        );
-
         return;
     }
 

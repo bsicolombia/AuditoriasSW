@@ -2,11 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     "use strict";
 
-    console.log(
-        "=== ESTADISTICAS DE AUDITORIAS INICIADAS ==="
-    );
-
-
     /* =========================================================
        FUNCIONES GENERALES
        ========================================================= */
@@ -129,10 +124,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!elementoDatos) {
 
-            console.warn(
-                "⚠️ No existe #datos-Resultado-Auditorias-Tecnico"
-            );
-
             return [];
         }
 
@@ -143,9 +134,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!contenido) {
 
-            console.warn(
-                "⚠️ #datos-Resultado-Auditorias-Tecnico está vacío"
-            );
 
             return [];
         }
@@ -211,11 +199,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!Array.isArray(datos)) {
 
-                console.error(
-                    "❌ Los datos de técnicos no son un array:",
-                    datos
-                );
-
                 return [];
             }
 
@@ -224,16 +207,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         } catch (error) {
 
-            console.error(
-                "❌ Error leyendo JSON de técnicos:",
-                error
-            );
-
-
-            console.error(
-                "Contenido recibido:",
-                contenido
-            );
 
 
             return [];
@@ -258,33 +231,9 @@ document.addEventListener("DOMContentLoaded", function () {
         window.Resultado_Auditorias_Tecnico =
             datos;
 
-
-        console.log(
-            "✅ Resultado_Auditorias_Tecnico globalizado:",
-            datos.length,
-            "registros"
-        );
-
-
         if (datos.length > 0) {
 
-            console.table(
-                datos
-            );
 
-
-            console.log(
-                "🔎 Primer técnico:",
-                datos[0]
-            );
-
-
-            console.log(
-                "🔎 Campos:",
-                Object.keys(
-                    datos[0] || {}
-                )
-            );
         }
 
 
@@ -306,10 +255,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         } catch (error) {
 
-            console.warn(
-                "⚠️ No se pudo emitir evento global:",
-                error
-            );
         }
 
 
@@ -601,13 +546,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "%";
         }
 
-
-        console.log(
-            "📊 RESUMEN GLOBAL:",
-            resumen
-        );
-
-
         return resumen;
     }
 
@@ -674,16 +612,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         } catch (error) {
 
-            console.error(
-                "❌ ERROR JSON OPERACIONES:",
-                error
-            );
-
-
-            console.error(
-                "Contenido operaciones:",
-                elementoOperaciones.textContent
-            );
+            
         }
 
 
@@ -697,15 +626,6 @@ document.addEventListener("DOMContentLoaded", function () {
             )
         ) {
 
-            console.log(
-                "✅ Operaciones recibidas:",
-                datosOperaciones.length
-            );
-
-
-            console.table(
-                datosOperaciones
-            );
 
 
             /* =================================================
@@ -1230,29 +1150,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-                console.log(
-                    "✅ GRÁFICA DE OPERACIONES CREADA"
-                );
+
 
             } else {
 
-                console.warn(
-                    "⚠️ Chart.js no está cargado"
-                );
+
             }
 
         } else {
 
-            console.warn(
-                "⚠️ Los datos de operaciones no son un array"
-            );
+
         }
 
     } else {
 
-        console.warn(
-            "⚠️ No se encontraron los elementos de la gráfica de operaciones"
-        );
     }
 
 
@@ -1263,11 +1174,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener(
         "ResultadoAuditoriasTecnicoActualizado",
         function () {
-
-            console.log(
-                "🔄 Actualización global de técnicos recibida"
-            );
-
 
             actualizarResumenVisual();
 
@@ -1281,21 +1187,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
         }
-    );
-
-
-    /* =========================================================
-       FINAL
-       ========================================================= */
-
-    console.log(
-        "✅ RESULTADO POR TÉCNICO CARGADO"
-    );
-
-
-    console.log(
-        "🌎 Variable global disponible como:",
-        "window.Resultado_Auditorias_Tecnico"
     );
 
 });

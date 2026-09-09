@@ -256,11 +256,6 @@
         }
         catch (error) {
 
-            console.error(
-                "Error leyendo datos por digitador:",
-                error
-            );
-
             datos = [];
 
         }
@@ -549,10 +544,6 @@
             "function"
         ) {
 
-            console.warn(
-                "⚠️ Todavía no existe obtenerResumenTecnicosGlobal()."
-            );
-
             return;
 
         }
@@ -560,13 +551,6 @@
 
         const resumen =
             window.obtenerResumenTecnicosGlobal();
-
-
-        console.log(
-            "📊 Resumen compartido con Digitador:",
-            resumen
-        );
-
 
         /* ---------------------------------------------------------
         TÉCNICOS CONTRATADOS
@@ -719,10 +703,6 @@
     window.addEventListener(
         "ResultadoAuditoriasTecnicoActualizado",
         function () {
-
-            console.log(
-                "🔄 Digitador: actualizando resumen compartido"
-            );
 
             actualizarResumenDigitador();
 

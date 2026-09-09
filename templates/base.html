@@ -25,18 +25,46 @@
 <div class="layout">
     <aside class="sidebar">
 
-        <a href="{% url 'index' %}"><img src="{% static 'img/LogoBSI.png' %}" alt="Logo" class="logo"></a>
-
-        <h2>Auditorías</h2>
+        <a href="{% url 'index' %}"><img src="{% static 'img/LOGOBSI (3).png' %}" alt="Logo" class="logo"></a>
 
         <nav>
             <ul>
-                <li><a href="{% url 'index' %}">Inicio</a></li>
-                <li><a href="{% url 'carga' %}">Carga Auditorias y Tecnicos</a></li>
-                <li><a href="{% url 'estadistica' %}">Estadísticas</a></li>       
-                <li><a href="{% url 'consulta' %}">Consultas</a></li>
-                <li><a href="{% url 'reauditar' %}">Reauditar / Auditar</a></li>
-                
+                <li>
+                    <a href="{% url 'index' %}">
+                        <img src="{% static 'img/casa.png' %}" alt="Inicio">
+                        <span>Inicio</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'carga' %}">
+                        <img src="{% static 'img/cargando.png' %}" alt="Carga">
+                        <span>Carga Auditorías y Técnicos</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'estadistica' %}">
+                        <img src="{% static 'img/beneficios.png' %}" alt="Estadísticas">
+                        <span>Estadísticas</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'consulta' %}">
+                        <img src="{% static 'img/lupa.png' %}" alt="Consultas">
+                        <span>Consultas</span>
+                    </a>
+                </li>
+
+                <div class="reauditar">
+                    <li>
+                        <a href="{% url 'reauditar' %}">
+                            <img src="{% static 'img/revision.png' %}" alt="Reauditar">
+                            <span>Mes Actual Reauditar / Auditar</span>
+                        </a>
+                    </li>
+                </div>
             </ul>
         </nav>
     </aside>

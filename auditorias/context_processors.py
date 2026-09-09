@@ -17,6 +17,7 @@ def texto_seguro(valor, defecto=""):
     None -> ""
     "   Hola   " -> "Hola"
     """
+
     if valor is None:
         return defecto
 
@@ -105,8 +106,6 @@ def extraer_cedula_nombre_tecnico(nombre):
 
     nombre = str(nombre).strip()
 
-    # Caso normal:
-    # nombre - 123456789
     coincidencia = re.search(
         r"(?:-\s*)?(\d{6,15})\s*$",
         nombre
@@ -158,10 +157,8 @@ def obtener_cedula_auditoria(auditoria):
     """
     Obtiene la cédula del técnico desde un registro de Auditoria.
 
-    IMPORTANTE:
-
-    numero_cedula parece ser la cédula del AUDITOR,
-    por eso NO se debe usar como cédula del técnico.
+    numero_cedula corresponde al auditor,
+    por eso no se utiliza como cédula del técnico.
 
     La cédula del técnico está al final de nombre_tecnico.
     """
@@ -326,25 +323,7 @@ def obtener_filtros(request):
     if resultado_invalido:
         filtros["resultado"] = ""
 
-    # ========================================================
-    # DEBUG
-    # ========================================================
-
-    print("\n")
-    print("=" * 100)
-    print("DEBUG - FILTROS RECIBIDOS")
-    print("=" * 100)
-
-    for nombre, valor in filtros.items():
-        print(
-            f"{nombre}: {repr(valor)}"
-        )
-
-    print("=" * 100)
-    print("\n")
-
     return filtros
-
 
 
 # ============================================================
@@ -352,16 +331,6 @@ def obtener_filtros(request):
 # ============================================================
 
 def aplicar_filtros(queryset, filtros):
-
-    print("\n")
-    print("=" * 100)
-    print("DEBUG - APLICAR FILTROS")
-    print("=" * 100)
-
-    print(
-        "Auditorías inicialmente:",
-        queryset.count()
-    )
 
     # ========================================================
     # AÑO
@@ -377,13 +346,6 @@ def aplicar_filtros(queryset, filtros):
 
             queryset = queryset.filter(
                 fecha__year=int(anio)
-            )
-
-            print(
-                "Después de AÑO:",
-                anio,
-                "=>",
-                queryset.count()
             )
 
     # ========================================================
@@ -402,13 +364,6 @@ def aplicar_filtros(queryset, filtros):
                 fecha__month=int(mes)
             )
 
-            print(
-                "Después de MES:",
-                mes,
-                "=>",
-                queryset.count()
-            )
-
     # ========================================================
     # DÍA
     # ========================================================
@@ -423,13 +378,6 @@ def aplicar_filtros(queryset, filtros):
 
             queryset = queryset.filter(
                 fecha__day=int(dia)
-            )
-
-            print(
-                "Después de DÍA:",
-                dia,
-                "=>",
-                queryset.count()
             )
 
     # ========================================================
@@ -448,13 +396,6 @@ def aplicar_filtros(queryset, filtros):
             tipo_operacion__iexact=tipo_operacion
         )
 
-        print(
-            "Después de OPERACIÓN:",
-            repr(tipo_operacion),
-            "=>",
-            queryset.count()
-        )
-
     # ========================================================
     # TÉCNICO
     # ========================================================
@@ -467,26 +408,9 @@ def aplicar_filtros(queryset, filtros):
 
     if tecnico_seleccionado:
 
-        print("\n")
-        print("-" * 100)
-        print("BUSCANDO TÉCNICO")
-        print("-" * 100)
-
-        print(
-            "Técnico seleccionado:",
-            repr(tecnico_seleccionado)
-        )
-
         nombre_tecnico_normalizado = (
             normalizar_texto(
                 tecnico_seleccionado
-            )
-        )
-
-        print(
-            "Nombre normalizado:",
-            repr(
-                nombre_tecnico_normalizado
             )
         )
 
@@ -509,8 +433,6 @@ def aplicar_filtros(queryset, filtros):
         )
 
         cedulas_tecnico = set()
-
-        nombres_tecnico = set()
 
         for tecnico_bd in tecnicos_bd:
 
@@ -537,29 +459,11 @@ def aplicar_filtros(queryset, filtros):
                 == nombre_tecnico_normalizado
             ):
 
-                nombres_tecnico.add(
-                    nombre_bd_normalizado
-                )
-
                 if cedula_bd:
 
                     cedulas_tecnico.add(
                         cedula_bd
                     )
-
-        print(
-            "Cédulas encontradas:",
-            sorted(
-                cedulas_tecnico
-            )
-        )
-
-        print(
-            "Nombres normalizados:",
-            sorted(
-                nombres_tecnico
-            )
-        )
 
         # ----------------------------------------------------
         # BUSCAR AUDITORÍAS
@@ -585,20 +489,14 @@ def aplicar_filtros(queryset, filtros):
                 )
             )
 
-            # -----------------------------------------------
-            # CÉDULA AL FINAL DEL NOMBRE
-            # -----------------------------------------------
-
+            # Cédula al final del nombre
             cedula_auditoria = (
                 extraer_cedula_nombre_tecnico(
                     nombre_auditoria
                 )
             )
 
-            # -----------------------------------------------
-            # NOMBRE SIN CÉDULA
-            # -----------------------------------------------
-
+            # Nombre sin cédula
             nombre_auditoria_limpio = (
                 obtener_nombre_sin_cedula(
                     nombre_auditoria
@@ -611,10 +509,7 @@ def aplicar_filtros(queryset, filtros):
                 )
             )
 
-            # -----------------------------------------------
-            # MATCH POR CÉDULA
-            # -----------------------------------------------
-
+            # Match por cédula
             match_cedula = (
 
                 cedula_auditoria
@@ -622,10 +517,7 @@ def aplicar_filtros(queryset, filtros):
                 in cedulas_tecnico
             )
 
-            # -----------------------------------------------
-            # MATCH POR NOMBRE
-            # -----------------------------------------------
-
+            # Match por nombre
             match_nombre = (
 
                 nombre_auditoria_normalizado
@@ -648,28 +540,9 @@ def aplicar_filtros(queryset, filtros):
             )
         )
 
-        print(
-            "Auditorías encontradas para técnico:",
-            len(ids_tecnico)
-        )
-
-        print(
-            "Primeros IDs:",
-            ids_tecnico[:30]
-        )
-
         queryset = queryset.filter(
             id__in=ids_tecnico
         )
-
-        print(
-            "Después de TÉCNICO:",
-            repr(tecnico_seleccionado),
-            "=>",
-            queryset.count()
-        )
-
-        print("-" * 100)
 
     # ========================================================
     # AUDITOR
@@ -685,13 +558,6 @@ def aplicar_filtros(queryset, filtros):
 
         queryset = queryset.filter(
             nombre_auditor__iexact=auditor
-        )
-
-        print(
-            "Después de AUDITOR:",
-            repr(auditor),
-            "=>",
-            queryset.count()
         )
 
     # ========================================================
@@ -710,13 +576,6 @@ def aplicar_filtros(queryset, filtros):
             hallazgo__iexact=hallazgo
         )
 
-        print(
-            "Después de HALLAZGO:",
-            repr(hallazgo),
-            "=>",
-            queryset.count()
-        )
-
     # ========================================================
     # RESULTADO
     # ========================================================
@@ -727,11 +586,6 @@ def aplicar_filtros(queryset, filtros):
         )
     ).lower()
 
-    # SOLO permitimos estos dos valores.
-    #
-    # Si llega "tecnicos" por error del frontend,
-    # simplemente NO se aplica el filtro.
-
     resultados_validos = {
         "cumple",
         "no_cumple",
@@ -741,20 +595,6 @@ def aplicar_filtros(queryset, filtros):
 
         queryset = queryset.filter(
             resultado_auditoria__iexact=resultado
-        )
-
-        print(
-            "Después de RESULTADO:",
-            repr(resultado),
-            "=>",
-            queryset.count()
-        )
-
-    elif resultado:
-
-        print(
-            "RESULTADO IGNORADO POR SER INVÁLIDO:",
-            repr(resultado)
         )
 
     # ========================================================
@@ -768,16 +608,6 @@ def aplicar_filtros(queryset, filtros):
     )
 
     if supervisor:
-
-        print("\n")
-        print("-" * 100)
-        print("DEBUG - FILTRO SUPERVISOR")
-        print("-" * 100)
-
-        print(
-            "Supervisor seleccionado:",
-            repr(supervisor)
-        )
 
         tecnicos_supervisor = list(
             Tecnicos.objects
@@ -828,20 +658,6 @@ def aplicar_filtros(queryset, filtros):
                     )
                 )
 
-        print(
-            "Técnicos supervisor:",
-            len(
-                tecnicos_supervisor
-            )
-        )
-
-        print(
-            "Cédulas supervisor:",
-            list(
-                cedulas_supervisor
-            )[:30]
-        )
-
         ids_supervisor = []
 
         auditorias_supervisor = (
@@ -880,14 +696,18 @@ def aplicar_filtros(queryset, filtros):
 
             if (
 
-                cedula
-                and cedula in cedulas_supervisor
+                (
+                    cedula
+                    and cedula in cedulas_supervisor
+                )
 
-            ) or (
+                or
 
-                nombre_normalizado
-                and nombre_normalizado
-                in nombres_supervisor
+                (
+                    nombre_normalizado
+                    and nombre_normalizado
+                    in nombres_supervisor
+                )
 
             ):
 
@@ -904,30 +724,6 @@ def aplicar_filtros(queryset, filtros):
         queryset = queryset.filter(
             id__in=ids_supervisor
         )
-
-        print(
-            "Auditorías coincidentes con supervisor:",
-            len(ids_supervisor)
-        )
-
-        print(
-            "Queryset FINAL después SUPERVISOR:",
-            queryset.count()
-        )
-
-        print("-" * 100)
-
-    # ========================================================
-    # RESULTADO FINAL
-    # ========================================================
-
-    print(
-        "QUERYSET FINAL:",
-        queryset.count()
-    )
-
-    print("=" * 100)
-    print("\n")
 
     return queryset
 
@@ -1625,11 +1421,6 @@ def obtener_resultado_auditorias_tecnico(
     supervisor=""
 ):
 
-    print("\n")
-    print("=" * 100)
-    print("RESULTADO AUDITORÍAS POR TÉCNICO")
-    print("=" * 100)
-
     supervisor = texto_seguro(
         supervisor
     )
@@ -1792,8 +1583,6 @@ def obtener_resultado_auditorias_tecnico(
 
     resultado = []
 
-    coincidencias = 0
-
     for tecnico in tecnicos:
 
         supervisor_tecnico = texto_seguro(
@@ -1853,8 +1642,6 @@ def obtener_resultado_auditorias_tecnico(
         # ----------------------------------------------------
 
         if estadisticas:
-
-            coincidencias += 1
 
             total = (
                 estadisticas["total"]
@@ -1961,21 +1748,6 @@ def obtener_resultado_auditorias_tecnico(
             fila
         )
 
-    print(
-        "Técnicos encontrados:",
-        len(resultado)
-    )
-
-    print(
-        "Técnicos con auditorías:",
-        coincidencias
-    )
-
-    print(
-        "Técnicos sin auditorías:",
-        len(resultado) - coincidencias
-    )
-
     # ========================================================
     # ORDEN
     # ========================================================
@@ -1993,9 +1765,6 @@ def obtener_resultado_auditorias_tecnico(
             x["tecnico"].lower()
         )
     )
-
-    print("=" * 100)
-    print("\n")
 
     return resultado
 
@@ -2286,7 +2055,10 @@ def obtener_resultado_diario_tecnico(
             )
         )
 
-        clave = cedula or nombre_normalizado
+        clave = (
+            cedula
+            or nombre_normalizado
+        )
 
         if not clave:
             continue
@@ -2560,11 +2332,6 @@ def obtener_resultado_diario_tecnico(
 
 def estadisticas_auditorias(request):
 
-    print("\n")
-    print("#" * 100)
-    print("# INICIO CONTEXT PROCESSOR ESTADISTICAS AUDITORIAS")
-    print("#" * 100)
-
     # ========================================================
     # FILTROS
     # ========================================================
@@ -2579,11 +2346,6 @@ def estadisticas_auditorias(request):
 
     queryset = Auditoria.objects.all()
 
-    print(
-        "Auditorías totales en BD:",
-        queryset.count()
-    )
-
     # ========================================================
     # APLICAR FILTROS
     # ========================================================
@@ -2592,63 +2354,6 @@ def estadisticas_auditorias(request):
         queryset,
         filtros
     )
-
-    # ========================================================
-    # DEBUG FINAL
-    # ========================================================
-
-    print("\n")
-    print("=" * 100)
-    print("QUERYSET FINAL")
-    print("=" * 100)
-
-    print(
-        "Filtros:",
-        filtros
-    )
-
-    print(
-        "Total final:",
-        queryset.count()
-    )
-
-    ejemplos = (
-        queryset
-        .values(
-            "id",
-            "fecha",
-            "nombre_tecnico",
-            "tipo_operacion",
-            "resultado_auditoria"
-        )[:10]
-    )
-
-    for item in ejemplos:
-
-        nombre_tecnico = texto_seguro(
-            item.get(
-                "nombre_tecnico"
-            )
-        )
-
-        print(
-            "ID:",
-            item["id"],
-            "| Fecha:",
-            item["fecha"],
-            "| Técnico:",
-            repr(nombre_tecnico),
-            "| Cédula técnico extraída:",
-            extraer_cedula_nombre_tecnico(
-                nombre_tecnico
-            ),
-            "| Operación:",
-            item["tipo_operacion"],
-            "| Resultado:",
-            item["resultado_auditoria"]
-        )
-
-    print("=" * 100)
 
     # ========================================================
     # OPCIONES
@@ -2763,15 +2468,5 @@ def estadisticas_auditorias(request):
                 filtros["supervisor"]
             ),
     }
-
-    print("\n")
-    print("#" * 100)
-    print("# FIN CONTEXT PROCESSOR")
-    print(
-        "# Auditorías finales:",
-        queryset.count()
-    )
-    print("#" * 100)
-    print("\n")
 
     return contexto

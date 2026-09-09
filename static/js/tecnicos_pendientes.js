@@ -1,79 +1,57 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     "use strict";
-
-    console.log(
-        "=== PANEL TÉCNICOS SIN AUDITAR / PARA RE-AUDITAR INICIADO ==="
-    );
-
-
     /* =========================================================
-       REGLA DE NEGOCIO
+       CONFIGURACIÓN
        ========================================================= */
 
     const UMBRAL_REAUDITAR = 65;
 
 
     /* =========================================================
-       ELEMENTOS DEL DOM
-       ========================================================= */
-
-    const cuerpoSinAuditar =
-        document.getElementById(
-            "tablaSinAuditarBody"
-        );
-
-    const cuerpoReauditar =
-        document.getElementById(
-            "tablaReauditarBody"
-        );
-
-    if (
-        !cuerpoSinAuditar ||
-        !cuerpoReauditar
-    ) {
-
-        console.warn(
-            "⚠️ No se encontraron las tablas del panel de pendientes."
-        );
-
-        return;
-    }
-
-
-    /* =========================================================
-       FUNCIONES AUXILIARES (mismo criterio que tus otros scripts)
+       OBTENER NÚMERO
        ========================================================= */
 
     function obtenerNumero(valor) {
-
-        if (
-            typeof window.obtenerNumero ===
-            "function"
-        ) {
-
-            return window.obtenerNumero(
-                valor
-            );
-        }
 
         if (
             valor === null ||
             valor === undefined ||
             valor === ""
         ) {
-
             return 0;
         }
 
-        let texto =
-            String(valor)
-                .trim()
-                .replace("%", "")
-                .replace(",", ".");
+        if (typeof valor === "number") {
 
-        const numero =
-            Number(texto);
+            return Number.isFinite(valor)
+                ? valor
+                : 0;
+        }
+
+        let texto = String(valor)
+            .trim()
+            .replace("%", "")
+            .replace(/\s/g, "");
+
+        if (
+            texto.includes(".") &&
+            texto.includes(",")
+        ) {
+
+            texto = texto
+                .replace(/\./g, "")
+                .replace(",", ".");
+        }
+
+        else if (
+            texto.includes(",")
+        ) {
+
+            texto = texto.replace(",", ".");
+        }
+
+        const numero = Number(texto);
 
         return Number.isFinite(numero)
             ? numero
@@ -81,23 +59,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /* =========================================================
+       ESCAPE HTML
+       ========================================================= */
+
     function escapeHtml(texto) {
-
-        if (
-            typeof window.escapeHtml ===
-            "function"
-        ) {
-
-            return window.escapeHtml(
-                texto
-            );
-        }
 
         const div =
             document.createElement("div");
 
         div.textContent =
-            texto == null
+            texto === null ||
+            texto === undefined
                 ? ""
                 : String(texto);
 
@@ -105,59 +78,64 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function formatearNumero(numero) {
-
-        return obtenerNumero(numero)
-            .toLocaleString(
-                "es-CO",
-                {
-                    maximumFractionDigits: 2
-                }
-            );
-    }
-
-
-    function formatearPorcentaje(numero) {
-
-        return (
-            obtenerNumero(numero)
-                .toFixed(2)
-                .replace(/\.00$/, "") +
-            "%"
-        );
-    }
-
-
     /* =========================================================
-       LEER LOS DATOS
+       LEER RESULTADO_AUDITORIAS_TECNICO
        ========================================================= */
 
-    function leerDatosDesdeDOM() {
+    function obtenerDatos() {
+
+        /*
+         * PRIMERO:
+         * utilizar la variable global que ya creó
+         * estadisticas.js
+         */
+
+        if (
+            Array.isArray(
+                window.Resultado_Auditorias_Tecnico
+            )
+        ) {
+
+
+
+            return window.Resultado_Auditorias_Tecnico;
+        }
+
+
+        /*
+         * SEGUNDO:
+         * leer json_script directamente
+         */
 
         const elemento =
             document.getElementById(
                 "datos-Resultado-Auditorias-Tecnico"
             );
 
+
         if (!elemento) {
+
 
             return [];
         }
+
 
         const contenido =
             elemento.textContent.trim();
 
+
         if (!contenido) {
+
 
             return [];
         }
 
+
         try {
 
             let datos =
-                JSON.parse(
-                    contenido
-                );
+                JSON.parse(contenido);
+
 
             if (
                 !Array.isArray(datos) &&
@@ -165,628 +143,952 @@ document.addEventListener("DOMContentLoaded", function () {
                 Array.isArray(datos.data)
             ) {
 
-                datos =
-                    datos.data;
+                datos = datos.data;
             }
 
-            return Array.isArray(datos)
-                ? datos
-                : [];
+
+            if (
+                !Array.isArray(datos) &&
+                datos &&
+                Array.isArray(datos.resultado)
+            ) {
+
+                datos = datos.resultado;
+            }
+
+
+            if (
+                !Array.isArray(datos) &&
+                datos &&
+                Array.isArray(datos.datos)
+            ) {
+
+                datos = datos.datos;
+            }
+
+
+            if (!Array.isArray(datos)) {
+
+
+                return [];
+            }
+
+
+            window.Resultado_Auditorias_Tecnico =
+                datos;
+
+
+            return datos;
 
         } catch (error) {
-
-            console.error(
-                "❌ Error leyendo JSON de técnicos (panel pendientes):",
-                error
-            );
 
             return [];
         }
     }
 
 
-    function obtenerDatosTecnicos() {
-
-        /*
-         * Prioridad 1: variable global ya cargada por el
-         * script "RESULTADO POR TÉCNICO" (evita parsear el
-         * JSON dos veces).
-         */
-
-        if (
-            Array.isArray(
-                window.Resultado_Auditorias_Tecnico
-            ) &&
-            window.Resultado_Auditorias_Tecnico.length > 0
-        ) {
-
-            return window.Resultado_Auditorias_Tecnico;
-        }
-
-        /*
-         * Prioridad 2: leer directamente del DOM (por si
-         * este panel se usa en una página donde el otro
-         * script todavía no corrió).
-         */
-
-        return leerDatosDesdeDOM();
-    }
-
-
     /* =========================================================
-       DETERMINAR SI EL TÉCNICO TIENE AUDITORÍAS
+       TOTAL DE AUDITORÍAS
        ========================================================= */
 
-    function tieneAuditorias(item) {
+    function obtenerTotalAuditorias(item) {
 
-        if (!item) {
-
-            return false;
-        }
-
-        const valor =
-            item.tiene_auditorias ??
-            item.tieneAuditorias;
-
-        if (
-            valor === true ||
-            valor === 1 ||
-            valor === "1" ||
-            valor === "true" ||
-            valor === "True"
-        ) {
-
-            return true;
-        }
-
-        if (
-            valor === false ||
-            valor === 0 ||
-            valor === "0" ||
-            valor === "false" ||
-            valor === "False"
-        ) {
-
-            return false;
-        }
-
-        return (
-            obtenerNumero(
-                item.total ??
-                item.total_auditorias ??
-                0
-            ) > 0
+        return obtenerNumero(
+            item.total ??
+            item.total_auditorias ??
+            item.numero_auditorias ??
+            item.auditorias ??
+            0
         );
     }
 
 
     /* =========================================================
-       CLASIFICAR TÉCNICO SEGÚN LA REGLA DEL 65%
+       NO CUMPLE
+       ========================================================= */
+
+    function obtenerNoCumple(item) {
+
+        return obtenerNumero(
+            item.no_cumple ??
+            item.noCumple ??
+            item.total_no_cumple ??
+            item.totalNoCumple ??
+            0
+        );
+    }
+
+
+    /* =========================================================
+       CUMPLE
+       ========================================================= */
+
+    function obtenerCumple(item) {
+
+        return obtenerNumero(
+            item.cumple ??
+            item.total_cumple ??
+            item.totalCumple ??
+            0
+        );
+    }
+
+
+    /* =========================================================
+       PORCENTAJE DE ERROR
+       ========================================================= */
+
+    function obtenerPorcentajeError(item) {
+
+        /*
+         * Si Django ya envió porcentaje_error,
+         * utilizarlo directamente.
+         */
+
+        if (
+            item.porcentaje_error !== undefined &&
+            item.porcentaje_error !== null &&
+            item.porcentaje_error !== ""
+        ) {
+
+            return obtenerNumero(
+                item.porcentaje_error
+            );
+        }
+
+
+        if (
+            item.porcentajeError !== undefined &&
+            item.porcentajeError !== null &&
+            item.porcentajeError !== ""
+        ) {
+
+            return obtenerNumero(
+                item.porcentajeError
+            );
+        }
+
+
+        /*
+         * Si no viene porcentaje,
+         * calcularlo.
+         */
+
+        const total =
+            obtenerTotalAuditorias(item);
+
+        const noCumple =
+            obtenerNoCumple(item);
+
+
+        if (total <= 0) {
+            return 0;
+        }
+
+
+        return (
+            noCumple / total
+        ) * 100;
+    }
+
+
+    /* =========================================================
+       SABER SI TIENE AUDITORÍAS
+       ========================================================= */
+
+    function tieneAuditorias(item) {
+
+        const total =
+            obtenerTotalAuditorias(item);
+
+        /*
+         * LA REGLA PRINCIPAL ES:
+         *
+         * total > 0
+         *
+         * Porque Resultado_Auditorias_Tecnico
+         * ya viene comparado desde Django.
+         */
+
+        return total > 0;
+    }
+
+
+    /* =========================================================
+       CLASIFICAR TÉCNICO
        ========================================================= */
 
     function clasificarTecnico(item) {
 
-        const auditado =
-            tieneAuditorias(item);
-
         const total =
-            obtenerNumero(
-                item.total ??
-                item.total_auditorias ??
-                0
-            );
+            obtenerTotalAuditorias(item);
 
-        const noCumple =
-            obtenerNumero(
-                item.no_cumple ??
-                0
-            );
+        const porcentajeError =
+            obtenerPorcentajeError(item);
+
 
         /*
-         * Si el back-end ya envía porcentaje_error, se usa
-         * directamente. Si no, se calcula aquí mismo.
+         * ================================================
+         * 1. NO TIENE AUDITORÍAS
+         * ================================================
          */
 
-        let porcentajeError =
-            item.porcentaje_error !== undefined &&
-            item.porcentaje_error !== null
-
-                ? obtenerNumero(
-                    item.porcentaje_error
-                )
-
-                : (
-                    total > 0
-                        ? (noCumple / total) * 100
-                        : 0
-                );
-
-        if (!auditado) {
+        if (total === 0) {
 
             return {
 
-                auditado: false,
+                tipo: "sin_auditoria",
 
-                porcentajeError: 0,
-
-                estado: "Sin auditorías",
-
-                claseEstado: "estado-sin-auditorias",
+                estado: "Sin auditoría",
 
                 accion: "Auditar",
 
-                claseAccion: "accion-auditar",
+                requiereAuditar: true,
 
                 requiereReauditar: false
-
             };
         }
 
-        if (porcentajeError >= UMBRAL_REAUDITAR) {
+
+        /*
+         * ================================================
+         * 2. TIENE AUDITORÍAS Y ERROR >= 65%
+         * ================================================
+         */
+
+        if (
+            porcentajeError >=
+            UMBRAL_REAUDITAR
+        ) {
 
             return {
 
-                auditado: true,
+                tipo: "reauditar",
 
-                porcentajeError: porcentajeError,
-
-                estado: "Crítico",
-
-                claseEstado: "estado-critico",
+                estado: "Re-auditar",
 
                 accion: "Volver a auditar",
 
-                claseAccion: "accion-reauditar",
+                requiereAuditar: false,
 
                 requiereReauditar: true
-
             };
         }
 
+
+        /*
+         * ================================================
+         * 3. TIENE AUDITORÍAS Y ERROR < 65%
+         * ================================================
+         */
+
         return {
 
-            auditado: true,
+            tipo: "al_dia",
 
-            porcentajeError: porcentajeError,
-
-            estado: "Todo bien",
-
-            claseEstado: "estado-todo-bien",
+            estado: "Al día",
 
             accion: "Continuar seguimiento",
 
-            claseAccion: "accion-ok",
+            requiereAuditar: false,
 
             requiereReauditar: false
-
         };
     }
 
 
     /* =========================================================
-       RENDER: RESUMEN
+       SUPERVISOR
        ========================================================= */
 
-    function renderizarResumen(clasificados) {
+    function obtenerSupervisor(item) {
+
+        return (
+            item.supervisor ||
+            item.Supervisor ||
+            ""
+        );
+    }
+
+
+    /* =========================================================
+       TÉCNICO
+       ========================================================= */
+
+    function obtenerNombreTecnico(item) {
+
+        return (
+            item.tecnico ||
+            item.nombre_tecnico ||
+            item.nombreTecnico ||
+            item.nombre ||
+            "Sin nombre"
+        );
+    }
+
+
+    /* =========================================================
+       CÉDULA
+       ========================================================= */
+
+    function obtenerCedula(item) {
+
+        return (
+            item.cedula ||
+            item.numero_cedula ||
+            item.numeroCedula ||
+            ""
+        );
+    }
+
+
+    /* =========================================================
+       RESUMEN
+       ========================================================= */
+
+    function renderizarResumen(datos) {
 
         const total =
-            clasificados.length;
+            datos.length;
+
 
         const auditados =
-            clasificados.filter(
-                function (c) {
-
-                    return c.clasificacion.auditado;
-                }
+            datos.filter(
+                tieneAuditorias
             ).length;
 
-        const sinAuditar =
-            total - auditados;
 
-        const paraReauditar =
-            clasificados.filter(
-                function (c) {
-
-                    return c.clasificacion.requiereReauditar;
-                }
-            ).length;
-
-        const alDia =
-            auditados - paraReauditar;
-
-        function pintar(id, valor) {
-
-            const el =
-                document.getElementById(id);
-
-            if (el) {
-
-                el.textContent = valor;
-            }
-        }
-
-        pintar(
-            "resumenTotalTecnicos",
-            formatearNumero(total)
-        );
-
-        pintar(
-            "resumenAuditados",
-            formatearNumero(auditados)
-        );
-
-        pintar(
-            "resumenPorcentajeAuditados",
-            formatearPorcentaje(
-                total > 0
-                    ? (auditados / total) * 100
-                    : 0
-            )
-        );
-
-        pintar(
-            "resumenSinAuditar",
-            formatearNumero(sinAuditar)
-        );
-
-        pintar(
-            "resumenPorcentajeSinAuditar",
-            formatearPorcentaje(
-                total > 0
-                    ? (sinAuditar / total) * 100
-                    : 0
-            )
-        );
-
-        pintar(
-            "resumenParaReauditar",
-            formatearNumero(paraReauditar)
-        );
-
-        pintar(
-            "resumenPorcentajeReauditar",
-            formatearPorcentaje(
-                total > 0
-                    ? (paraReauditar / total) * 100
-                    : 0
-            )
-        );
-
-        pintar(
-            "resumenAlDia",
-            formatearNumero(alDia)
-        );
-
-        pintar(
-            "resumenPorcentajeAlDia",
-            formatearPorcentaje(
-                total > 0
-                    ? (alDia / total) * 100
-                    : 0
-            )
-        );
-    }
-
-
-    /* =========================================================
-       RENDER: TABLA SIN AUDITAR
-       ========================================================= */
-
-    function renderizarSinAuditar(clasificados) {
-
-        const filas =
-            clasificados
-                .filter(
-                    function (c) {
-
-                        return !c.clasificacion.auditado;
-                    }
-                )
-                .sort(
-                    function (a, b) {
-
-                        const supA =
-                            (a.item.supervisor || "")
-                                .toLowerCase();
-
-                        const supB =
-                            (b.item.supervisor || "")
-                                .toLowerCase();
-
-                        if (supA !== supB) {
-
-                            return supA.localeCompare(
-                                supB
-                            );
-                        }
-
-                        return (
-                            a.item.tecnico || ""
-                        ).localeCompare(
-                            b.item.tecnico || ""
-                        );
-                    }
-                );
-
-        if (filas.length === 0) {
-
-            cuerpoSinAuditar.innerHTML = `
-                <tr>
-                    <td colspan="5" class="tabla-sin-datos">
-                        Todos los técnicos tienen al menos una auditoría.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-        cuerpoSinAuditar.innerHTML =
-            filas
-                .map(
-                    function (fila) {
-
-                        const item =
-                            fila.item;
-
-                        const c =
-                            fila.clasificacion;
-
-                        return `
-                            <tr>
-                                <td>${escapeHtml(item.supervisor || "Sin supervisor")}</td>
-                                <td>${escapeHtml(item.tecnico || "Sin técnico")}</td>
-                                <td>${escapeHtml(item.cedula || "-")}</td>
-                                <td>
-                                    <span class="estado-badge ${c.claseEstado}">
-                                        ${escapeHtml(c.estado)}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="accion-badge ${c.claseAccion}">
-                                        ${escapeHtml(c.accion)}
-                                    </span>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                )
-                .join("");
-    }
-
-
-    /* =========================================================
-       RENDER: TABLA PARA RE-AUDITAR
-       ========================================================= */
-
-    function renderizarReauditar(clasificados) {
-
-        const filas =
-            clasificados
-                .filter(
-                    function (c) {
-
-                        return c.clasificacion.requiereReauditar;
-                    }
-                )
-                .sort(
-                    function (a, b) {
-
-                        return (
-                            b.clasificacion.porcentajeError -
-                            a.clasificacion.porcentajeError
-                        );
-                    }
-                );
-
-        if (filas.length === 0) {
-
-            cuerpoReauditar.innerHTML = `
-                <tr>
-                    <td colspan="8" class="tabla-sin-datos">
-                        Ningún técnico supera el ${UMBRAL_REAUDITAR}% de errores.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-        cuerpoReauditar.innerHTML =
-            filas
-                .map(
-                    function (fila) {
-
-                        const item =
-                            fila.item;
-
-                        const c =
-                            fila.clasificacion;
-
-                        return `
-                            <tr>
-                                <td>${escapeHtml(item.supervisor || "Sin supervisor")}</td>
-                                <td>${escapeHtml(item.tecnico || "Sin técnico")}</td>
-                                <td>${escapeHtml(item.cedula || "-")}</td>
-                                <td>${formatearNumero(item.total || 0)}</td>
-                                <td>${formatearNumero(item.no_cumple || 0)}</td>
-                                <td>${formatearPorcentaje(c.porcentajeError)}</td>
-                                <td>
-                                    <span class="estado-badge ${c.claseEstado}">
-                                        ${escapeHtml(c.estado)}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="accion-badge ${c.claseAccion}">
-                                        ${escapeHtml(c.accion)}
-                                    </span>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                )
-                .join("");
-    }
-
-
-    /* =========================================================
-       RENDER GENERAL
-       ========================================================= */
-
-    function renderizarPanel() {
-
-        const datos =
-            obtenerDatosTecnicos();
-
-        console.log(
-            "📋 Panel pendientes - técnicos recibidos:",
-            datos.length
-        );
-
-        const clasificados =
-            datos.map(
+        const sinAuditoria =
+            datos.filter(
                 function (item) {
 
-                    return {
+                    return (
+                        obtenerTotalAuditorias(item)
+                        === 0
+                    );
+                }
+            ).length;
 
-                        item: item,
 
-                        clasificacion:
-                            clasificarTecnico(item)
-                    };
+        const reauditar =
+            datos.filter(
+                function (item) {
+
+                    const total =
+                        obtenerTotalAuditorias(item);
+
+                    const error =
+                        obtenerPorcentajeError(item);
+
+                    return (
+                        total > 0 &&
+                        error >= UMBRAL_REAUDITAR
+                    );
+                }
+            ).length;
+
+
+        const alDia =
+            datos.filter(
+                function (item) {
+
+                    const total =
+                        obtenerTotalAuditorias(item);
+
+                    const error =
+                        obtenerPorcentajeError(item);
+
+                    return (
+                        total > 0 &&
+                        error < UMBRAL_REAUDITAR
+                    );
+                }
+            ).length;
+
+
+        const porcentajeAuditados =
+            total > 0
+                ? (auditados / total) * 100
+                : 0;
+
+
+        const porcentajeSinAuditar =
+            total > 0
+                ? (sinAuditoria / total) * 100
+                : 0;
+
+
+        const porcentajeReauditar =
+            total > 0
+                ? (reauditar / total) * 100
+                : 0;
+
+
+        const porcentajeAlDia =
+            total > 0
+                ? (alDia / total) * 100
+                : 0;
+
+
+        /*
+         * TÉCNICOS CONTRATADOS
+         */
+
+        const elementoTotal =
+            document.getElementById(
+                "resumenTotalTecnicos"
+            );
+
+        if (elementoTotal) {
+
+            elementoTotal.textContent =
+                total.toLocaleString("es-CO");
+        }
+
+
+        /*
+         * AUDITADOS
+         */
+
+        const elementoAuditados =
+            document.getElementById(
+                "resumenAuditados"
+            );
+
+        if (elementoAuditados) {
+
+            elementoAuditados.textContent =
+                auditados.toLocaleString("es-CO");
+        }
+
+
+        /*
+         * % AUDITADOS
+         */
+
+        const elementoPorcentajeAuditados =
+            document.getElementById(
+                "resumenPorcentajeAuditados"
+            );
+
+        if (elementoPorcentajeAuditados) {
+
+            elementoPorcentajeAuditados.textContent =
+                porcentajeAuditados
+                    .toFixed(2)
+                    .replace(/\.00$/, "") +
+                "%";
+        }
+
+
+        /*
+         * SIN AUDITORÍA
+         */
+
+        const elementoSinAuditar =
+            document.getElementById(
+                "resumenSinAuditar"
+            );
+
+        if (elementoSinAuditar) {
+
+            elementoSinAuditar.textContent =
+                sinAuditoria.toLocaleString("es-CO");
+        }
+
+
+        /*
+         * % SIN AUDITAR
+         */
+
+        const elementoPorcentajeSinAuditar =
+            document.getElementById(
+                "resumenPorcentajeSinAuditar"
+            );
+
+        if (elementoPorcentajeSinAuditar) {
+
+            elementoPorcentajeSinAuditar.textContent =
+                porcentajeSinAuditar
+                    .toFixed(2)
+                    .replace(/\.00$/, "") +
+                "%";
+        }
+
+
+        /*
+         * RE-AUDITAR
+         */
+
+        const elementoReauditar =
+            document.getElementById(
+                "resumenParaReauditar"
+            );
+
+        if (elementoReauditar) {
+
+            elementoReauditar.textContent =
+                reauditar.toLocaleString("es-CO");
+        }
+
+
+        /*
+         * % RE-AUDITAR
+         */
+
+        const elementoPorcentajeReauditar =
+            document.getElementById(
+                "resumenPorcentajeReauditar"
+            );
+
+        if (elementoPorcentajeReauditar) {
+
+            elementoPorcentajeReauditar.textContent =
+                porcentajeReauditar
+                    .toFixed(2)
+                    .replace(/\.00$/, "") +
+                "%";
+        }
+
+
+        /*
+         * AL DÍA
+         */
+
+        const elementoAlDia =
+            document.getElementById(
+                "resumenAlDia"
+            );
+
+        if (elementoAlDia) {
+
+            elementoAlDia.textContent =
+                alDia.toLocaleString("es-CO");
+        }
+
+
+        /*
+         * % AL DÍA
+         */
+
+        const elementoPorcentajeAlDia =
+            document.getElementById(
+                "resumenPorcentajeAlDia"
+            );
+
+        if (elementoPorcentajeAlDia) {
+
+            elementoPorcentajeAlDia.textContent =
+                porcentajeAlDia
+                    .toFixed(2)
+                    .replace(/\.00$/, "") +
+                "%";
+        }
+
+
+        return {
+
+            total,
+            auditados,
+            sinAuditoria,
+            reauditar,
+            alDia,
+
+            porcentajeAuditados,
+            porcentajeSinAuditar,
+            porcentajeReauditar,
+            porcentajeAlDia
+        };
+    }
+
+
+    /* =========================================================
+       TABLA: TÉCNICOS SIN AUDITORÍA
+       ========================================================= */
+
+    function renderizarSinAuditar(datos) {
+
+        const tbody =
+            document.getElementById(
+                "tablaSinAuditarBody"
+            );
+
+
+        const contador =
+            document.getElementById(
+                "contadorTablaSinAuditar"
+            );
+
+
+        if (!tbody) {
+            return;
+        }
+
+
+        const tecnicosSinAuditoria =
+            datos.filter(
+                function (item) {
+
+                    return (
+                        obtenerTotalAuditorias(item)
+                        === 0
+                    );
                 }
             );
 
-        renderizarResumen(clasificados);
 
-        renderizarSinAuditar(clasificados);
+        tecnicosSinAuditoria.sort(
+            function (a, b) {
 
-        renderizarReauditar(clasificados);
-    }
+                const supervisorA =
+                    obtenerSupervisor(a);
 
+                const supervisorB =
+                    obtenerSupervisor(b);
 
-    window.actualizarPanelTecnicosPendientes =
-        renderizarPanel;
-
-
-    /* =========================================================
-       DIAGNÓSTICO: ¿existe el <script> con el JSON?
-       ========================================================= */
-
-    (function diagnosticoInicial() {
-
-        const elemento =
-            document.getElementById(
-                "datos-Resultado-Auditorias-Tecnico"
-            );
-
-        if (!elemento) {
-
-            console.error(
-                "❌ [Panel pendientes] NO existe en esta página " +
-                "el <script id=\"datos-Resultado-Auditorias-Tecnico\">. " +
-                "Revisa que la plantilla que incluye este panel " +
-                "también incluya ese bloque con {{ Resultado_Auditorias_Tecnico|safe }}."
-            );
-
-            return;
-        }
-
-        const contenido =
-            elemento.textContent.trim();
-
-        console.log(
-            "🔍 [Panel pendientes] <script id=\"datos-Resultado-Auditorias-Tecnico\"> " +
-            "encontrado. Longitud del contenido:",
-            contenido.length
-        );
-
-        if (!contenido || contenido === "[]") {
-
-            console.warn(
-                "⚠️ [Panel pendientes] El bloque existe pero está vacío " +
-                "([] o \"\"). Revisa que la vista/context processor esté " +
-                "devolviendo Resultado_Auditorias_Tecnico con datos para " +
-                "esta página."
-            );
-        }
-
-    })();
-
-
-    /* =========================================================
-       PRIMERA CARGA + REINTENTOS
-       =========================================================
-
-       No asumimos que window.Resultado_Auditorias_Tecnico ya
-       esté listo: si el script que lo globaliza se registra
-       DESPUÉS de este en el HTML, en el primer intento vendría
-       vacío. Por eso reintentamos varias veces antes de rendir
-       el panel como "sin datos".
-       ========================================================= */
-
-    let intentosRestantes = 20;
-
-    function intentarRenderizar() {
-
-        const datos =
-            obtenerDatosTecnicos();
-
-        if (
-            datos.length > 0 ||
-            intentosRestantes <= 0
-        ) {
-
-            if (
-                datos.length === 0
-            ) {
-
-                console.warn(
-                    "⚠️ [Panel pendientes] Se agotaron los reintentos " +
-                    "y no se encontraron técnicos. Los contadores " +
-                    "quedarán en 0 hasta que llegue el evento " +
-                    "'ResultadoAuditoriasTecnicoActualizado' o recargues la página."
+                return supervisorA.localeCompare(
+                    supervisorB,
+                    "es"
                 );
             }
+        );
 
-            renderizarPanel();
+
+        tbody.innerHTML = "";
+
+
+        if (
+            tecnicosSinAuditoria.length === 0
+        ) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5"
+                        class="tabla-vacia">
+                        No ahi tecnicos para auditar
+                    </td>
+                </tr>
+            `;
+
+        } else {
+
+            tecnicosSinAuditoria.forEach(
+                function (item) {
+
+                    const supervisor =
+                        obtenerSupervisor(item);
+
+                    const tecnico =
+                        obtenerNombreTecnico(item);
+
+                    const cedula =
+                        obtenerCedula(item);
+
+
+                    tbody.innerHTML += `
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(supervisor)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(tecnico)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(cedula)}
+                            </td>
+
+                            <td>
+                                <span class="estado-sin-auditorias">
+                                    Sin auditoría
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="accion-auditar">
+                                    Auditar
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+                }
+            );
+        }
+
+
+        if (contador) {
+
+            contador.textContent =
+                tecnicosSinAuditoria.length;
+        }
+
+    }
+
+
+    /* =========================================================
+       TABLA: TÉCNICOS PARA RE-AUDITAR
+       ========================================================= */
+
+    function renderizarReauditar(datos) {
+
+        const tbody =
+            document.getElementById(
+                "tablaReauditarBody"
+            );
+
+
+        const contador =
+            document.getElementById(
+                "contadorTablaReauditar"
+            );
+
+
+        if (!tbody) {
+            return;
+        }
+
+
+        const tecnicosReauditar =
+            datos.filter(
+                function (item) {
+
+                    const total =
+                        obtenerTotalAuditorias(item);
+
+                    const porcentaje =
+                        obtenerPorcentajeError(item);
+
+                    /*
+                     * IMPORTANTE:
+                     *
+                     * total > 0
+                     *
+                     * evita que un técnico sin auditorías
+                     * aparezca como re-auditar.
+                     */
+
+                    return (
+                        total > 0 &&
+                        porcentaje >=
+                        UMBRAL_REAUDITAR
+                    );
+                }
+            );
+
+
+        /*
+         * MAYOR % DE ERROR PRIMERO
+         */
+
+        tecnicosReauditar.sort(
+            function (a, b) {
+
+                return (
+                    obtenerPorcentajeError(b) -
+                    obtenerPorcentajeError(a)
+                );
+            }
+        );
+
+
+        tbody.innerHTML = "";
+
+
+        if (
+            tecnicosReauditar.length === 0
+        ) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8"
+                        class="tabla-vacia">
+                        No hay técnicos para
+                        re-auditar.
+                    </td>
+                </tr>
+            `;
+
+        } else {
+
+            tecnicosReauditar.forEach(
+                function (item) {
+
+                    const supervisor =
+                        obtenerSupervisor(item);
+
+                    const tecnico =
+                        obtenerNombreTecnico(item);
+
+                    const cedula =
+                        obtenerCedula(item);
+
+                    const total =
+                        obtenerTotalAuditorias(item);
+
+                    const noCumple =
+                        obtenerNoCumple(item);
+
+                    const cumple =
+                        obtenerCumple(item);
+
+                    const porcentaje =
+                        obtenerPorcentajeError(item);
+
+
+                    tbody.innerHTML += `
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(supervisor)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(tecnico)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(cedula)}
+                            </td>
+
+                            <td>
+                                ${total.toLocaleString("es-CO")}
+                            </td>
+
+                            <td class="error-alto">
+                                ${porcentaje
+                                    .toFixed(2)
+                                    .replace(/\.00$/, "")}%
+                            </td>
+
+                            <td class="no-cumple">
+                                ${noCumple.toLocaleString("es-CO")}
+                            </td>
+
+                            <td class="cumple">
+                                ${cumple.toLocaleString("es-CO")}
+                            </td>
+
+                            <td>
+                                <span class="accion-reauditar">
+                                    Volver a auditar
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+                }
+            );
+        }
+
+
+        if (contador) {
+
+            contador.textContent =
+                tecnicosReauditar.length;
+        }
+
+    }
+
+
+    /* =========================================================
+       ACTUALIZAR TODO EL PANEL
+       ========================================================= */
+
+    function actualizarPanel() {
+
+        const datos =
+            obtenerDatos();
+
+
+        if (!Array.isArray(datos)) {
 
             return;
         }
 
-        intentosRestantes--;
+        /*
+         * Mostrar primer registro para comprobar
+         */
 
-        setTimeout(
-            intentarRenderizar,
-            250
+        if (datos.length > 0) {
+
+        }
+
+
+        /*
+         * Clasificar cada técnico
+         */
+
+        datos.forEach(
+            function (item) {
+
+                const clasificacion =
+                    clasificarTecnico(item);
+
+            }
         );
-    }
 
-    intentarRenderizar();
+
+        /*
+         * RESUMEN
+         */
+
+        renderizarResumen(datos);
+
+
+        /*
+         * TABLA PARA AUDITAR
+         */
+
+        renderizarSinAuditar(datos);
+
+
+        /*
+         * TABLA PARA RE-AUDITAR
+         */
+
+        renderizarReauditar(datos);
+
+    }
 
 
     /* =========================================================
-       ACTUALIZAR CUANDO CAMBIEN LOS DATOS GLOBALES
-       (emitido por tu script "RESULTADO POR TÉCNICO")
+       FUNCIÓN GLOBAL
+       ========================================================= */
+
+    window.actualizarPanelTecnicosPendientes =
+        actualizarPanel;
+
+
+    /* =========================================================
+       ESCUCHAR ACTUALIZACIÓN DE ESTADÍSTICAS
        ========================================================= */
 
     window.addEventListener(
         "ResultadoAuditoriasTecnicoActualizado",
-        function () {
+        function (event) {
+            if (
+                event.detail &&
+                Array.isArray(event.detail)
+            ) {
 
-            console.log(
-                "🔄 Panel pendientes: actualización global recibida"
-            );
+                window.Resultado_Auditorias_Tecnico =
+                    event.detail;
+            }
 
-            intentosRestantes = 0;
 
-            renderizarPanel();
+            actualizarPanel();
         }
     );
 
 
-    console.log(
-        "✅ PANEL TÉCNICOS SIN AUDITAR / PARA RE-AUDITAR LISTO"
-    );
+    /* =========================================================
+       INICIALIZAR
+       ========================================================= */
+
+    actualizarPanel();
+
 
 });

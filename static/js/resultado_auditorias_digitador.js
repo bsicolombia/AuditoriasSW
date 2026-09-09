@@ -25,11 +25,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error(
-            "Error leyendo datos de auditorías por digitador:",
-            error
-        );
-
         return;
     }
 

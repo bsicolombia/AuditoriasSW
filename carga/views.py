@@ -33,6 +33,31 @@ from .models import Tecnicos
 
 def carga(request):
 
+    # ==========================================================
+    # RESUMEN ACTUAL DE TÉCNICOS EN BASE DE DATOS
+    #
+    # IMPORTANTE:
+    # El template esperaba tecnico_total_bd,
+    # tecnico_total_supervisores y tecnicos_por_supervisor,
+    # pero esta vista nunca los enviaba. Por eso el resumen
+    # se veía vacío aunque tecnico_report_generated fuera True.
+    # ==========================================================
+
+    tecnico_total_bd = Tecnicos.objects.count()
+
+    tecnicos_por_supervisor = (
+        Tecnicos.objects
+        .exclude(supervisor__isnull=True)
+        .exclude(supervisor__exact="")
+        .values("supervisor")
+        .annotate(cantidad=Count("id"))
+        .order_by("supervisor")
+    )
+
+    tecnico_total_supervisores = (
+        tecnicos_por_supervisor.count()
+    )
+
     context = {
 
         # Formulario auditorías
@@ -56,6 +81,16 @@ def carga(request):
         "ultima_carga_tecnicos": request.session.get(
             "ultima_carga_tecnicos"
         ),
+
+        # ==================================================
+        # RESUMEN DE TÉCNICOS (BASE DE DATOS ACTUAL)
+        # ==================================================
+
+        "tecnico_total_bd": tecnico_total_bd,
+
+        "tecnico_total_supervisores": tecnico_total_supervisores,
+
+        "tecnicos_por_supervisor": tecnicos_por_supervisor,
 
         # ==================================================
         # REPORTE DE TÉCNICOS

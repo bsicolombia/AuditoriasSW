@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("=== ERRORES POR TÉCNICO + HALLAZGOS ===");
-
-
     // =====================================================
     // ELEMENTOS
     // =====================================================
@@ -29,10 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!elemento || !canvas) {
 
-        console.error(
-            "❌ No existe JSON o canvas"
-        );
-
         return;
 
     }
@@ -53,11 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-        console.error(
-            "❌ Error leyendo JSON:",
-            error
-        );
-
         return;
 
     }
@@ -67,10 +55,6 @@ document.addEventListener("DOMContentLoaded", function () {
         !Array.isArray(datos) ||
         datos.length === 0
     ) {
-
-        console.warn(
-            "⚠️ No existen datos"
-        );
 
         if (contador) {
 
@@ -1182,33 +1166,5 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     );
 
-
-    // =====================================================
-    // LOG FINAL
-    // =====================================================
-
-    console.log(
-        `✅ ${tecnicos.length} técnicos cargados`
-    );
-
-
-    console.log(
-        "📊 Totales calculados desde los hallazgos:",
-        tecnicos.map(
-            function (tecnico) {
-
-                return {
-
-                    tecnico:
-                        tecnico.tecnico,
-
-                    total:
-                        tecnico.total
-
-                };
-
-            }
-        )
-    );
 
 });

@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("=== AUDITORÍAS POR DÍA ===");
-
-
     // =====================================================
     // ELEMENTOS
     // =====================================================
@@ -24,19 +21,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!elemento) {
 
-        console.error(
-            "❌ No existe #datos-Auditoria_Dia"
-        );
-
         return;
     }
 
 
     if (!canvas) {
-
-        console.error(
-            "❌ No existe #graficaAuditoriasDia"
-        );
 
         return;
     }
@@ -56,9 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!contenido) {
 
-            console.warn(
-                "⚠️ El elemento de datos está vacío"
-            );
 
             return;
         }
@@ -68,16 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
             JSON.parse(contenido);
 
     } catch (error) {
-
-        console.error(
-            "❌ Error leyendo JSON:",
-            error
-        );
-
-        console.error(
-            "Contenido recibido:",
-            elemento.textContent
-        );
 
         return;
     }
@@ -89,19 +65,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!Array.isArray(datos)) {
 
-        console.error(
-            "❌ Los datos no son un Array"
-        );
 
         return;
     }
 
 
     if (datos.length === 0) {
-
-        console.warn(
-            "⚠️ No existen datos para Auditorías por día"
-        );
 
         return;
     }
@@ -1096,14 +1065,5 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
 
     });
-
-
-    // =====================================================
-    // FINAL
-    // =====================================================
-
-    console.log(
-        `✅ Auditorías por día creada correctamente: ${datos.length} días`
-    );
 
 });

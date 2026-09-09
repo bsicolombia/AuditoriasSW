@@ -1,19 +1,15 @@
+from django.http import HttpResponse
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.template.loader import get_template
+from django.db.models import Count
 import pandas as pd
-from xhtml2pdf import pisa
-from .models import Auditoria
-from django.db.models import Count
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl import Workbook
-from django.http import HttpResponse
-from django.db.models import Count
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
+from xhtml2pdf import pisa
+from .models import Auditoria
+
 
 def cargar_excel(request):
 
@@ -80,7 +76,7 @@ def filtrar_auditorias(request):
         "numero_cuenta_contrato": "numero_cuenta_contrato__icontains",
 
         "numero_orden": "numero_orden__icontains",
-        
+
         "tipo_operacion": "tipo_operacion",
 
         "resultado_auditoria": "resultado_auditoria",
@@ -157,9 +153,8 @@ def filtrar_auditorias(request):
         auditorias = auditorias.filter(
             fecha__lte=fecha_fin_auditoria
         )
-    
-    return auditorias
 
+    return auditorias
 
 def consulta(request):
 
@@ -175,7 +170,6 @@ def consulta(request):
             "Cantidad": cantidad
         }
     )
-
 
 def generate_pdf(request):
 
@@ -2766,7 +2760,6 @@ def exportar_estadisticas(request):
 
         fila_actual += 1
 
-
     # ----------------------------------------------------------
     # TOTAL DIGITADORES
     # ----------------------------------------------------------
@@ -2793,7 +2786,6 @@ def exportar_estadisticas(request):
 
     )
 
-
     crear_total(
 
         ws,
@@ -2805,7 +2797,6 @@ def exportar_estadisticas(request):
         fila_total
 
     )
-
 
     # ----------------------------------------------------------
     # TABLA DIGITADORES
@@ -2827,7 +2818,6 @@ def exportar_estadisticas(request):
 
     )
 
-
     ajustar_ancho(
 
         columna,
@@ -2837,7 +2827,6 @@ def exportar_estadisticas(request):
         30
 
     )
-
 
     # ==========================================================
     # 7. OPERACIONES
@@ -2863,9 +2852,7 @@ def exportar_estadisticas(request):
 
     )
 
-
     columna = 1
-
 
     crear_titulo(
 
@@ -2880,7 +2867,6 @@ def exportar_estadisticas(request):
         "OPERACIONES"
 
     )
-
 
     crear_encabezados(
 
@@ -2899,7 +2885,6 @@ def exportar_estadisticas(request):
         ]
 
     )
-
 
     operaciones = [
 
@@ -2920,11 +2905,9 @@ def exportar_estadisticas(request):
 
     ]
 
-
     filas = []
 
     total_operaciones = 0
-
 
     for nombre, codigo in operaciones:
 
@@ -2934,7 +2917,6 @@ def exportar_estadisticas(request):
 
         ).count()
 
-
         filas.append([
 
             nombre,
@@ -2943,9 +2925,7 @@ def exportar_estadisticas(request):
 
         ])
 
-
         total_operaciones += cantidad
-
 
     ultima_fila_operaciones = (
 
@@ -2962,7 +2942,6 @@ def exportar_estadisticas(request):
         )
 
     )
-
 
     crear_total(
 
@@ -2982,7 +2961,6 @@ def exportar_estadisticas(request):
 
     )
 
-
     crear_tabla(
 
         ws,
@@ -2999,7 +2977,6 @@ def exportar_estadisticas(request):
 
     )
 
-
     ajustar_ancho(
 
         columna,
@@ -3008,13 +2985,11 @@ def exportar_estadisticas(request):
 
     )
 
-
     # ==========================================================
     # 8. RESUMEN GENERAL
     # ==========================================================
 
     columna = 4
-
 
     crear_titulo(
 
@@ -3029,7 +3004,6 @@ def exportar_estadisticas(request):
         "RESUMEN GENERAL"
 
     )
-
 
     crear_encabezados(
 
@@ -3048,7 +3022,6 @@ def exportar_estadisticas(request):
         ]
 
     )
-
 
     resumen = [
 
@@ -3154,9 +3127,7 @@ def exportar_estadisticas(request):
 
     ]
 
-
     filas = []
-
 
     for nombre, cantidad in resumen:
 
@@ -3167,7 +3138,6 @@ def exportar_estadisticas(request):
             cantidad
 
         ])
-
 
     ultima_fila_resumen = escribir_datos(
 
@@ -3180,7 +3150,6 @@ def exportar_estadisticas(request):
         filas
 
     )
-
 
     crear_total(
 
@@ -3199,7 +3168,6 @@ def exportar_estadisticas(request):
         ]
 
     )
-
 
     crear_tabla(
 
@@ -3226,8 +3194,7 @@ def exportar_estadisticas(request):
 
     )
 
-
-    # ==========================================================
+    # =========================================================
     # FORMATO FINAL
     # ==========================================================
 
@@ -3246,7 +3213,6 @@ def exportar_estadisticas(request):
             ws.row_dimensions[
                 fila
             ].height = 18
-
 
     # ==========================================================
     # ALINEACIÓN DE NÚMEROS
@@ -3272,30 +3238,17 @@ def exportar_estadisticas(request):
 
                 )
 
-
-    # ==========================================================
-    # CONFIGURACIÓN DE IMPRESIÓN
-    # ==========================================================
-
     ws.page_setup.orientation = (
         "landscape"
     )
-
 
     ws.page_setup.fitToWidth = 1
 
     ws.page_setup.fitToHeight = 0
 
-
     ws.sheet_properties.pageSetUpPr.fitToPage = True
 
-
     ws.print_title_rows = "1:2"
-
-
-    # ==========================================================
-    # DESCARGAR EXCEL
-    # ==========================================================
 
     response = HttpResponse(
 
@@ -3309,7 +3262,6 @@ def exportar_estadisticas(request):
 
     )
 
-
     response["Content-Disposition"] = (
 
         'attachment; '
@@ -3318,10 +3270,8 @@ def exportar_estadisticas(request):
 
     )
 
-
     wb.save(
         response
     )
-
 
     return response

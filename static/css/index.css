@@ -1,189 +1,571 @@
-body {
-    margin: 0;
-    background: linear-gradient(135deg, #aac5d3, #1c3358);
-    font-family: Arial, Helvetica, sans-serif;
-    color: white;
-    min-height: 100vh;
-   }
+/* =========================================
+   INDEX / DASHBOARD
+========================================= */
+
 .dashboard {
-    width: 90%;
-    max-width: 1100px;
+    width: 92%;
+    max-width: 1180px;
+
     margin: 0 auto;
-    padding: 34px 20px;
+
+    padding: 40px 20px 55px;
 }
+
+/* =========================================
+   HEADER
+========================================= */
 
 .dashboard-header {
     text-align: center;
-    margin-bottom: 45px;
+
+    margin-bottom: 35px;
 }
 
 .dashboard-header h1 {
-    font-size: 42px;
-    margin: 0 0 10px;
+    margin: 0 0 8px;
+
+    font-size: 40px;
     font-weight: 700;
-    letter-spacing: 1px;
-}
-.dashboard > h3 {
-    text-align: center;
-    margin: 0 0 25px;
-    font-size: 20px;
-    font-weight: 700;
-    color: #e2e8f0;
-    letter-spacing: 1px;
+
+    letter-spacing: 0.3px;
+
+    color: #071c2b;
 }
 
 .dashboard-header p {
-    font-size: 18px;
-    color: #cbd5e1;
     margin: 0;
+
+    color: #607789;
+
+    font-size: 16px;
 }
+
+/* =========================================
+   SECCIÓN RESULTADOS
+========================================= */
+
+.dashboard > h3 {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    margin: 0 0 22px;
+
+    color: #183d54;
+
+    font-size: 17px;
+    font-weight: 650;
+
+    letter-spacing: 0.3px;
+}
+
+/* Pequeño punto azul */
+
+.dashboard > h3::before {
+    content: "";
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #38bdf8;
+
+    box-shadow:
+        0 0 8px rgba(56, 189, 248, 0.55);
+}
+
+/* =========================================
+   ESTADÍSTICAS
+========================================= */
 
 .stats-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px;
 
-    max-width: 700px;
-    margin: 30px auto;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 18px;
+
+    max-width: 1050px;
+
+    margin: 0 auto 48px;
 }
+
+/* =========================================
+   CARD ESTADÍSTICA
+========================================= */
 
 .stats {
+    position: relative;
+
+    min-height: 165px;
+
+    padding: 22px 18px;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     justify-content: center;
 
-    padding: 20px;
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #f4f8fb 100%
+        );
 
-    background-color: #0b111f(112, 108, 108);
-    border-radius: 10px;
+    border: 1px solid #d6e2ea;
 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+
+    box-shadow:
+        0 6px 20px rgba(6, 24, 38, 0.07);
+
+    overflow: hidden;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
 }
+
+/* Barra superior */
+
+.stats::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0b4f75,
+            #38bdf8
+        );
+}
+
+/* Efecto suave inferior */
+
+.stats::after {
+    content: "";
+
+    position: absolute;
+
+    width: 100px;
+    height: 100px;
+
+    right: -55px;
+    bottom: -55px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(56, 189, 248, 0.06);
+
+    transition:
+        transform 0.3s ease;
+}
+
+/* =========================================
+   TEXTO ESTADÍSTICAS
+========================================= */
 
 .stats h2 {
-    margin: 0 0 15px 0;
-    font-size: 20px;
+    margin: 0 0 14px;
+
+    color: #09283d;
+
+    font-size: 18px;
+
+    font-weight: 650;
+
+    text-align: center;
+
+    line-height: 1.3;
 }
+
+/* =========================================
+   ICONOS ESTADÍSTICAS
+========================================= */
 
 .stats img {
-    width: 80px;
-    height: 80px;
+    width: 65px;
+    height: 65px;
+
     object-fit: contain;
+
+    transition:
+        transform 0.3s ease,
+        filter 0.3s ease;
 }
+
+/* =========================================
+   HOVER ESTADÍSTICAS
+========================================= */
 
 .stats:hover {
-    transform: translateY(-8px);
-    background: rgba(20, 68, 88, 0.15);
-    border-color: #38bdf8;
+    transform: translateY(-6px);
+
+    border-color: #a8cddd;
+
     box-shadow:
-        0 15px 35px rgba(46, 46, 46, 0.35),
-        0 0 20px rgba(56, 189, 248, 0.15);
+        0 15px 32px rgba(6, 24, 38, 0.12),
+        0 0 18px rgba(56, 189, 248, 0.08);
 }
 
-.menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 25px;
+.stats:hover::after {
+    transform: scale(1.5);
 }
+
+.stats:hover img {
+    transform: scale(1.08);
+
+    filter:
+        drop-shadow(
+            0 5px 10px
+            rgba(11, 92, 142, 0.20)
+        );
+}
+
+/* =========================================
+   MENÚ PRINCIPAL
+========================================= */
+
+.bottom-cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 22px;
+
+    max-width: 1050px;
+
+    margin: 0 auto;
+}
+
+/* =========================================
+   MENU CARD
+========================================= */
 
 .menu-card {
-    width: 280px;
-    min-height: 250px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
+    position: relative;
+
+    min-height: 265px;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     justify-content: center;
-    text-decoration: none;
-    color: white;
-    padding: 25px;
+
+    padding: 28px;
+
     box-sizing: border-box;
-    backdrop-filter: blur(10px);
-    transition: 
+
+    text-decoration: none;
+
+    color: #172b3a;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f1f6f9
+        );
+
+    border: 1px solid #d4e1e9;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 7px 24px rgba(6, 24, 38, 0.08);
+
+    overflow: hidden;
+
+    transition:
         transform 0.3s ease,
-        background 0.3s ease,
-        box-shadow 0.3s ease;
+        box-shadow 0.3s ease,
+        border-color 0.3s ease,
+        background 0.3s ease;
 }
+
+/* Barra superior */
+
+.menu-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 4px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0b4f75,
+            #38bdf8
+        );
+
+    transform: scaleX(0);
+
+    transform-origin: left;
+
+    transition:
+        transform 0.3s ease;
+}
+
+/* Brillo */
+
+.menu-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 160px;
+    height: 160px;
+
+    right: -80px;
+    top: -80px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(56, 189, 248, 0.06);
+
+    transition:
+        transform 0.4s ease;
+}
+
+/* =========================================
+   CARD CARGAR
+========================================= */
 
 .menu-card.principal {
-    width: 340px;
-    min-height: 280px;
+    min-height: 285px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #edf8fd,
+            #ffffff
+        );
+
+    border-color: #b9d6e5;
+
+    box-shadow:
+        0 9px 28px rgba(8, 59, 92, 0.11);
 }
 
-
-/* Imágenes */
+/* =========================================
+   IMÁGENES
+========================================= */
 
 .menu-card img {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
+
     object-fit: contain;
 
-    margin-bottom: 15px;
+    margin-bottom: 17px;
 
-    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 2;
+
+    transition:
+        transform 0.3s ease,
+        filter 0.3s ease;
 }
 
 .menu-card.principal img {
-    width: 200px;
-    height: 170px;
+    width: 160px;
+    height: 140px;
 }
 
+/* =========================================
+   TEXTO
+========================================= */
+
 .card-text {
+    position: relative;
+
+    z-index: 2;
+
     text-align: center;
 }
 
 .card-text h2 {
-    margin: 5px 0 8px;
-    font-size: 23px;
+    margin: 5px 0 7px;
+
+    color: #082f49;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    transition:
+        color 0.25s ease;
 }
 
 .card-text p {
     margin: 0;
-    color: #cbd5e1;
+
+    color: #657989;
+
     font-size: 14px;
+
+    line-height: 1.5;
 }
 
+/* =========================================
+   HOVER MENU
+========================================= */
+
 .menu-card:hover {
-    transform: translateY(-8px);
-    background: rgba(56, 189, 248, 0.15);
+    transform: translateY(-7px);
+
     border-color: #38bdf8;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #edf8fd
+        );
+
     box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.35),
-        0 0 20px rgba(56, 189, 248, 0.15);
+        0 17px 35px rgba(6, 24, 38, 0.13),
+        0 0 20px rgba(56, 189, 248, 0.08);
+}
+
+.menu-card:hover::before {
+    transform: scaleX(1);
+}
+
+.menu-card:hover::after {
+    transform: scale(1.5);
 }
 
 .menu-card:hover img {
-    transform: scale(1.08);
+    transform: scale(1.07);
+
+    filter:
+        drop-shadow(
+            0 7px 12px
+            rgba(11, 92, 142, 0.18)
+        );
 }
 
-.bottom-cards {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
+.menu-card:hover .card-text h2 {
+    color: #0b5c8e;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+
+    .stats-container {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .bottom-cards {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .menu-card.principal {
+        grid-column: span 2;
+    }
 }
 
 @media (max-width: 700px) {
 
     .dashboard {
-        padding: 30px 10px;
+        width: 100%;
+
+        padding:
+            30px 15px 40px;
     }
 
     .dashboard-header h1 {
         font-size: 30px;
     }
 
+    .dashboard-header p {
+        font-size: 15px;
+    }
+
+    .dashboard > h3 {
+        font-size: 15px;
+    }
+
+    .stats-container {
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 12px;
+
+        margin-bottom: 35px;
+    }
+
+    .stats {
+        min-height: 145px;
+
+        padding: 16px 10px;
+    }
+
+    .stats h2 {
+        font-size: 15px;
+    }
+
+    .stats img {
+        width: 55px;
+        height: 55px;
+    }
+
     .bottom-cards {
-        flex-direction: column;
-        align-items: center;
+        grid-template-columns: 1fr;
+    }
+
+    .menu-card.principal {
+        grid-column: auto;
     }
 
     .menu-card,
     .menu-card.principal {
-        width: 90%;
-        max-width: 340px;
+        width: 100%;
+
+        min-height: 235px;
+    }
+}
+
+@media (max-width: 450px) {
+
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+
+    .stats {
+        min-height: 130px;
     }
 }

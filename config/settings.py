@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'auditorias',
     'carga',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -152,3 +153,7 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/index/"
+LOGOUT_REDIRECT_URL = "/"

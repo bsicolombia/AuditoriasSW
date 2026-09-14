@@ -20,7 +20,7 @@
         <div>
 
             <h2 class="panel-titulo">
-                Técnicos SIN AUDITAR y técnicos para RE-AUDITAR del Mes Actual
+                Técnicos <span class="texto-rojo">SIN AUDITAR</span> y técnicos para <span class="texto-rojo">RE-AUDITAR</span> del Mes Actual
             </h2>
 
             <p class="panel-descripcion">
@@ -196,7 +196,7 @@
             <div>
 
                 <h3>
-                    Técnicos para AUDITAR
+                    Técnicos para <span class="texto-rojo">AUDITAR</span>
                 </h3>
 
                 <p>
@@ -286,7 +286,7 @@
             <div>
 
                 <h3>
-                    Técnicos para RE-AUDITAR
+                    Técnicos para <span class="texto-rojo">RE-AUDITAR</span>
                 </h3>
 
                 <p>
@@ -430,6 +430,10 @@
     line-height: 1.3;
 }
 
+.texto-rojo {
+    color: #dc2626;
+}
+
 .panel-descripcion {
     margin: 0;
     max-width: 900px;
@@ -521,7 +525,7 @@
 }
 
 .tarjeta-sin-auditar {
-    border-top: 4px solid #f59e0b;
+    border-top: 4px solid #dc2626;
 }
 
 .tarjeta-reauditar {
@@ -533,7 +537,7 @@
 }
 
 .tarjeta-sin-auditar .resumen-valor {
-    color: #b45309;
+    color: #dc2626;
 }
 
 .tarjeta-reauditar .resumen-valor {
@@ -628,8 +632,8 @@
 }
 
 .contador-tabla-auditar {
-    background: #fef3c7;
-    color: #92400e;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .contador-tabla-reauditar {
@@ -817,8 +821,8 @@
 }
 
 .estado-sin-auditorias {
-    background: #e2e8f0;
-    color: #475569;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .accion-reauditar {
@@ -832,8 +836,8 @@
 }
 
 .accion-auditar {
-    background: #fef3c7;
-    color: #b45309;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 

@@ -20,13 +20,6 @@ Estadísticas
     </h1>
 
 </div>
-
-
-<h4>
-    Seleccionar Consulta
-</h4>
-
-
 <!-- =========================================================
      FILTROS
 ========================================================= -->
@@ -578,35 +571,26 @@ document.addEventListener("DOMContentLoaded", function () {
 /* =========================================
    CONTENEDOR PRINCIPAL
 ========================================= */
-
 .estadisticas-header {
     width: 100%;
-
     text-align: center;
 
-    padding-top: 10px;
-
-    margin-bottom: 25px;
+    padding-top: 2px;
+    margin-bottom: 8px;
 }
 
-
-/* =========================================
-   TÍTULO PRINCIPAL
-========================================= */
-
 .estadisticas-header h1 {
-    margin: 0 0 8px;
+    margin: 0;
 
     color: #071c2b;
 
-    font-size: 36px;
-
+    font-size: 30px;
     font-weight: 700;
 
     letter-spacing: 0.5px;
-
-    line-height: 1.2;
+    line-height: 1.1;
 }
+
 
 
 /* Línea decorativa debajo del título */
@@ -1450,6 +1434,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 }
+
+/* ==========================================
+   FILTROS ACTIVOS
+   ========================================== */
+
+.filtros-card select.filtro-activo {
+    border: 1px solid #1976d2;
+    border-bottom: 3px solid #1976d2;
+
+    background-color: #f5faff;
+
+    box-shadow:
+        0 2px 5px rgba(25, 118, 210, 0.15);
+
+    transition: all 0.2s ease;
+}
+
 </style>
 
 {% endblock %}

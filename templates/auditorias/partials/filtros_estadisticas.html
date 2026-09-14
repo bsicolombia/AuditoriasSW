@@ -84,17 +84,13 @@
 
 
             <div>
-
                 <label>Día</label>
 
                 <select name="dia">
 
-                    <option value="">
-                        Todos
-                    </option>
+                    <option value="">Todos</option>
 
                     {% for dia in dias_estadisticas %}
-
                         <option
                             value="{{ dia }}"
                             {% if filtros_estadisticas.dia == dia|stringformat:"s" %}
@@ -103,12 +99,11 @@
                         >
                             {{ dia }}
                         </option>
-
                     {% endfor %}
 
                 </select>
-
             </div>
+
 
             <div>
                 <label>Operación</label>
@@ -117,30 +112,18 @@
 
                     <option value="">Todas</option>
 
-                    <option
-                        value="DC00"
-                        {% if filtros_estadisticas.tipo_operacion == "DC00" %}
-                            selected
-                        {% endif %}
-                    >
+                    <option value="DC00"
+                        {% if filtros_estadisticas.tipo_operacion == "DC00" %}selected{% endif %}>
                         DC00
                     </option>
 
-                    <option
-                        value="RC00"
-                        {% if filtros_estadisticas.tipo_operacion == "RC00" %}
-                            selected
-                        {% endif %}
-                    >
+                    <option value="RC00"
+                        {% if filtros_estadisticas.tipo_operacion == "RC00" %}selected{% endif %}>
                         RC00
                     </option>
 
-                    <option
-                        value="ZVCL"
-                        {% if filtros_estadisticas.tipo_operacion == "ZVCL" %}
-                            selected
-                        {% endif %}
-                    >
+                    <option value="ZVCL"
+                        {% if filtros_estadisticas.tipo_operacion == "ZVCL" %}selected{% endif %}>
                         ZVCL
                     </option>
 
@@ -151,10 +134,7 @@
             <div>
                 <label>Técnico</label>
 
-                <select
-                    name="tecnico"
-                    class="select-filtro"
-                >
+                <select name="tecnico" class="select-filtro">
 
                     <option value="">Todos</option>
 
@@ -174,18 +154,13 @@
                 </select>
             </div>
 
-            <div>
 
+            <div>
                 <label>Supervisor</label>
 
-                <select
-                    name="supervisor"
-                    class="select-filtro"
-                >
+                <select name="supervisor" class="select-filtro">
 
-                    <option value="">
-                        Todos
-                    </option>
+                    <option value="">Todos</option>
 
                     {% for supervisor in supervisores_estadisticas %}
 
@@ -201,16 +176,13 @@
                     {% endfor %}
 
                 </select>
-
             </div>
+
 
             <div>
                 <label>Auditor / Digitador</label>
 
-                <select
-                    name="auditor"
-                    class="select-filtro"
-                >
+                <select name="auditor" class="select-filtro">
 
                     <option value="">Todos</option>
 
@@ -230,90 +202,79 @@
                 </select>
             </div>
 
+
             <div>
-            <label>Hallazgo</label>
+                <label>Hallazgo</label>
 
-            <select
-                name="hallazgo"
-                class="select-filtro"
-            >
+                <select name="hallazgo" class="select-filtro">
 
-                <option value="">
-                    Todos
-                </option>
+                    <option value="">Todos</option>
 
-                {% for hallazgo in hallazgos_estadisticas %}
+                    {% for hallazgo in hallazgos_estadisticas %}
 
-                    <option
-                        value="{{ hallazgo }}"
-                        {% if filtros_estadisticas.hallazgo == hallazgo %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ hallazgo }}
+                        <option
+                            value="{{ hallazgo }}"
+                            {% if filtros_estadisticas.hallazgo == hallazgo %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ hallazgo }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+
+            <div>
+                <label>Resultados auditorías</label>
+
+                <select
+                    name="resultado"
+                    id="filtroResultado"
+                    class="select-filtro"
+                >
+
+                    <option value="">
+                        Estadísticas Gráficas
                     </option>
 
-                {% endfor %}
+                    <option
+                        value="tecnicos"
+                        {% if filtros_estadisticas.resultado == "tecnicos" %}selected{% endif %}
+                    >
+                        Tabla Resultados Auditorías por técnicos
+                    </option>
 
-            </select>
-        </div>
+                    <option
+                        value="digitadores"
+                        {% if filtros_estadisticas.resultado == "digitadores" %}selected{% endif %}
+                    >
+                        Tabla Resultados por digitadores
+                    </option>
 
-        <div>
+                </select>
+            </div>
 
-            <label>Resultados auditorias</label>
 
-            <select
-                name="resultado"
-                id="filtroResultado"
-                class="select-filtro"
-            >
+            <div class="filtros-botones">
 
-                <option
-                    value=""
-                    {% if filtros_estadisticas.resultado == "" %}
-                        selected
-                    {% endif %}
+                <button
+                    type="submit"
+                    class="btn-filtrar"
                 >
-                    Estadisticas Graficas
-                </option>
+                    🔎 Filtrar
+                </button>
 
-                <option
-                    value="tecnicos"
-                    {% if filtros_estadisticas.resultado == "tecnicos" %}
-                        selected
-                    {% endif %}
+                <a
+                    href="{% url 'estadistica' %}"
+                    class="btn-limpiar"
                 >
-                    Tabla Resultados Auditorias por técnicos
-                </option>
+                    ↻ Limpiar
+                </a>
 
-                <option
-                    value="digitadores"
-                    {% if filtros_estadisticas.resultado == "digitadores" %}
-                        selected
-                    {% endif %}
-                >
-                    Tabla Resultados por digitadores
-                </option>
-
-            </select>
-
-        </div>
-
-        <div class="filtros-botones">
-
-            <button
-                type="submit"
-                class="btn-filtrar"
-            >
-                🔎 Filtrar
-            </button>
-
-            <a
-                href="{% url 'estadistica' %}"
-                class="btn-limpiar"
-            >
-                ↻ Limpiar
-            </a>
+            </div>
 
         </div>
 
@@ -321,3 +282,56 @@
 
 </div>
 
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const formulario = document.getElementById("formFiltrosEstadisticas");
+
+    if (!formulario) {
+        return;
+    }
+
+    const filtros = formulario.querySelectorAll("select, input");
+
+
+    function actualizarFiltro(filtro) {
+
+        if (filtro.value && filtro.value.trim() !== "") {
+
+            filtro.classList.add("filtro-activo");
+
+        } else {
+
+            filtro.classList.remove("filtro-activo");
+
+        }
+
+    }
+
+
+    // Aplicar al cargar la página
+
+    filtros.forEach(function (filtro) {
+
+        actualizarFiltro(filtro);
+
+    });
+
+
+    // Aplicar cuando cambie
+
+    filtros.forEach(function (filtro) {
+
+        filtro.addEventListener("change", function () {
+
+            actualizarFiltro(this);
+
+        });
+
+    });
+
+});
+
+</script>

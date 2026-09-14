@@ -480,3 +480,156 @@
         max-height: 400px;
     }
 }
+
+/* ==========================================
+   TABLA
+   ========================================== */
+
+.contenedor-tabla {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* ==========================================
+   CELDAS DE TEXTO LARGO
+   ========================================== */
+
+.contenedor-tabla td.texto-largo {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
+
+    min-width: 250px;
+    max-width: 500px;
+
+    vertical-align: top;
+    line-height: 1.5;
+}
+
+
+/* Respeta los saltos de línea escritos
+   en Observaciones y Hallazgo */
+
+.contenedor-tabla td.texto-largo {
+    white-space: pre-wrap;
+}
+
+
+/* ==========================================
+   TODAS LAS CELDAS
+   ========================================== */
+
+.contenedor-tabla td,
+.contenedor-tabla th {
+    vertical-align: top;
+}
+
+
+/* ==========================================
+   TABLA
+   ========================================== */
+
+.contenedor-tabla table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+/* ==========================================
+   ENCABEZADOS
+   ========================================== */
+
+.contenedor-tabla th {
+    white-space: nowrap;
+}
+
+
+/* ==========================================
+   CELDAS
+   ========================================== */
+
+.contenedor-tabla td {
+    padding: 8px;
+}
+
+.resumen-consulta h2:nth-of-type(2) {
+    font-weight: 700;
+}
+
+/* ==========================================
+   RESPONSIVE TABLA
+========================================== */
+
+@media (max-width: 1100px) {
+
+    .contenedor-tabla {
+        max-height: 450px;
+    }
+
+    .contenedor-tabla table {
+        min-width: 900px;
+    }
+}
+
+
+@media (max-width: 800px) {
+
+    .contenedor-tabla {
+        max-height: 420px;
+
+        border-radius: 6px;
+    }
+
+    .contenedor-tabla table {
+        min-width: 850px;
+    }
+
+    .contenedor-tabla th {
+        padding: 6px 5px;
+        font-size: 9px;
+    }
+
+    .contenedor-tabla td {
+        padding: 6px 5px;
+        font-size: 9px;
+    }
+
+    .contenedor-tabla td.texto-largo {
+        min-width: 220px;
+        max-width: 400px;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .contenedor-tabla {
+        max-height: 400px;
+
+        margin-top: 0;
+
+        border-radius: 5px;
+    }
+
+    .contenedor-tabla table {
+        min-width: 800px;
+    }
+
+    .contenedor-tabla th {
+        padding: 5px 4px;
+        font-size: 9px;
+    }
+
+    .contenedor-tabla td {
+        padding: 5px 4px;
+        font-size: 9px;
+    }
+
+    .contenedor-tabla td.texto-largo {
+        font-size: 0px;
+        min-width: 200px;
+        max-width: 350px;
+    }
+}

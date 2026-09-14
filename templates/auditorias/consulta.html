@@ -3,283 +3,695 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/consultas.css' %}" >
-{% endblock %}
+<link rel="stylesheet" href="{% static 'css/consultas.css' %}">
+<style>
 
+.filtro label {
+    font-weight: 700;
+    font-size: 1.05em;
+}
+/* ==========================================
+   FILTRO ACTIVO
+   ========================================== */
+
+#form-filtros select.filtro-activo,
+#form-filtros input.filtro-activo {
+    border: 1px solid #1976d2;
+    border-bottom: 3px solid #1976d2;
+
+    background-color: #f5faff;
+
+    box-shadow:
+        0 2px 5px rgba(25, 118, 210, 0.15);
+
+    transition: all 0.2s ease;
+}
+
+#form-filtros {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px 12px;
+    align-items: end;
+}
+
+.filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.filtro label {
+    font-size: 0.85em;
+    margin-bottom: 0;
+}
+
+.filtro select,
+.filtro input[type="date"] {
+    padding: 4px 6px;
+    font-size: 0.85em;
+    height: 30px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+    #form-filtros {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    #form-filtros {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+</style>
+{% endblock %}
 
 {% block title %}
 Consultas
 {% endblock %}
 
-
-
 {% block content %}
-
-<h1>
-Consultas
-</h1>
 
 <div class="filtros">
 
     <form method="GET" id="form-filtros">
 
-        <div class="filtro">
-            <label>Fecha Diligenciamiento</label>
-            <input
-                type="date"
-                name="fecha"
-                value="{{ request.GET.fecha|default:'' }}">
-        </div>
-
+        <!-- AÑO AUDITORÍA -->
 
         <div class="filtro">
-            <label>Nombre Auditor</label>
-            <input
-                type="text"
-                name="nombre_auditor"
-                placeholder="Nombre auditor"
-                value="{{ request.GET.nombre_auditor|default:'' }}">
-        </div>
 
+            <label>Año</label>
 
-        <div class="filtro">
-            <label>N° Cédula</label>
-            <input
-                type="text"
-                name="numero_cedula"
-                placeholder="Cédula"
-                value="{{ request.GET.numero_cedula|default:'' }}">
-        </div>
+            <select name="ano_auditoria">
 
+                {% for ano in anos_auditoria %}
 
-        <div class="filtro">
-            <label>Aplicativo</label>
-            <input
-                type="text"
-                name="aplicativo"
-                placeholder="Aplicativo"
-                value="{{ request.GET.aplicativo|default:'' }}">
-        </div>
+                    <option
+                        value="{{ ano.year }}"
+                        {% if ano_auditoria == ano.year|stringformat:"s" %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ ano.year }}
+                    </option>
 
+                {% endfor %}
 
-        <div class="filtro">
-            <label>Fecha Operación</label>
-            <input
-                type="date"
-                name="fecha_operacion"
-                value="{{ request.GET.fecha_operacion|default:'' }}">
-        </div>
-
-
-        <div class="filtro">
-            <label>Nombre Técnico</label>
-            <input
-                type="text"
-                name="nombre_tecnico"
-                placeholder="Nombre técnico"
-                value="{{ request.GET.nombre_tecnico|default:'' }}">
-        </div>
-
-
-        <div class="filtro">
-            <label>N° Cuenta Contrato</label>
-            <input
-                type="text"
-                name="numero_cuenta_contrato"
-                placeholder="Cuenta contrato"
-                value="{{ request.GET.numero_cuenta_contrato|default:'' }}">
-        </div>
-
-
-        <div class="filtro">
-            <label>N° Orden</label>
-            <input
-                type="text"
-                name="numero_orden"
-                placeholder="Número orden"
-                value="{{ request.GET.numero_orden|default:'' }}">
-        </div>
-
-
-        <div class="filtro">
-            <label>Tipo Operación</label>
-
-            <select name="tipo_operacion">
-                <option value="">Todos</option>
-
-                <option value="ZVCL"
-                    {% if request.GET.tipo_operacion == "ZVCL" %}selected{% endif %}>
-                    ZVCL
-                </option>
-
-                <option value="DC00"
-                    {% if request.GET.tipo_operacion == "DC00" %}selected{% endif %}>
-                    DC00
-                </option>
-
-                <option value="RC00"
-                    {% if request.GET.tipo_operacion == "RC00" %}selected{% endif %}>
-                    RC00
-                </option>
             </select>
+
         </div>
 
+
+        <!-- MES AUDITORÍA -->
+
         <div class="filtro">
+
+            <label>Mes</label>
+
+            <select name="mes_auditoria">
+
+                <option
+                    value=""
+                    {% if not mes_auditoria %}
+                        selected
+                    {% endif %}
+                >
+                    Todos los meses
+                </option>
+
+                <option value="1" {% if mes_auditoria == "1" %}selected{% endif %}>
+                    Enero
+                </option>
+
+                <option value="2" {% if mes_auditoria == "2" %}selected{% endif %}>
+                    Febrero
+                </option>
+
+                <option value="3" {% if mes_auditoria == "3" %}selected{% endif %}>
+                    Marzo
+                </option>
+
+                <option value="4" {% if mes_auditoria == "4" %}selected{% endif %}>
+                    Abril
+                </option>
+
+                <option value="5" {% if mes_auditoria == "5" %}selected{% endif %}>
+                    Mayo
+                </option>
+
+                <option value="6" {% if mes_auditoria == "6" %}selected{% endif %}>
+                    Junio
+                </option>
+
+                <option value="7" {% if mes_auditoria == "7" %}selected{% endif %}>
+                    Julio
+                </option>
+
+                <option value="8" {% if mes_auditoria == "8" %}selected{% endif %}>
+                    Agosto
+                </option>
+
+                <option value="9" {% if mes_auditoria == "9" %}selected{% endif %}>
+                    Septiembre
+                </option>
+
+                <option value="10" {% if mes_auditoria == "10" %}selected{% endif %}>
+                    Octubre
+                </option>
+
+                <option value="11" {% if mes_auditoria == "11" %}selected{% endif %}>
+                    Noviembre
+                </option>
+
+                <option value="12" {% if mes_auditoria == "12" %}selected{% endif %}>
+                    Diciembre
+                </option>
+
+            </select>
+
+        </div>
+
+        <!-- NOMBRE TÉCNICO -->
+
+        <div class="filtro">
+
+            <label>Técnico</label>
+
+            <select name="nombre_tecnico">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for tecnico in nombres_tecnicos %}
+
+                    <option
+                        value="{{ tecnico }}"
+                        {% if request.GET.nombre_tecnico == tecnico %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ tecnico }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <!-- HALLAZGO -->
+
+        <div class="filtro">
+
+            <label>Hallazgo</label>
+            <select name="hallazgo">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for item in hallazgos %}
+
+                    <option
+                        value="{{ item }}"
+                        {% if request.GET.hallazgo == item %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ item }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <!-- RESULTADO AUDITORÍA -->
+
+        <div class="filtro">
+
             <label>Resultado Auditoría</label>
 
             <select name="resultado_auditoria">
-                <option value="">Todos</option>
 
-                <option value="cumple"
-                    {% if request.GET.resultado_auditoria == "cumple" %}selected{% endif %}>
-                    Cumple
+                <option value="">
+                    Todos
                 </option>
 
-                <option value="no_cumple"
-                    {% if request.GET.resultado_auditoria == "no_cumple" %}selected{% endif %}>
-                    No Cumple
-                </option>
+                {% for resultado in resultados_auditoria %}
+
+                    <option
+                        value="{{ resultado }}"
+                        {% if request.GET.resultado_auditoria == resultado %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ resultado }}
+                    </option>
+
+                {% endfor %}
+
             </select>
+
         </div>
 
-        <div class="filtro"> 
-            <label>Tipo Hallazgo</label> 
-            <select name="tipo_hallazgo"> 
-                <option value="">Todos</option> 
-                <option value="Alto" {% if request.GET.tipo_hallazgo == "Alto" %}selected{% endif %}> Alto </option> 
-                <option value="Medio" {% if request.GET.tipo_hallazgo == "Medio" %}selected{% endif %}> Medio </option> 
-                <option value="Bajo" {% if request.GET.tipo_hallazgo == "Bajo" %}selected{% endif %}> Bajo </option> 
-            </select> 
-        </div>
-
+        <!-- TIPO OPERACIÓN -->
 
         <div class="filtro">
-            <label>Hallazgo</label>
-            <input
-                type="text"
-                name="hallazgo"
-                placeholder="Hallazgo"
-                value="{{ request.GET.hallazgo|default:'' }}">
+
+            <label>Tipo Ope</label>
+
+            <select name="tipo_operacion">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for tipo in tipos_operacion %}
+
+                    <option
+                        value="{{ tipo }}"
+                        {% if request.GET.tipo_operacion == tipo %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ tipo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
         </div>
 
+        <!-- NOMBRE AUDITOR -->
+
         <div class="filtro">
-            <label>Fecha Operacion Ejecucion Desde</label>
+
+            <label>Auditor</label>
+
+            <select name="nombre_auditor">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for nombre in nombres_auditores %}
+
+                    <option
+                        value="{{ nombre }}"
+                        {% if request.GET.nombre_auditor == nombre %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ nombre }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- CÉDULA -->
+
+        <div class="filtro">
+
+            <label>Cédula</label>
+
+            <select name="numero_cedula">
+
+                <option value="">
+                    Todas
+                </option>
+
+                {% for cedula in cedulas %}
+
+                    <option
+                        value="{{ cedula }}"
+                        {% if request.GET.numero_cedula == cedula %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ cedula }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- APLICATIVO -->
+
+        <div class="filtro">
+
+            <label>Aplicativo</label>
+
+            <select name="aplicativo">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for aplicativo in aplicativos %}
+
+                    <option
+                        value="{{ aplicativo }}"
+                        {% if request.GET.aplicativo == aplicativo %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ aplicativo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- CUENTA CONTRATO -->
+
+        <div class="filtro">
+
+            <label>N° Cta Contrato</label>
+
+            <select name="numero_cuenta_contrato">
+
+                <option value="">
+                    Todas
+                </option>
+
+                {% for cuenta in cuentas_contrato %}
+
+                    <option
+                        value="{{ cuenta }}"
+                        {% if request.GET.numero_cuenta_contrato == cuenta %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ cuenta }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- NÚMERO ORDEN -->
+
+        <div class="filtro">
+
+            <label>N° Orden</label>
+
+            <select name="numero_orden">
+
+                <option value="">
+                    Todas
+                </option>
+
+                {% for orden in numeros_orden %}
+
+                    <option
+                        value="{{ orden }}"
+                        {% if request.GET.numero_orden == orden %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ orden }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <!-- TIPO HALLAZGO -->
+
+        <div class="filtro">
+
+            <label>Tipo Hallazgo</label>
+
+            <select name="tipo_hallazgo">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for tipo in tipos_hallazgo %}
+
+                    <option
+                        value="{{ tipo }}"
+                        {% if request.GET.tipo_hallazgo == tipo %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ tipo|capfirst }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- FECHA OPERACIÓN DESDE -->
+
+        <div class="filtro">
+
+            <label>Fecha Ope Desde</label>
+
             <input
                 type="date"
-                name="fecha_inicio"
-                value="{{ request.GET.fecha_inicio|default:'' }}">
+                name="fecha_operacion_desde"
+                value="{{ request.GET.fecha_operacion_desde|default:'' }}">
+
         </div>
+
+
+        <!-- FECHA OPERACIÓN HASTA -->
 
         <div class="filtro">
-            <label>Fecha Operacion Ejecucion Hasta</label>
+
+            <label>Fecha Ope Hasta</label>
+
             <input
                 type="date"
-                name="fecha_fin"
-                value="{{ request.GET.fecha_fin|default:'' }}">
-        </div>
+                name="fecha_operacion_hasta"
+                value="{{ request.GET.fecha_operacion_hasta|default:'' }}">
 
-        <div class="filtro">
-            <label>Fecha Auditoria Desde</label>
-            <input
-                type="date"
-                name="fecha_inicio_auditoria"
-                value="{{ request.GET.fecha_inicio_auditoria|default:'' }}">
         </div>
-
-        <div class="filtro">
-            <label>Fecha Auditoria Hasta</label>
-            <input
-                type="date"
-                name="fecha_fin_auditoria"
-                value="{{ request.GET.fecha_fin_auditoria|default:'' }}">
-        </div>
-
 
     </form>
 
-        <div class="resumen-consulta">
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
 
-            <h2>Total de auditorías: {{ Cantidad }}</h2>
+        const filtros = document.querySelectorAll(
+            "#form-filtros select, #form-filtros input"
+        );
 
-            <div class="botones">
 
-                <!-- FILTRAR -->
-                <button
-                    type="submit"
-                    form="form-filtros">
-                    Filtrar
-                </button>
+        function actualizarFiltros() {
 
-                <!-- PDF -->
-                <button
-                    type="submit"
-                    form="form-filtros"
-                    formaction="{% url 'generar_pdf' %}"
-                    formmethod="GET">
-                    Generar PDF
-                </button>
+            filtros.forEach(function (filtro) {
 
-                <!-- EXCEL -->
-                <button
-                    type="submit"
-                    form="form-filtros"
-                    formaction="{% url 'exportar-excel' %}"
-                    formmethod="GET">
-                    Generar Excel
-                </button>
+                if (filtro.value !== "") {
 
-                <!-- LIMPIAR -->
-                <a href="{% url 'consulta' %}">
-                    Limpiar filtros
-                </a>
+                    filtro.classList.add("filtro-activo");
 
-            </div>
+                } else {
+
+                    filtro.classList.remove("filtro-activo");
+
+                }
+
+            });
+
+        }
+
+
+        // Al cambiar un filtro
+        filtros.forEach(function (filtro) {
+
+            filtro.addEventListener(
+                "change",
+                actualizarFiltros
+            );
+
+        });
+
+
+        // Al cargar la página
+        actualizarFiltros();
+
+    });
+</script>
+
+    <!-- RESUMEN Y BOTONES -->
+
+    <div class="resumen-consulta">
+
+        <h2>Total de auditorías: {{ Cantidad }}</h2>
+
+        <h2>CONSULTA DE AUDITORIAS REALIZADAS</h2>
+
+        <div class="botones">
+
+            <!-- FILTRAR -->
+            <button
+                type="submit"
+                form="form-filtros">
+                Filtrar
+            </button>
+
+            <!-- PDF -->
+            <button
+                type="submit"
+                form="form-filtros"
+                formaction="{% url 'generar_pdf' %}"
+                formmethod="GET">
+                Generar PDF
+            </button>
+
+            <!-- EXCEL -->
+            <button
+                type="submit"
+                form="form-filtros"
+                formaction="{% url 'exportar-excel' %}"
+                formmethod="GET">
+                Generar Excel
+            </button>
+
+            <!-- LIMPIAR -->
+            <a href="{% url 'consulta' %}">
+                Limpiar filtros
+            </a>
 
         </div>
 
+    </div>
 
 </div>
 
 
-<div class="contenedor-tabla"> 
-<table>
-    <thead>
-        <tr>
-            <th>Fecha</th> 
-            <th>Nombre Auditor</th>
-            <th>N°Cedula</th>
-            <th>Aplicativo</th>    
-            <th>Fecha Operacion</th>
-            <th>Nombre Tecnico</th>
-            <th>N°Cuenta Contrato</th>
-            <th>N° Orden</th>
-            <th>Tipo Operacion</th>
-            <th>Resul Auditoria</th>
-            <th>Observaciones</th>
-            <th>Tipo Hallazgo</th>
-            <th>Hallazgo</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for a in Auditorias %}
-        <tr>
-            <td>{{ a.fecha|date:"d/m/Y" }}</td>
-            <td>{{a.nombre_auditor}}</td>
-            <td>{{a.numero_cedula}}</td>
-            <td>{{a.aplicativo}}</td>
-            <td>{{ a.fecha_operacion|date:"d/m/Y" }}</td>
-            <td>{{a.nombre_tecnico}}</td>
-            <td>{{a.numero_cuenta_contrato}}</td>
-            <td>{{a.numero_orden}}</td>
-            <td>{{a.tipo_operacion}}</td>
-            <td>{{a.resultado_auditoria}}</td>
-            <td>{{a.observacion}}</td>
-            <td>{{a.tipo_hallazgo}}</td>
-            <td>{{a.hallazgo}}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!-- ====================================== -->
+<!-- TABLA -->
+<!-- ====================================== -->
+
+<div class="contenedor-tabla">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Fecha</th>
+                <th>Nombre Auditor</th>
+                <th>N° Cédula</th>
+                <th>Aplicativo</th>
+                <th>Fecha Operación</th>
+                <th>Nombre Técnico</th>
+                <th>N° Cuenta Contrato</th>
+                <th>N° Orden</th>
+                <th>Tipo Operación</th>
+                <th>Resultado Auditoría</th>
+                <th>Observaciones</th>
+                <th>Tipo Hallazgo</th>
+                <th>Hallazgo</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for a in Auditorias %}
+
+            <tr>
+
+                <td>
+                    {{ a.fecha|date:"d/m/Y" }}
+                </td>
+
+                <td>
+                    {{ a.nombre_auditor }}
+                </td>
+
+                <td>
+                    {{ a.numero_cedula }}
+                </td>
+
+                <td>
+                    {{ a.aplicativo }}
+                </td>
+
+                <td>
+                    {{ a.fecha_operacion|date:"d/m/Y" }}
+                </td>
+
+                <td>
+                    {{ a.nombre_tecnico }}
+                </td>
+
+                <td>
+                    {{ a.numero_cuenta_contrato }}
+                </td>
+
+                <td>
+                    {{ a.numero_orden }}
+                </td>
+
+                <td>
+                    {{ a.tipo_operacion }}
+                </td>
+
+                <td>
+                    {{ a.get_resultado_auditoria_display }}
+                </td>
+
+                <!-- OBSERVACIONES -->
+                <td class="texto-largo">
+                    {{ a.observacion|linebreaksbr }}
+                </td>
+
+                <td>
+                    {{ a.get_tipo_hallazgo_display }}
+                </td>
+
+                <!-- HALLAZGO -->
+                <td class="texto-largo">
+                    {{ a.hallazgo|linebreaksbr }}
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="13">
+                    No se encontraron auditorías con los filtros seleccionados.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
 </div>
 
 {% endblock %}

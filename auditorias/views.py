@@ -9,7 +9,9 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 from xhtml2pdf import pisa
 from .models import Auditoria
-
+from datetime import datetime
+from django.contrib.auth.decorators import login_required
+from carga.decorators import role_required
 
 def cargar_excel(request):
 
@@ -156,19 +158,331 @@ def filtrar_auditorias(request):
 
     return auditorias
 
+@role_required("Administrador", "Coordinador")
 def consulta(request):
 
-    auditorias = filtrar_auditorias(request)
+    # =====================================================
+    # CONSULTA BASE
+    # =====================================================
+
+    auditorias = Auditoria.objects.all()
+
+
+    # =====================================================
+    # OBTENER VALORES DE LOS FILTROS
+    # =====================================================
+
+    nombre_auditor = request.GET.get(
+        "nombre_auditor", ""
+    ).strip()
+
+    numero_cedula = request.GET.get(
+        "numero_cedula", ""
+    ).strip()
+
+    aplicativo = request.GET.get(
+        "aplicativo", ""
+    ).strip()
+
+    nombre_tecnico = request.GET.get(
+        "nombre_tecnico", ""
+    ).strip()
+
+    numero_cuenta_contrato = request.GET.get(
+        "numero_cuenta_contrato", ""
+    ).strip()
+
+    numero_orden = request.GET.get(
+        "numero_orden", ""
+    ).strip()
+
+    tipo_operacion = request.GET.get(
+        "tipo_operacion", ""
+    ).strip()
+
+    resultado_auditoria = request.GET.get(
+        "resultado_auditoria", ""
+    ).strip()
+
+    tipo_hallazgo = request.GET.get(
+        "tipo_hallazgo", ""
+    ).strip()
+
+    hallazgo = request.GET.get(
+        "hallazgo", ""
+    ).strip()
+
+    # =====================================================
+    # FECHA ACTUAL
+    # =====================================================
+
+    fecha_actual = datetime.now()
+
+    mes_actual = str(fecha_actual.month)
+    ano_actual = str(fecha_actual.year)
+
+
+    # =====================================================
+    # OBTENER VALORES DE LOS FILTROS
+    # =====================================================
+
+    mes_auditoria = request.GET.get(
+        "mes_auditoria",
+        mes_actual
+    ).strip()
+
+    ano_auditoria = request.GET.get(
+        "ano_auditoria",
+        ano_actual
+    ).strip()
+
+
+    fecha_operacion_desde = request.GET.get(
+        "fecha_operacion_desde", ""
+    ).strip()
+
+    fecha_operacion_hasta = request.GET.get(
+        "fecha_operacion_hasta", ""
+    ).strip()
+
+
+    # =====================================================
+    # APLICAR FILTROS
+    # =====================================================
+
+    if nombre_auditor:
+        auditorias = auditorias.filter(
+            nombre_auditor=nombre_auditor
+        )
+
+    if numero_cedula:
+        auditorias = auditorias.filter(
+            numero_cedula=numero_cedula
+        )
+
+    if aplicativo:
+        auditorias = auditorias.filter(
+            aplicativo=aplicativo
+        )
+
+    if nombre_tecnico:
+        auditorias = auditorias.filter(
+            nombre_tecnico=nombre_tecnico
+        )
+
+    if numero_cuenta_contrato:
+        auditorias = auditorias.filter(
+            numero_cuenta_contrato=numero_cuenta_contrato
+        )
+
+    if numero_orden:
+        auditorias = auditorias.filter(
+            numero_orden=numero_orden
+        )
+
+    if tipo_operacion:
+        auditorias = auditorias.filter(
+            tipo_operacion=tipo_operacion
+        )
+
+    if resultado_auditoria:
+        auditorias = auditorias.filter(
+            resultado_auditoria=resultado_auditoria
+        )
+
+    if tipo_hallazgo:
+        auditorias = auditorias.filter(
+            tipo_hallazgo=tipo_hallazgo
+        )
+
+    if hallazgo:
+        auditorias = auditorias.filter(
+            hallazgo=hallazgo
+        )
+
+
+    # =====================================================
+    # MES DE AUDITORÍA
+    # =====================================================
+
+    if mes_auditoria:
+        auditorias = auditorias.filter(
+            fecha__month=int(mes_auditoria)
+        )
+
+
+    # =====================================================
+    # AÑO DE AUDITORÍA
+    # =====================================================
+
+    if ano_auditoria:
+        auditorias = auditorias.filter(
+            fecha__year=int(ano_auditoria)
+        )
+
+
+    # =====================================================
+    # FECHA OPERACIÓN DESDE
+    # =====================================================
+
+    if fecha_operacion_desde:
+        auditorias = auditorias.filter(
+            fecha_operacion__gte=fecha_operacion_desde
+        )
+
+
+    # =====================================================
+    # FECHA OPERACIÓN HASTA
+    # =====================================================
+
+    if fecha_operacion_hasta:
+        auditorias = auditorias.filter(
+            fecha_operacion__lte=fecha_operacion_hasta
+        )
+
+
+    # =====================================================
+    # ORDENAR RESULTADOS
+    # =====================================================
+
+    auditorias = auditorias.order_by(
+        "-fecha",
+        "-fecha_operacion"
+    )
+
+
+    # =====================================================
+    # CANTIDAD
+    # =====================================================
+
     cantidad = auditorias.count()
+
+
+    # =====================================================
+    # OPCIONES PARA LOS SELECT
+    #
+    # Estas se obtienen de TODA la base de datos,
+    # no del queryset filtrado.
+    # =====================================================
+
+    nombres_auditores = (
+        Auditoria.objects
+        .exclude(nombre_auditor="")
+        .values_list("nombre_auditor", flat=True)
+        .distinct()
+        .order_by("nombre_auditor")
+    )
+
+    cedulas = (
+        Auditoria.objects
+        .exclude(numero_cedula="")
+        .values_list("numero_cedula", flat=True)
+        .distinct()
+        .order_by("numero_cedula")
+    )
+
+    aplicativos = (
+        Auditoria.objects
+        .exclude(aplicativo="")
+        .values_list("aplicativo", flat=True)
+        .distinct()
+        .order_by("aplicativo")
+    )
+
+    nombres_tecnicos = (
+        Auditoria.objects
+        .exclude(nombre_tecnico="")
+        .values_list("nombre_tecnico", flat=True)
+        .distinct()
+        .order_by("nombre_tecnico")
+    )
+
+    cuentas_contrato = (
+        Auditoria.objects
+        .exclude(numero_cuenta_contrato="")
+        .values_list("numero_cuenta_contrato", flat=True)
+        .distinct()
+        .order_by("numero_cuenta_contrato")
+    )
+
+    numeros_orden = (
+        Auditoria.objects
+        .exclude(numero_orden="")
+        .values_list("numero_orden", flat=True)
+        .distinct()
+        .order_by("numero_orden")
+    )
+
+    tipos_operacion = (
+        Auditoria.objects
+        .exclude(tipo_operacion="")
+        .values_list("tipo_operacion", flat=True)
+        .distinct()
+        .order_by("tipo_operacion")
+    )
+
+    resultados_auditoria = (
+        Auditoria.objects
+        .exclude(resultado_auditoria="")
+        .values_list("resultado_auditoria", flat=True)
+        .distinct()
+        .order_by("resultado_auditoria")
+    )
+
+    tipos_hallazgo = (
+        Auditoria.objects
+        .exclude(tipo_hallazgo="")
+        .values_list("tipo_hallazgo", flat=True)
+        .distinct()
+        .order_by("tipo_hallazgo")
+    )
+
+    hallazgos = (
+        Auditoria.objects
+        .exclude(hallazgo="")
+        .values_list("hallazgo", flat=True)
+        .distinct()
+        .order_by("hallazgo")
+    )
+
+    anos_auditoria = (
+        Auditoria.objects
+        .dates("fecha", "year", order="DESC")
+    )
+
+
+    # =====================================================
+    # CONTEXTO
+    # =====================================================
+
+    context = {
+
+        "Auditorias": auditorias,
+
+        "Cantidad": cantidad,
+
+        "ano_auditoria": ano_auditoria,
+
+        "mes_auditoria": mes_auditoria,
+
+        # Select dinámicos
+        "nombres_auditores": nombres_auditores,
+        "cedulas": cedulas,
+        "aplicativos": aplicativos,
+        "nombres_tecnicos": nombres_tecnicos,
+        "cuentas_contrato": cuentas_contrato,
+        "numeros_orden": numeros_orden,
+        "tipos_operacion": tipos_operacion,
+        "resultados_auditoria": resultados_auditoria,
+        "tipos_hallazgo": tipos_hallazgo,
+        "hallazgos": hallazgos,
+        "anos_auditoria": anos_auditoria,
+    }
 
     return render(
         request,
         "auditorias/consulta.html",
-
-        {
-            "Auditorias": auditorias,
-            "Cantidad": cantidad
-        }
+        context
     )
 
 def generate_pdf(request):
@@ -294,7 +608,8 @@ def estadistica(request):
         request,
         "auditorias/estadistica.html"
     )
-
+    
+@role_required("Administrador", "Coordinador", "Digitador")
 def reauditar(request):
 
     return render(

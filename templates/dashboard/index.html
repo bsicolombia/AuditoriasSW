@@ -14,6 +14,12 @@ AuditoriasSW
 <div class="dashboard">
 
     <div class="dashboard-header">
+        {% if user.is_authenticated %}
+            <p>Hola {{ user.username }}</p>
+        {% else %}
+            <p>No has iniciado sesión.</p>
+        {% endif %}
+
         <h1>Sistema de Auditorías</h1>
         <p>Bienvenido al panel principal</p>
 

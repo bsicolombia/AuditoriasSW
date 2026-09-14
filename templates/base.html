@@ -1,34 +1,38 @@
 {% load static %}
+{% load role_tags %}
 
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
+
     <title>
         {% block title %}
         Auditorías
         {% endblock %}
     </title>
 
-    <!-- CSS general -->
-    <link rel="stylesheet" href="{% static 'css/base.css' %}"> 
-    <!-- CSS específico de cada página --> 
-     {% block extra_css %} 
-     {% endblock %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
-    
+    {% block extra_css %}
+    {% endblock %}
 </head>
 
 <body>
 
 <div class="layout">
+
     <aside class="sidebar">
 
-        <a href="{% url 'index' %}"><img src="{% static 'img/LOGOBSI (3).png' %}" alt="Logo" class="logo"></a>
+        <a href="{% url 'index' %}">
+            <img src="{% static 'img/LOGOBSI (3).png' %}" alt="Logo" class="logo">
+        </a>
 
         <nav>
             <ul>
+
+                <!-- INICIO -->
                 <li>
                     <a href="{% url 'index' %}">
                         <img src="{% static 'img/casa.png' %}" alt="Inicio">
@@ -36,38 +40,84 @@
                     </a>
                 </li>
 
+
+                <!-- CARGA -->
+                {% if user|has_any_role:"Administrador,Digitador" %}
                 <li>
                     <a href="{% url 'carga' %}">
                         <img src="{% static 'img/cargando.png' %}" alt="Carga">
                         <span>Carga Auditorías y Técnicos</span>
                     </a>
                 </li>
+                {% endif %}
 
+
+                <!-- ESTADÍSTICAS -->
+                {% if user|has_any_role:"Administrador,Coordinador,Invitado" %}
                 <li>
                     <a href="{% url 'estadistica' %}">
                         <img src="{% static 'img/beneficios.png' %}" alt="Estadísticas">
                         <span>Estadísticas</span>
                     </a>
                 </li>
+                {% endif %}
 
+
+                <!-- CONSULTAS -->
+                {% if user|has_any_role:"Administrador,Coordinador" %}
                 <li>
                     <a href="{% url 'consulta' %}">
                         <img src="{% static 'img/lupa.png' %}" alt="Consultas">
                         <span>Consultas</span>
                     </a>
                 </li>
+                {% endif %}
 
-                <div class="reauditar">
-                    <li>
-                        <a href="{% url 'reauditar' %}">
-                            <img src="{% static 'img/revision.png' %}" alt="Reauditar">
-                            <span>Mes Actual Reauditar / Auditar</span>
-                        </a>
-                    </li>
-                </div>
+
+                <!-- REAUDITAR -->
+                {% if user|has_any_role:"Administrador,Coordinador,Digitador" %}
+                <li>
+                    <a href="{% url 'reauditar' %}">
+                        <img src="{% static 'img/revision.png' %}" alt="Reauditar">
+                        <span>Mes Actual Reauditar / Auditar</span>
+                    </a>
+                </li>
+                {% endif %}
+
+
+                <!-- BITÁCORA -->
+                {% if user|has_any_role:"Administrador,Coordinador" %}
+                <li>
+                    <a href="{% url 'bitacora' %}">
+                        <img src="{% static 'img/bitacora.png' %}" alt="Bitácora">
+                        <span>Bitácora</span>
+                    </a>
+                </li>
+                {% endif %}
+
+
+                <!-- ADMINISTRACIÓN -->
+                {% if user.is_superuser %}
+                <li>
+                    <a href="/admin/">
+                        <img src="{% static 'img/admin.png' %}" alt="Administrar">
+                        <span>Administrar</span>
+                    </a>
+                </li>
+                {% endif %}
+
+
+                <!-- CERRAR SESIÓN -->
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+
             </ul>
         </nav>
+
     </aside>
+
 
     <section class="contenido">
         {% block content %}
@@ -76,7 +126,5 @@
 
 </div>
 
-
 </body>
-
 </html>

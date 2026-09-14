@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.utils import timezone
-
+from .decorators import role_required
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
@@ -23,14 +23,14 @@ from .forms import (
     TecnicoForm,
     TecnicoCargaForm,
 )
-
+from django.contrib.auth.decorators import login_required
 from auditorias.models import Auditoria
 from .models import Tecnicos
 
 # ==========================================================
 # CARGA
 # ==========================================================
-
+@role_required("Administrador", "Digitador")
 def carga(request):
 
     # ==========================================================
@@ -138,7 +138,14 @@ def carga(request):
         context,
     )
 
-
+@role_required("Administrador", "Coordinador")
+def bitacora(request):
+    
+    return render(
+            request,
+            "carga/bitacora.html"
+            
+        )
 # ==========================================================
 # CONVERTIR TEXTO
 # ==========================================================
@@ -3392,3 +3399,4 @@ def exportar_excel_completo(request):
     wb.save(response)
 
     return response
+    

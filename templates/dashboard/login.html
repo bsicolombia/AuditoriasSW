@@ -1,12 +1,33 @@
-<h1>Iniciar Sesión para Entrar al Sistema de Auditorias</h1>
+{% load static %}
 
-<form method="post">
-    {% csrf_token %}
+<link rel="stylesheet" href="{% static 'css/reset.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 
-    {{ form.as_p}}
+<body>
 
-    <button type="submit">
-        iniciar sesión
-    </button>
+    <main class="login">
 
-</form>
+        <!-- Panel izquierdo: marca -->
+        <section class="login__brand">
+            <img src="{% static 'img/LOGOBSI (3).png' %}" alt="logoLogin" class="login__logo">
+            <h2>Bienvenido de nuevo</h2>
+            <p>Para mantenerte conectado con nosotros por favor inicia sesión con tus datos.</p>
+        </section>
+
+        <!-- Panel derecho: formulario -->
+        <section class="login__form">
+            <h1>Iniciar Sesión para Entrar al Sistema de Auditorías</h1>
+            <p class="login__subtitle">Ingresa tus datos para continuar</p>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit">
+                    Iniciar sesión
+                </button>
+            </form>
+        </section>
+
+    </main>
+</body>

@@ -16,7 +16,6 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 from xhtml2pdf import pisa
-
 from .forms import (
     CsvUploadForm,
     AuditoriaForm,

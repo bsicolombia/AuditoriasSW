@@ -1,0 +1,82 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if subtitle %}{{ subtitle }} | {% endif %}
+    {% if title %}{{ title }} | {% endif %}
+    AuditoríasSW
+{% endblock %}
+
+
+{# El logotipo vive en el panel lateral, así que no repetimos marca aquí #}
+{% block branding %}{% endblock %}
+
+
+{% block usertools %}
+
+    {% if user.is_active %}
+
+        <div class="topbar-tools">
+
+            <div class="topbar-greeting">
+
+                <span class="topbar-greeting-name">
+                    {{ user.get_short_name|default:user.get_username }}
+                </span>
+
+                <span class="topbar-greeting-date">
+                    Hoy es {% now "d/m/Y" %}
+                </span>
+
+            </div>
+
+
+            <div class="topbar-actions">
+
+                <a
+                    href="{% url 'index' %}"
+                    class="topbar-btn topbar-btn-ghost"
+                >
+                    <span>Ir a mi sitio</span>
+                    <span class="topbar-btn-icon">↗</span>
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    class="topbar-logout-form"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="topbar-btn topbar-btn-solid"
+                    >
+                        <span>Cerrar sesión</span>
+                        <span class="topbar-btn-icon">⇥</span>
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+{% endblock %}
+
+
+{% block nav-global %}{% endblock %}
+
+
+{% block extrastyle %}
+
+    {{ block.super }}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/admin_custom.css' %}"
+    >
+
+{% endblock %}

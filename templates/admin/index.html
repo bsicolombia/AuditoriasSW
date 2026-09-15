@@ -1,0 +1,192 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}
+    Panel administrativo | AuditoríasSW
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="dashboard-hero">
+
+        <div class="dashboard-hero-content">
+
+            <span class="dashboard-eyebrow">Panel administrativo</span>
+
+            <h1>
+                Bienvenido, {{ user.get_short_name|default:user.get_username }}
+            </h1>
+
+            <p>
+                Administra las aplicaciones, registros y procesos
+                del sistema desde un solo lugar.
+            </p>
+
+        </div>
+
+
+        <div class="dashboard-hero-decoration">
+            <div class="hero-circle hero-circle-one"></div>
+            <div class="hero-circle hero-circle-two"></div>
+            <span class="hero-main-icon">⚙</span>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         RESUMEN RÁPIDO
+    ====================================================== -->
+
+    <section class="stat-row">
+
+        <div class="stat-card">
+            <span class="stat-value">{{ app_list|length }}</span>
+            <span class="stat-label">Aplicaciones activas</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-value">
+                {% if user.is_superuser %}Superusuario{% else %}Staff{% endif %}
+            </span>
+            <span class="stat-label">Nivel de acceso</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-value">
+                {{ user.last_login|date:"d/m/Y H:i"|default:"Primer ingreso" }}
+            </span>
+            <span class="stat-label">Último acceso</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-value">{% now "d/m/Y" %}</span>
+            <span class="stat-label">Fecha actual</span>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         APLICACIONES
+    ====================================================== -->
+
+    <section class="dashboard-applications">
+
+        <div class="section-header">
+
+            <div>
+                <span class="section-eyebrow">Gestión</span>
+                <h2>Aplicaciones del sistema</h2>
+                <p>Accede rápidamente a los módulos disponibles.</p>
+            </div>
+
+        </div>
+
+
+        <div class="application-grid">
+
+            {% for app in app_list %}
+
+                <div class="application-card">
+
+                    <div class="application-card-header">
+
+                        <div class="application-icon">
+
+                            {% if app.app_label == "auditorias" %}
+                                ◈
+
+                            {% elif app.app_label == "carga" %}
+                                ▣
+
+                            {% elif app.app_label == "dashboard" %}
+                                ▦
+
+                            {% else %}
+                                ⚙
+
+                            {% endif %}
+
+                        </div>
+
+                        <div>
+                            <h3>{{ app.name }}</h3>
+                            <span>
+                                {{ app.models|length }} modelo{{ app.models|length|pluralize }} disponible{{ app.models|length|pluralize }}
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="application-models">
+
+                        {% for model in app.models %}
+
+                            {% if model.admin_url %}
+
+                                <div class="model-link-row">
+
+                                    <a href="{{ model.admin_url }}" class="model-link">
+                                        <span class="model-link-name">{{ model.name }}</span>
+                                        <span class="model-link-arrow">→</span>
+                                    </a>
+
+                                    {% if model.add_url %}
+
+                                        <a
+                                            href="{{ model.add_url }}"
+                                            class="model-link-add"
+                                            title="Agregar {{ model.name }}"
+                                        >+</a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            {% endif %}
+
+                        {% empty %}
+
+                            <div class="empty-models">No hay modelos disponibles.</div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <div class="empty-dashboard">
+
+                    <div class="empty-dashboard-icon">◌</div>
+
+                    <h3>No hay aplicaciones disponibles</h3>
+
+                    <p>
+                        Actualmente no existen módulos registrados
+                        en el panel administrativo.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+</div>
+
+{% endblock %}

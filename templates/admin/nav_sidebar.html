@@ -1,0 +1,157 @@
+{% load i18n static %}
+
+<nav
+    id="nav-sidebar"
+    class="custom-admin-sidebar"
+    aria-label="{% translate 'Sidebar' %}"
+>
+
+    <!-- =====================================================
+         LOGO
+    ====================================================== -->
+
+    <div class="admin-sidebar-logo">
+
+        <a href="{% url 'admin:index' %}">
+
+            <img
+                src="{% static 'img/LOGOBSI (3).png' %}"
+                alt="AuditoríasSW"
+            >
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         PERFIL
+    ====================================================== -->
+
+    <div class="admin-profile-card">
+
+        <div class="admin-profile-icon">
+            {{ user.get_short_name|default:user.get_username|first|upper }}
+        </div>
+
+        <div class="admin-profile-info">
+
+            <strong>
+                {{ user.get_full_name|default:user.get_username }}
+            </strong>
+
+            <span>
+                {% if user.is_superuser %}Administrador{% else %}Panel de control{% endif %}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MENÚ PRINCIPAL
+    ====================================================== -->
+
+    <div class="admin-sidebar-menu">
+
+        <span class="admin-sidebar-title">
+            Menú principal
+        </span>
+
+
+        <a
+            href="{% url 'admin:index' %}"
+            class="admin-sidebar-link {% if request.path == '/admin/' %}admin-sidebar-link-active{% endif %}"
+        >
+            <span class="admin-sidebar-icon">⌂</span>
+            <span class="admin-sidebar-text">Dashboard</span>
+        </a>
+
+
+        {% if app_list %}
+
+            <div class="admin-sidebar-title-container">
+                <span class="admin-sidebar-title">Aplicaciones</span>
+            </div>
+
+
+            {% for app in app_list %}
+
+                <div class="admin-sidebar-app">
+
+                    <div class="admin-sidebar-app-header">
+
+                        <span class="admin-app-icon">
+
+                            {% if app.app_label == "auditorias" %}
+                                ◈
+
+                            {% elif app.app_label == "carga" %}
+                                ▣
+
+                            {% elif app.app_label == "dashboard" %}
+                                ▦
+
+                            {% elif app.app_label == "logs" %}
+                                ◫
+
+                            {% else %}
+                                ⚙
+
+                            {% endif %}
+
+                        </span>
+
+                        <span class="admin-app-name">{{ app.name }}</span>
+
+                    </div>
+
+
+                    <div class="admin-sidebar-models">
+
+                        {% for model in app.models %}
+
+                            {% if model.admin_url %}
+
+                                <a
+                                    href="{{ model.admin_url }}"
+                                    class="admin-sidebar-model"
+                                >
+                                    <span class="admin-model-line"></span>
+                                    <span class="admin-model-name">{{ model.name }}</span>
+                                    <span class="admin-model-arrow">→</span>
+                                </a>
+
+                            {% endif %}
+
+                        {% empty %}
+
+                            <span class="admin-sidebar-empty">Sin opciones disponibles</span>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         PIE
+    ====================================================== -->
+
+    <div class="admin-sidebar-bottom">
+
+        <span class="admin-sidebar-footer-text">
+            AuditoríasSW · Sistema interno
+        </span>
+
+    </div>
+
+</nav>

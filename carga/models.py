@@ -6,5 +6,9 @@ class Tecnicos (models.Model):
     tecnico_cedula = models.CharField(max_length=10, unique=True)
     tecnico_apellido_nombres = models.CharField(max_length=150)
     
+    class Meta:
+        verbose_name = "Técnico"
+        verbose_name_plural = "Técnicos"
+    
     def __str__(self):
         return self.tecnico_apellido_nombres

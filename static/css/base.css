@@ -347,3 +347,69 @@ button:hover {
         min-height: 42px;
     }
 }
+
+.tarjeta-ultima-carga {
+    margin: 18px 12px;
+    padding: 14px;
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, rgba(11, 92, 142, 0.42), rgba(8, 57, 82, 0.38));
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.tarjeta-ultima-carga-titulo {
+    display: block;
+    margin-bottom: 8px;
+    color: #7dd3fc;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.tarjeta-ultima-carga-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 0;
+}
+
+.tarjeta-ultima-carga-item + .tarjeta-ultima-carga-item {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tarjeta-ultima-carga-label {
+    color: #cfe3ee;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tarjeta-ultima-carga-fecha {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+}
+
+.tarjeta-ultima-carga-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 0;
+}
+
+.tarjeta-ultima-carga-datos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.tarjeta-ultima-carga-usuario {
+    margin-top: 2px;
+    color: #9fb7c7;
+    font-size: 10px;
+    font-weight: 600;
+}

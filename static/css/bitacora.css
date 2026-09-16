@@ -1,0 +1,1159 @@
+/* =========================================
+   CONTENEDOR
+========================================= */
+
+.bitacora-container {
+    width: 92%;
+    max-width: 1250px;
+
+    margin: 0 auto;
+
+    padding: 35px 20px 55px;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.bitacora-header {
+    text-align: center;
+
+    margin-bottom: 25px;
+}
+
+.bitacora-header h1 {
+    margin: 0 0 6px;
+
+    color: #071c2b;
+
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.bitacora-header p {
+    margin: 0;
+
+    color: #607789;
+
+    font-size: 14px;
+}
+
+
+/* =========================================
+   FILTROS
+========================================= */
+
+.filtros-card {
+    background: #ffffff;
+
+    border: 1px solid #d6e2ea;
+
+    border-radius: 13px;
+
+    padding: 15px 18px;
+
+    margin-bottom: 18px;
+
+    box-shadow:
+        0 4px 15px rgba(6, 24, 38, 0.05);
+}
+
+.filtros-form {
+    display: flex;
+
+    align-items: end;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+}
+
+.filtro {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    min-width: 145px;
+}
+
+.filtro label {
+    color: #29475a;
+
+    font-size: 12px;
+
+    font-weight: 650;
+}
+
+.filtro select {
+    height: 38px;
+
+    padding: 0 10px;
+
+    border: 1px solid #ccdbe4;
+
+    border-radius: 7px;
+
+    background: #f8fbfd;
+
+    color: #29475a;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+.filtro select:focus {
+    border-color: #38bdf8;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(56, 189, 248, 0.10);
+}
+
+
+/* =========================================
+   BOTONES FILTRO
+========================================= */
+
+.btn-filtrar,
+.btn-limpiar {
+    height: 38px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0 18px;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+.btn-filtrar {
+    border: none;
+
+    background: #0b5c8e;
+
+    color: white;
+}
+
+.btn-limpiar {
+    background: #edf2f5;
+
+    color: #365467;
+
+    border: 1px solid #d4e0e7;
+}
+
+
+/* =========================================
+   LISTA
+========================================= */
+
+.lista-card {
+    background: #ffffff;
+
+    border: 1px solid #d6e2ea;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 6px 20px rgba(6, 24, 38, 0.07);
+}
+
+.lista-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 18px 22px;
+
+    border-bottom: 1px solid #e0e8ed;
+}
+
+.lista-header h2 {
+    margin: 0 0 3px;
+
+    color: #082f49;
+
+    font-size: 20px;
+}
+
+.lista-header p {
+    margin: 0;
+
+    color: #718594;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.tabla-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.bitacora-table {
+    width: 100%;
+
+    min-width: 850px;
+
+    border-collapse: collapse;
+}
+
+.bitacora-table th {
+    padding: 12px 16px;
+
+    background: #f3f8fa;
+
+    color: #29475a;
+
+    text-align: left;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    border-bottom: 1px solid #dce6eb;
+}
+
+.bitacora-table td {
+    padding: 13px 16px;
+
+    border-bottom: 1px solid #e8eef2;
+
+    vertical-align: middle;
+
+    font-size: 13px;
+
+    color: #405867;
+}
+
+.bitacora-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.bitacora-table tbody tr:hover {
+    background: #f8fbfd;
+}
+
+
+/* =========================================
+   FECHA
+========================================= */
+
+.fecha-cell strong {
+    display: block;
+
+    color: #183d54;
+
+    font-size: 13px;
+}
+
+.fecha-cell span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #81929d;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   USUARIO
+========================================= */
+
+.usuario-cell {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+.usuario-avatar {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0b4f75,
+            #38bdf8
+        );
+
+    color: white;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.usuario-cell strong {
+    display: block;
+
+    color: #183d54;
+
+    font-size: 13px;
+}
+
+.usuario-cell small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #81929d;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   OBSERVACIONES
+========================================= */
+
+.observacion-cell {
+    max-width: 480px;
+
+    line-height: 1.45;
+}
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.acciones {
+    display: flex;
+
+    gap: 6px;
+}
+
+.btn-editar,
+.btn-eliminar {
+    padding: 6px 10px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-size: 11px;
+
+    font-weight: 650;
+
+    white-space: nowrap;
+}
+
+.btn-editar {
+    color: #08618d;
+
+    background: #e7f5fb;
+}
+
+.btn-eliminar {
+    color: #b42318;
+
+    background: #fcebea;
+}
+
+.btn-editar:hover {
+    background: #d7eef8;
+}
+
+.btn-eliminar:hover {
+    background: #f8d9d6;
+}
+
+
+/* =========================================
+   SIN REGISTROS
+========================================= */
+
+.sin-registros {
+    padding: 45px 20px;
+
+    text-align: center;
+}
+
+.sin-registros span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 35px;
+}
+
+.sin-registros h3 {
+    margin: 0 0 5px;
+
+    color: #29475a;
+}
+
+.sin-registros p {
+    margin: 0;
+
+    color: #718594;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   CREAR
+========================================= */
+
+.crear-card {
+    margin-top: 18px;
+
+    padding: 18px 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #d6e2ea;
+
+    border-radius: 13px;
+
+    box-shadow:
+        0 4px 15px rgba(6, 24, 38, 0.05);
+}
+
+.crear-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 13px;
+}
+
+.crear-header h2 {
+    margin: 0 0 3px;
+
+    color: #082f49;
+
+    font-size: 17px;
+}
+
+.crear-header p {
+    margin: 0;
+
+    color: #718594;
+
+    font-size: 12px;
+}
+
+.crear-header strong {
+    color: #0b5c8e;
+}
+
+.crear-fecha {
+    padding: 6px 10px;
+
+    border-radius: 6px;
+
+    background: #edf8fd;
+
+    color: #0b5c8e;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   OBSERVACIÓN
+========================================= */
+
+.observacion-form {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.observacion-form label {
+    color: #29475a;
+
+    font-size: 13px;
+
+    font-weight: 650;
+
+    white-space: nowrap;
+}
+
+.observacion-form textarea {
+    flex: 1;
+
+    min-height: 45px;
+    max-height: 100px;
+
+    padding: 10px 12px;
+
+    box-sizing: border-box;
+
+    resize: vertical;
+
+    border: 1px solid #ccdbe4;
+
+    border-radius: 7px;
+
+    background: #f8fbfd;
+
+    color: #29475a;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    outline: none;
+}
+
+.observacion-form textarea:focus {
+    border-color: #38bdf8;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(56, 189, 248, 0.10);
+}
+
+
+/* =========================================
+   GUARDAR
+========================================= */
+
+.crear-footer {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 10px;
+}
+
+.btn-guardar {
+    padding: 8px 18px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #0b5c8e;
+
+    color: white;
+
+    font-size: 12px;
+
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+.btn-guardar:hover {
+    background: #084c75;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 750px) {
+
+    .bitacora-container {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding: 25px 12px 40px;
+    }
+
+    .filtros-form {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .filtro {
+        width: 100%;
+    }
+
+    .btn-filtrar,
+    .btn-limpiar {
+        width: 100%;
+    }
+
+    .crear-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .observacion-form {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .observacion-form textarea {
+        width: 100%;
+    }
+
+    .crear-footer {
+        justify-content: stretch;
+    }
+
+    .btn-guardar {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   BOTÓN ACTUALIZAR BITÁCORA
+========================================= */
+
+.btn-actualizar {
+    border: none;
+
+    padding: 12px 24px;
+
+    border-radius: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #0b5c8e,
+        #0b7db5
+    );
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.btn-actualizar:hover {
+    transform: translateY(-2px);
+
+    background: linear-gradient(
+        135deg,
+        #084b75,
+        #096a9c
+    );
+
+    box-shadow:
+        0 6px 15px rgba(11, 92, 142, 0.25);
+}
+
+/* =========================================
+   BOTÓN ACTUALIZAR BITÁCORA
+========================================= */
+
+.btn-actualizar {
+    border: none;
+
+    padding: 12px 24px;
+
+    border-radius: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #0b5c8e,
+        #0b7db5
+    );
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.btn-actualizar:hover {
+    transform: translateY(-2px);
+
+    background: linear-gradient(
+        135deg,
+        #084b75,
+        #096a9c
+    );
+
+    box-shadow:
+        0 6px 15px
+        rgba(11, 92, 142, 0.25);
+}
+
+
+/* =========================================
+   ERRORES DEL FORMULARIO
+========================================= */
+
+.form-errors {
+    margin-top: 8px;
+
+    padding: 10px 12px;
+
+    border-radius: 8px;
+
+    background: #fff1f2;
+
+    border: 1px solid #fecdd3;
+
+    color: #be123c;
+
+    font-size: 13px;
+}
+
+/* =========================================
+   OBSERVACIONES - TEXTO LARGO
+========================================= */
+
+.observacion-cell {
+    max-width: 420px;
+
+    min-width: 250px;
+
+    white-space: normal;
+
+    word-break: break-word;
+
+    overflow-wrap: anywhere;
+
+    line-height: 1.55;
+
+    vertical-align: top;
+
+    color: #405565;
+
+    font-size: 14px;
+}
+
+
+/* Cada salto de línea de la observación */
+
+.observacion-cell br {
+    display: block;
+
+    content: "";
+
+    margin-bottom: 4px;
+}
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.bitacora-table {
+    width: 100%;
+
+    table-layout: fixed;
+
+    border-collapse: collapse;
+}
+
+
+/* =========================================
+   ANCHOS DE COLUMNAS
+========================================= */
+
+.bitacora-table th:nth-child(1),
+.bitacora-table td:nth-child(1) {
+    width: 150px;
+}
+
+
+.bitacora-table th:nth-child(2),
+.bitacora-table td:nth-child(2) {
+    width: 190px;
+}
+
+
+.bitacora-table th:nth-child(3),
+.bitacora-table td:nth-child(3) {
+    width: auto;
+}
+
+
+.bitacora-table th:nth-child(4),
+.bitacora-table td:nth-child(4) {
+    width: 190px;
+}
+
+
+/* =========================================
+   CELDA GENERAL
+========================================= */
+
+.bitacora-table td {
+    vertical-align: top;
+
+    padding: 16px;
+}
+
+
+/* =========================================
+   OBSERVACIÓN MUY LARGA
+========================================= */
+
+.observacion-cell {
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+
+    word-break: break-word;
+}
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.acciones {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    align-items: flex-start;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .bitacora-table {
+        table-layout: auto;
+    }
+
+    .observacion-cell {
+        min-width: 220px;
+
+        max-width: 350px;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .tabla-wrapper {
+        overflow-x: auto;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .bitacora-table {
+        min-width: 750px;
+    }
+
+    .observacion-cell {
+        max-width: 300px;
+    }
+
+}
+
+/* =========================================
+   LISTA DE REGISTROS
+========================================= */
+
+.lista-card {
+    width: 100%;
+    margin-top: 25px;
+}
+
+
+/* =========================================
+   CONTENEDOR CON SCROLL
+========================================= */
+
+.tabla-wrapper {
+    width: 100%;
+
+    max-height: 500px;
+
+    overflow-y: auto;
+    overflow-x: auto;
+
+    border-radius: 12px;
+
+    border: 1px solid #d6e2ea;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 6px 20px rgba(6, 24, 38, 0.07);
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: thin;
+
+    scrollbar-color: #8db8cc #eef4f7;
+}
+
+
+/* =========================================
+   SCROLL VERTICAL
+========================================= */
+
+.tabla-wrapper::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+
+.tabla-wrapper::-webkit-scrollbar-track {
+    background: #eef4f7;
+
+    border-radius: 10px;
+}
+
+
+.tabla-wrapper::-webkit-scrollbar-thumb {
+    background: #8db8cc;
+
+    border-radius: 10px;
+
+    border: 2px solid #eef4f7;
+}
+
+
+.tabla-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #5f9bb5;
+}
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.bitacora-table {
+    width: 100%;
+
+    min-width: 850px;
+
+    border-collapse: collapse;
+
+    table-layout: fixed;
+}
+
+
+/* =========================================
+   ENCABEZADO FIJO
+========================================= */
+
+.bitacora-table thead th {
+    position: sticky;
+
+    top: 0;
+
+    z-index: 10;
+
+    background: #edf6fa;
+
+    color: #183d54;
+
+    box-shadow:
+        0 2px 5px rgba(6, 24, 38, 0.10);
+}
+
+
+/* =========================================
+   OBSERVACIONES LARGAS
+========================================= */
+
+.observacion-cell {
+    max-width: 420px;
+
+    white-space: normal;
+
+    overflow-wrap: anywhere;
+
+    word-break: break-word;
+
+    line-height: 1.55;
+
+    vertical-align: top;
+}
+
+
+/* =========================================
+   CELDAS
+========================================= */
+
+.bitacora-table th,
+.bitacora-table td {
+    padding: 15px;
+
+    vertical-align: top;
+}
+
+
+/* =========================================
+   ANCHOS
+========================================= */
+
+.bitacora-table th:nth-child(1),
+.bitacora-table td:nth-child(1) {
+    width: 150px;
+}
+
+
+.bitacora-table th:nth-child(2),
+.bitacora-table td:nth-child(2) {
+    width: 190px;
+}
+
+
+.bitacora-table th:nth-child(3),
+.bitacora-table td:nth-child(3) {
+    width: auto;
+}
+
+
+.bitacora-table th:nth-child(4),
+.bitacora-table td:nth-child(4) {
+    width: 180px;
+}
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.acciones {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    align-items: flex-start;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .tabla-wrapper {
+        max-height: 450px;
+
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    .bitacora-table {
+        min-width: 850px;
+    }
+
+}
+
+/* ==========================================
+   FILTROS ACTIVOS - BITÁCORA
+========================================== */
+
+.filtros-card select.filtro-activo {
+
+    border: 1px solid #1976d2;
+
+    border-bottom: 3px solid #1976d2;
+
+    background-color: #f5faff;
+
+    color: #0b4f75;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 2px 5px rgba(25, 118, 210, 0.15);
+
+    transition:
+        all 0.2s ease;
+}
+
+
+/* Cuando el filtro está activo y recibe el foco */
+
+.filtros-card select.filtro-activo:focus {
+
+    border-color: #1565c0;
+
+    border-bottom-color: #1565c0;
+
+    background-color: #eef7ff;
+
+    box-shadow:
+        0 0 0 3px rgba(25, 118, 210, 0.12);
+}
+
+
+/* Hover de filtro activo */
+
+.filtros-card select.filtro-activo:hover {
+
+    border-color: #1565c0;
+
+    background-color: #eef7ff;
+
+}

@@ -1,0 +1,571 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if editando %}
+Editar Bitácora
+{% else %}
+Bitácora
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/bitacora.css' %}"> {% endblock %}
+
+{% block content %}
+
+<div class="bitacora-container">
+<!-- =========================================
+     ENCABEZADO
+========================================== -->
+
+<div class="bitacora-header">
+
+    {% if editando %}
+
+        <h1>
+            Editar Bitácora
+        </h1>
+
+        <p>
+            Modificar la observación seleccionada
+        </p>
+
+    {% else %}
+
+        <h1>
+            Bitácora
+        </h1>
+
+        <p>
+            Historial de actividades realizadas en el sistema
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================================
+     CREAR / EDITAR BITÁCORA
+========================================== -->
+
+{% if puede_editar %}
+
+<div class="crear-card">
+
+    <div class="crear-header">
+
+        <div>
+
+            {% if editando %}
+
+                <h2>
+                    Editar observación
+                </h2>
+
+                <p>
+                    Usuario:
+                    <strong>
+                        {{ registro_editando.usuario.username }}
+                    </strong>
+                </p>
+
+            {% else %}
+
+                <h2>
+                    Nueva observación
+                </h2>
+
+                <p>
+                    Usuario:
+                    <strong>
+                        {{ request.user.username }}
+                    </strong>
+                </p>
+
+            {% endif %}
+
+        </div>
+
+        <span class="crear-fecha">
+
+            {% if editando %}
+                Fecha:
+                {{ registro_editando.fecha|date:"d/m/Y H:i:s" }}
+            {% else %}
+                Fecha automática
+            {% endif %}
+
+        </span>
+
+    </div>
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div class="observacion-form">
+
+            <label for="id_observaciones">
+                Observaciones
+            </label>
+
+            {{ form.observaciones }}
+
+        </div>
+
+
+        <div class="crear-footer">
+
+            {% if editando %}
+
+                <a
+                    href="{% url 'bitacora' %}"
+                    class="btn-limpiar"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-actualizar"
+                >
+                    Actualizar bitácora
+                </button>
+
+            {% else %}
+
+                <button
+                    type="submit"
+                    class="btn-guardar"
+                >
+                    Guardar observación
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endif %}
+
+
+
+<!-- =========================================
+     FILTROS
+========================================== -->
+
+<div class="filtros-card">
+
+    <form method="get" class="filtros-form">
+
+
+        <!-- =====================================
+             DÍA
+        ====================================== -->
+
+        <div class="filtro">
+
+            <label for="dia">
+                Día
+            </label>
+
+            <select name="dia" id="dia">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for d in dias %}
+
+                    <option
+                        value="{{ d }}"
+                        {% if filtro_dia == d|stringformat:"s" %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ d }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- =====================================
+             MES
+        ====================================== -->
+
+        <div class="filtro">
+
+            <label for="mes">
+                Mes
+            </label>
+
+            <select name="mes" id="mes">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for numero, nombre in meses %}
+
+                    <option
+                        value="{{ numero }}"
+                        {% if filtro_mes == numero|stringformat:"s" %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ nombre }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- =====================================
+             AÑO
+        ====================================== -->
+
+        <div class="filtro">
+
+            <label for="anio">
+                Año
+            </label>
+
+            <select name="anio" id="anio">
+
+                <option value="">
+                    Todos
+                </option>
+
+                {% for anio in anios %}
+
+                    <option
+                        value="{{ anio }}"
+                        {% if filtro_anio == anio|stringformat:"s" %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ anio }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- =====================================
+             FILTRAR
+        ====================================== -->
+
+        <button
+            type="submit"
+            class="btn-filtrar"
+        >
+            Filtrar
+        </button>
+
+
+        <!-- =====================================
+             LIMPIAR
+        ====================================== -->
+
+        <a
+            href="{% url 'bitacora' %}"
+            class="btn-limpiar"
+        >
+            Limpiar
+        </a>
+
+    </form>
+
+</div>
+
+
+<!-- =========================================
+     LISTA DE REGISTROS
+========================================== -->
+
+<div class="lista-card">
+
+    <div class="lista-header">
+
+        <div>
+
+            <h2>
+                Registros
+            </h2>
+
+            <p>
+
+                {{ registros|length }}
+
+                registro{{ registros|length|pluralize }}
+
+                encontrado{{ registros|length|pluralize }}
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if registros %}
+
+        <div class="tabla-wrapper">
+
+            <table class="bitacora-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Fecha
+                        </th>
+
+                        <th>
+                            Usuario
+                        </th>
+
+                        <th>
+                            Observaciones
+                        </th>
+
+                        <th>
+                            Acciones
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for registro in registros %}
+
+                        <tr>
+
+                            <!-- =====================
+                                 FECHA
+                            ====================== -->
+
+                            <td class="fecha-cell">
+
+                                <strong>
+                                    {{ registro.fecha|date:"d/m/Y" }}
+                                </strong>
+
+                                <span>
+                                    {{ registro.fecha|date:"H:i:s" }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- =====================
+                                 USUARIO
+                            ====================== -->
+
+                            <td>
+
+                                <div class="usuario-cell">
+
+                                    <div class="usuario-avatar">
+
+                                        {{ registro.usuario.username|first|upper }}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ registro.usuario.username }}
+                                        </strong>
+
+                                        {% if registro.usuario.get_full_name %}
+
+                                            <small>
+                                                {{ registro.usuario.get_full_name }}
+                                            </small>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- =====================
+                                 OBSERVACIONES
+                            ====================== -->
+
+                            <td class="observacion-cell">
+
+                                {{ registro.observaciones|linebreaksbr }}
+
+                            </td>
+
+
+                            <!-- =====================
+                                 ACCIONES
+                            ====================== -->
+
+                            <td>
+
+                                {% if puede_editar %}
+
+                                    <div class="acciones">
+
+                                        <a
+                                            href="{% url 'editar_bitacora' registro.id %}"
+                                            class="btn-editar"
+                                        >
+                                            Editar
+                                        </a>
+
+                                        <a
+                                            href="{% url 'eliminar_bitacora' registro.id %}"
+                                            class="btn-eliminar"
+                                        >
+                                            Eliminar
+                                        </a>
+
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="solo-lectura">
+                                        Solo lectura
+                                    </span>
+
+                                {% endif %}
+
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="sin-registros">
+
+            <span>
+                📋
+            </span>
+
+            <h3>
+                No se encontraron registros
+            </h3>
+
+            <p>
+                No existen registros con los filtros seleccionados.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const filtros = [
+        document.getElementById("dia"),
+        document.getElementById("mes"),
+        document.getElementById("anio")
+    ];
+
+
+    function actualizarFiltrosActivos() {
+
+        filtros.forEach(function (filtro) {
+
+            if (!filtro) {
+                return;
+            }
+
+
+            /*
+             * Si tiene un valor seleccionado,
+             * se marca como filtro activo.
+             */
+
+            if (filtro.value !== "") {
+
+                filtro.classList.add("filtro-activo");
+
+            } else {
+
+                filtro.classList.remove("filtro-activo");
+
+            }
+
+        });
+
+    }
+
+
+    /*
+     * Ejecutar al cargar la página.
+     * Esto permite que también se marque
+     * el filtro cuando viene desde GET.
+     */
+
+    actualizarFiltrosActivos();
+
+
+    /*
+     * Actualizar inmediatamente cuando
+     * el usuario cambia un filtro.
+     */
+
+    filtros.forEach(function (filtro) {
+
+        if (!filtro) {
+            return;
+        }
+
+        filtro.addEventListener(
+            "change",
+            actualizarFiltrosActivos
+        );
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

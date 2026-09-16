@@ -1,21 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
 /* =========================================
-   RESET LOCAL / BASE
+   TOKENS
+========================================= */
+
+:root {
+    --azul-900: #04111c;
+    --azul-800: #072338;
+    --azul-700: #083b5c;
+    --azul-600: #0b5c8e;
+    --cian: #38bdf8;
+
+    --tinta: #0f2233;
+    --gris: #6b8296;
+    --linea: #dbe4ec;
+    --papel: #ffffff;
+
+    --error: #c8384f;
+
+    --fuente: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+}
+
+/* =========================================
+   BASE
 ========================================= */
 
 * {
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
-    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
-    color: #172b3a;
-}
 
-/* =========================================
-   FONDO DE LA PANTALLA
-========================================= */
+    font-family: var(--fuente);
+    color: var(--tinta);
+
+    -webkit-font-smoothing: antialiased;
+}
 
 body {
     display: flex;
@@ -23,155 +46,121 @@ body {
     justify-content: center;
 
     min-height: 100vh;
-    padding: 30px 20px;
+    padding: 28px 20px;
 
-    background:
-        radial-gradient(
-            circle at 85% 5%,
-            rgba(56, 189, 248, 0.10),
-            transparent 30%
-        ),
-        linear-gradient(
-            160deg,
-            #061826 0%,
-            #08263b 55%,
-            #04111c 100%
-        );
+    background: var(--azul-900);
 }
 
 /* =========================================
-   TARJETA PRINCIPAL (DOS PANELES)
+   TARJETA
 ========================================= */
 
 .login {
     display: flex;
-
+ 
     width: 100%;
-    max-width: 900px;
-    min-height: 480px;
-
-    background: #ffffff;
-
-    border-radius: 22px;
+    max-width: 820px;
+    min-height: 460px;
+ 
+    background: var(--papel);
+ 
+    border-radius: 26px;
     overflow: hidden;
-
-    box-shadow:
-        0 25px 55px rgba(3, 15, 25, 0.40),
-        0 0 0 1px rgba(56, 189, 248, 0.10);
+ 
+    box-shadow: 0 30px 70px rgba(2, 10, 18, 0.55);
 }
 
 /* =========================================
-   PANEL IZQUIERDO / BRANDING
+   PANEL IZQUIERDO
 ========================================= */
 
 .login__brand {
-    flex: 0 0 42%;
+    flex: 0 0 52%;
 
     position: relative;
+    isolation: isolate;
     overflow: hidden;
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
 
-    padding: 46px 40px;
+    padding: 52px 54px;
 
-    color: #000000;
+    color: #ffffff;
 
-    background:
-        linear-gradient(
-            160deg,
-            #0b5c8e 0%,
-            #083b5c 60%,
-            #04111c 130%
-        );
+    background: linear-gradient(155deg,
+            var(--azul-600) 0%,
+            var(--azul-700) 48%,
+            var(--azul-900) 100%);
 }
 
-/* Curva decorativa tipo "blob" que separa los dos paneles */
-.login__brand::after {
-    content: "";
-
-    position: absolute;
-    top: -20%;
-    right: -55%;
-
-    width: 130%;
-    height: 140%;
-
-    background: #ffffff;
-
-    border-radius: 50%;
-}
-
-/* Línea de brillo, mismo lenguaje visual que el sidebar */
+/* Arcos decorativos */
 .login__brand::before {
     content: "";
 
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
+    z-index: -1;
 
-    width: 4px;
-    height: 100%;
-
-    background: linear-gradient(
-        180deg,
-        #38bdf8,
-        rgba(56, 189, 248, 0.15),
-        transparent
-    );
-
-    z-index: 2;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600' fill='none' stroke='rgba(255,255,255,0.16)' stroke-width='1.1'><circle cx='560' cy='60' r='190'/><circle cx='560' cy='60' r='250'/><circle cx='560' cy='60' r='315'/><circle cx='560' cy='60' r='385'/><circle cx='560' cy='60' r='460'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 110% -8%;
+    background-size: 125%;
 }
 
-.login__brand > * {
-    position: relative;
-    z-index: 3;
+/* Halo cian suave */
+.login__brand::after {
+    content: "";
+
+    position: absolute;
+    top: -30%;
+    right: -20%;
+
+    width: 70%;
+    aspect-ratio: 1;
+    z-index: -1;
+
+    background: radial-gradient(circle,
+            rgba(56, 189, 248, 0.30),
+            transparent 62%);
 }
 
 .login__logo {
     width: 800px;
-    max-width: 100%;
     height: auto;
-
-    margin-bottom: 26px;
-
-    transition:
-        transform 0.3s ease,
-        filter 0.3s ease;
-}
-
-.login__logo:hover {
-    transform: scale(1.05);
-
-    filter:
-        drop-shadow(
-            0 0 14px
-            rgba(56, 189, 248, 0.45)
-        );
+    filter: drop-shadow(0 6px 18px rgba(2, 12, 22, 0.45));
 }
 
 .login__brand h2 {
-    margin: 0 0 12px;
+    margin: 42px 0 18px;
+    max-width: 11ch;
 
-    font-size: 22px;
-    font-weight: 700;
-
-    color: #000000;
+    font-size: clamp(38px, 4.6vw, 58px);
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
 }
 
 .login__brand p {
     margin: 0;
-    max-width: 220px;
+    max-width: 44ch;
 
-    font-size: 13.5px;
-    line-height: 1.5;
+    font-size: 16px;
+    line-height: 1.6;
 
-    color: #000000;
+    color: rgba(226, 240, 250, 0.82);
+}
+
+.login__brand small {
+    margin-top: auto;
+    padding-top: 46px;
+
+    font-size: 13px;
+    color: rgba(226, 240, 250, 0.45);
 }
 
 /* =========================================
-   PANEL DERECHO / FORMULARIO
+   PANEL DERECHO
 ========================================= */
 
 .login__form {
@@ -181,113 +170,112 @@ body {
     flex-direction: column;
     justify-content: center;
 
-    padding: 46px 48px;
+    padding: 52px 56px;
 }
 
 .login__form h1 {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
 
-    font-size: 22px;
+    font-size: 30px;
     font-weight: 800;
-    line-height: 1.3;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 
-    color: #08263b;
+    color: var(--azul-800);
 }
 
 .login__subtitle {
-    margin: 0 0 26px;
+    margin: 0 0 34px;
 
-    font-size: 13.5px;
-    color: #7f93a2;
+    font-size: 15px;
+    line-height: 1.55;
+
+    color: var(--gris);
 }
 
 /* =========================================
-   FORMULARIO (Django form.as_p)
+   CAMPOS (Django form.as_p)
 ========================================= */
 
-.login__form form {
-    text-align: left;
-}
-
 .login__form form p {
-    margin: 0 0 16px;
+    margin: 0 0 22px;
 }
 
 .login__form form label {
     display: block;
 
-    margin-bottom: 6px;
+    margin-bottom: 7px;
 
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
 
-    color: #445868;
-
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
+    color: var(--gris);
 }
 
 .login__form form input {
     width: 100%;
 
-    padding: 12px 14px;
+    padding: 12px 2px;
 
-    border: 1px solid #d7e2ea;
-    border-radius: 9px;
+    border: none;
+    border-bottom: 1.5px solid var(--linea);
+    border-radius: 0;
 
-    background: #f5f9fb;
+    background: transparent;
 
     font-family: inherit;
-    font-size: 15px;
-    color: #172b3a;
+    font-size: 16px;
+    color: var(--tinta);
 
     transition:
-        border-color 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.25s ease;
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.login__form form input::placeholder {
+    color: #a9bac7;
 }
 
 .login__form form input:focus {
     outline: none;
 
-    border-color: #38bdf8;
-    background: #ffffff;
-
-    box-shadow:
-        0 0 0 3px rgba(56, 189, 248, 0.18);
+    border-bottom-color: var(--azul-600);
+    box-shadow: 0 1.5px 0 0 var(--azul-600);
 }
 
-/* Errores que agrega Django junto a los campos */
+.login__form form input:focus-visible {
+    outline: 2px solid transparent;
+}
+
+/* Errores por campo */
 .login__form form ul.errorlist {
     list-style: none;
-
-    margin: 6px 0 0;
+    margin: 8px 0 0;
     padding: 0;
 
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
-    color: #d6455c;
+    color: var(--error);
+}
+
+/* Error general del formulario */
+.login__form form .errorlist.nonfield {
+    margin: 0 0 22px;
+    padding: 12px 16px;
+
+    border: 1px solid rgba(200, 56, 79, 0.28);
+    border-left: 3px solid var(--error);
+    border-radius: 10px;
+
+    background: rgba(200, 56, 79, 0.06);
 }
 
 .login__form form .helptext {
     display: block;
+    margin-top: 6px;
 
-    margin-top: 5px;
-
-    font-size: 12px;
-    color: #8598a6;
-}
-
-/* Mensajes de error generales del formulario (form.non_field_errors) */
-.login__form form .errorlist.nonfield {
-    background: rgba(214, 69, 92, 0.08);
-    border: 1px solid rgba(214, 69, 92, 0.35);
-    border-radius: 8px;
-
-    padding: 10px 14px;
-    margin-bottom: 16px;
-
-    color: #b13048;
+    font-size: 12.5px;
+    color: #93a7b5;
 }
 
 /* =========================================
@@ -297,92 +285,116 @@ body {
 .login__form button {
     width: 100%;
 
-    margin-top: 8px;
+    margin-top: 12px;
+    padding: 16px 22px;
 
     border: none;
+    border-radius: 12px;
 
-    padding: 13px 22px;
-
-    border-radius: 9px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #0b5c8e,
-            #083b5c
-        );
+    background: linear-gradient(135deg,
+            var(--azul-600),
+            var(--azul-800));
 
     color: #ffffff;
 
     font-family: inherit;
-    font-size: 15px;
+    font-size: 15.5px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.01em;
 
     cursor: pointer;
 
-    box-shadow:
-        0 8px 18px rgba(8, 59, 92, 0.30);
+    box-shadow: 0 10px 22px rgba(8, 59, 92, 0.28);
 
     transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.25s ease;
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease;
 }
 
 .login__form button:hover {
-    background:
-        linear-gradient(
-            135deg,
-            #1177b5,
-            #0b527d
-        );
-
+    filter: brightness(1.12);
     transform: translateY(-2px);
-
-    box-shadow:
-        0 12px 24px rgba(8, 59, 92, 0.38);
+    box-shadow: 0 14px 28px rgba(8, 59, 92, 0.34);
 }
 
 .login__form button:active {
     transform: translateY(0);
+    box-shadow: 0 6px 14px rgba(8, 59, 92, 0.3);
+}
+
+.login__form button:focus-visible {
+    outline: 3px solid var(--cian);
+    outline-offset: 3px;
+}
+
+/* Pie del formulario */
+.login__help {
+    margin: 26px 0 0;
+
+    font-size: 13.5px;
+    color: var(--gris);
+}
+
+.login__help a {
+    color: var(--azul-600);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(11, 92, 142, 0.35);
+}
+
+.login__help a:hover {
+    border-bottom-color: var(--azul-600);
 }
 
 /* =========================================
    RESPONSIVE
 ========================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
 
     .login {
         flex-direction: column;
-        max-width: 420px;
+        max-width: 480px;
         min-height: auto;
     }
 
     .login__brand {
         flex: none;
-
-        padding: 34px 30px 60px;
-        text-align: center;
-        align-items: center;
+        padding: 38px 34px 34px;
     }
 
-    .login__brand::after {
-        top: auto;
-        bottom: -60%;
-        right: -35%;
-
-        width: 160%;
-        height: 100%;
+    .login__logo {
+        width: 92px;
+        margin-bottom: 0;
     }
 
-    .login__brand p {
+    .login__brand h2 {
+        margin: 24px 0 12px;
+        font-size: 34px;
         max-width: 100%;
     }
 
+    .login__brand p {
+        font-size: 15px;
+    }
+
+    .login__brand small {
+        display: none;
+    }
+
     .login__form {
-        padding: 34px 30px 40px;
+        padding: 34px 34px 40px;
+    }
+
+    .login__form h1 {
+        font-size: 25px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    * {
+        transition: none !important;
     }
 }

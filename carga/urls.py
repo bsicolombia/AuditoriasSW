@@ -8,4 +8,9 @@ urlpatterns = [
     path("errores/pdf/",views.generar_pdf_errores,name="reporte_errores_pdf"),
     path("tecnicos/crear/",views.tecnicos_crear,name="tecnicos_crear"),
     path("exportar-estadisticas/",views.exportar_excel_completo,name="exportar-estadisticas"),
+    
+    # Bitácora
+    path('bitacora/',views.bitacora,name='bitacora'),
+    path('bitacora/editar/<int:id>/',views.editar_bitacora,name='editar_bitacora'),
+    path('bitacora/eliminar/<int:id>/',views.eliminar_bitacora,name='eliminar_bitacora'),
 ]

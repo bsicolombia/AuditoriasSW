@@ -53,7 +53,7 @@
 
 
                 <!-- ESTADÍSTICAS -->
-                {% if user|has_any_role:"Administrador,Coordinador,Invitado" %}
+                {% if user|has_any_role:"Administrador,Coordinador,Digitador,Invitado" %}
                 <li>
                     <a href="{% url 'estadistica' %}">
                         <img src="{% static 'img/beneficios.png' %}" alt="Estadísticas">
@@ -64,7 +64,7 @@
 
 
                 <!-- CONSULTAS -->
-                {% if user|has_any_role:"Administrador,Coordinador" %}
+                {% if user|has_any_role:"Administrador,Coordinador,Digitador" %}
                 <li>
                     <a href="{% url 'consulta' %}">
                         <img src="{% static 'img/lupa.png' %}" alt="Consultas">
@@ -86,7 +86,7 @@
 
 
                 <!-- BITÁCORA -->
-                {% if user|has_any_role:"Administrador,Coordinador" %}
+                {% if user|has_any_role:"Administrador,Coordinador,Digitador" %}
                 <li>
                     <a href="{% url 'bitacora' %}">
                         <img src="{% static 'img/bitacora.png' %}" alt="Bitácora">
@@ -105,6 +105,42 @@
                     </a>
                 </li>
                 {% endif %}
+
+                <div class="tarjeta-ultima-carga-item">
+                    <span class="tarjeta-ultima-carga-label">Auditorías</span>
+                    <div class="tarjeta-ultima-carga-datos">
+                        <strong class="tarjeta-ultima-carga-fecha">
+                            {% if ultima_carga_auditorias_global %}
+                                {{ ultima_carga_auditorias_global|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Sin cargas
+                            {% endif %}
+                        </strong>
+                        {% if usuario_ultima_carga_auditorias_global %}
+                            <span class="tarjeta-ultima-carga-usuario">
+                                {{ usuario_ultima_carga_auditorias_global.get_full_name|default:usuario_ultima_carga_auditorias_global.username }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="tarjeta-ultima-carga-item">
+                    <span class="tarjeta-ultima-carga-label">Técnicos</span>
+                    <div class="tarjeta-ultima-carga-datos">
+                        <strong class="tarjeta-ultima-carga-fecha">
+                            {% if ultima_carga_tecnicos_global %}
+                                {{ ultima_carga_tecnicos_global|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Sin cargas
+                            {% endif %}
+                        </strong>
+                        {% if usuario_ultima_carga_tecnicos_global %}
+                            <span class="tarjeta-ultima-carga-usuario">
+                                {{ usuario_ultima_carga_tecnicos_global.get_full_name|default:usuario_ultima_carga_tecnicos_global.username }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
 
 
                 <!-- CERRAR SESIÓN -->

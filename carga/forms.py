@@ -1,5 +1,5 @@
 from django import forms
-
+from .models import Bitacora
 from auditorias.models import Auditoria
 from .models import Tecnicos
 
@@ -96,3 +96,9 @@ class TecnicoForm(forms.ModelForm):
             "tecnico_cedula",
             "tecnico_apellido_nombres",
         ]
+
+class BitacoraForm(forms.ModelForm):
+
+    class Meta:
+        model = Bitacora
+        fields = ['observaciones']

@@ -1,0 +1,125 @@
+{% extends "panel/base.html" %}
+{% load static %}
+
+{% block title %}Panel administrativo | AuditoríasSW{% endblock %}
+
+{% block content %}
+
+<div class="pnl-dashboard">
+
+    <section class="pnl-hero">
+
+        <div class="pnl-hero-content">
+            <span class="pnl-eyebrow">Panel administrativo</span>
+            <h1>Bienvenido, {{ request.user.get_short_name|default:request.user.get_username }}</h1>
+            <p>Administra las aplicaciones, registros y procesos del sistema desde un solo lugar.</p>
+        </div>
+
+        <div class="pnl-hero-decoration">
+            <div class="pnl-hero-circle pnl-hero-circle-1"></div>
+            <div class="pnl-hero-circle pnl-hero-circle-2"></div>
+            <span class="pnl-hero-icon">⚙</span>
+        </div>
+
+    </section>
+
+
+    <section class="pnl-stats">
+
+        <div class="pnl-stat">
+            <span class="pnl-stat-value">{{ total_apps }}</span>
+            <span class="pnl-stat-label">Aplicaciones activas</span>
+        </div>
+
+        <div class="pnl-stat">
+            <span class="pnl-stat-value">{{ total_models }}</span>
+            <span class="pnl-stat-label">Modelos disponibles</span>
+        </div>
+
+        <div class="pnl-stat">
+            <span class="pnl-stat-value">
+                {% if request.user.is_superuser %}Superusuario{% else %}Staff{% endif %}
+            </span>
+            <span class="pnl-stat-label">Nivel de acceso</span>
+        </div>
+
+        <div class="pnl-stat">
+            <span class="pnl-stat-value">{% now "d/m/Y" %}</span>
+            <span class="pnl-stat-label">Fecha actual</span>
+        </div>
+
+    </section>
+
+
+    <section class="pnl-apps-section">
+
+        <div class="pnl-section-header">
+            <span class="pnl-section-eyebrow">Gestión</span>
+            <h2>Aplicaciones del sistema</h2>
+            <p>Accede rápidamente a los módulos disponibles.</p>
+        </div>
+
+        <div class="pnl-app-grid">
+
+            {% for app in app_list %}
+
+                <div class="pnl-app-card">
+
+                    <div class="pnl-app-card-header">
+
+                        <div class="pnl-app-card-icon">
+                            {% if app.app_label == "auditorias" %}◈
+                            {% elif app.app_label == "carga" %}▣
+                            {% elif app.app_label == "dashboard" %}▦
+                            {% else %}⚙
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <h3>{{ app.name }}</h3>
+                            <span>
+                                {{ app.models|length }} modelo{{ app.models|length|pluralize }} disponible{{ app.models|length|pluralize }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="pnl-app-card-models">
+
+                        {% for model in app.models %}
+                            {% if model.admin_url %}
+                                <div class="pnl-model-row">
+                                    <a href="{{ model.admin_url }}" class="pnl-model-row-link">
+                                        <span>{{ model.name }}</span>
+                                        <span>→</span>
+                                    </a>
+                                    {% if model.add_url %}
+                                        <a href="{{ model.add_url }}" class="pnl-model-row-add" title="Agregar {{ model.name }}">+</a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% empty %}
+                            <div class="pnl-empty-models">No hay modelos disponibles.</div>
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <div class="pnl-empty-dashboard">
+                    <div class="pnl-empty-icon">◌</div>
+                    <h3>No hay aplicaciones disponibles</h3>
+                    <p>Actualmente no existen módulos registrados en el panel administrativo.</p>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

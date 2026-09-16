@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel administrativo | AuditoríasSW{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/panel.css' %}">
+</head>
+<body>
+
+<div class="pnl-shell">
+
+    <nav class="pnl-sidebar">
+
+        <div class="pnl-logo">
+            <a href="{% url 'panel:home' %}">
+                <img src="{% static 'img/LOGOBSI (3).png' %}" alt="AuditoríasSW">
+            </a>
+        </div>
+
+        <div class="pnl-profile">
+            <div class="pnl-profile-icon">
+                {{ request.user.get_short_name|default:request.user.get_username|first|upper }}
+            </div>
+            <div class="pnl-profile-info">
+                <strong>{{ request.user.get_full_name|default:request.user.get_username }}</strong>
+                <span>{% if request.user.is_superuser %}Administrador{% else %}Panel de control{% endif %}</span>
+            </div>
+        </div>
+
+        <div class="pnl-menu">
+
+            <span class="pnl-menu-title">Menú principal</span>
+
+            
+                <a href="{% url 'panel:home' %}"
+                class="pnl-link {% if request.resolver_match.url_name == 'home' %}pnl-link-active{% endif %}"
+            >
+                <span class="pnl-link-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            {% if app_list %}
+
+                <span class="pnl-menu-title pnl-menu-title-spaced">Aplicaciones</span>
+
+                {% for app in app_list %}
+                    <div class="pnl-app">
+
+                        <div class="pnl-app-header">
+                            <span class="pnl-app-icon">
+                                {% if app.app_label == "auditorias" %}◈
+                                {% elif app.app_label == "carga" %}▣
+                                {% elif app.app_label == "dashboard" %}▦
+                                {% else %}⚙
+                                {% endif %}
+                            </span>
+                            <span class="pnl-app-name">{{ app.name }}</span>
+                        </div>
+
+                        <div class="pnl-app-models">
+                            {% for model in app.models %}
+                                {% if model.admin_url %}
+                                    <a href="{{ model.admin_url }}" class="pnl-model-link">
+                                        <span class="pnl-model-dot"></span>
+                                        <span class="pnl-model-name">{{ model.name }}</span>
+                                        <span class="pnl-model-arrow">→</span>
+                                    </a>
+                                {% endif %}
+                            {% empty %}
+                                <span class="pnl-empty">Sin opciones disponibles</span>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+            {% endif %}
+
+        </div>
+
+        <div class="pnl-sidebar-bottom">
+            <a href={% url 'index' %} class="pnl-back-link">
+                <span>← Volver a AuditoriasSW</span>
+            </a>
+            <span class="pnl-footer-text">AuditoríasSW · Sistema interno</span>
+        </div>
+
+    </nav>
+
+
+    <div class="pnl-main">
+
+        <header class="pnl-topbar">
+
+            <div class="pnl-greeting">
+                <span class="pnl-greeting-name">
+                    {{ request.user.get_short_name|default:request.user.get_username }}
+                </span>
+                <span class="pnl-greeting-date">Hoy es {% now "d/m/Y" %}</span>
+            </div>
+
+            <div class="pnl-actions">
+
+                <a href={% url 'index' %} class="pnl-btn pnl-btn-ghost">
+                    <span>Ir a AuditoriasSW</span>
+                    <span>↗</span>
+                </a>
+
+                <form method="post" action="{% url 'admin:logout' %}" class="pnl-logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="pnl-btn pnl-btn-solid">
+                        <span>Cerrar sesión</span>
+                        <span>⇥</span>
+                    </button>
+                </form>
+
+            </div>
+
+        </header>
+
+        <main class="pnl-content">
+            {% block content %}{% endblock %}
+        </main>
+
+    </div>
+
+</div>
+
+</body>
+</html>

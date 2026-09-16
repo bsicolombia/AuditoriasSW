@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load role_tags %}
 
 {% block title %}
 AuditoriasSW
@@ -22,60 +23,77 @@ AuditoriasSW
 
         <h1>Sistema de Auditorías</h1>
         <p>Bienvenido al panel principal</p>
-
-        
     </div>
-    <h3>Resultados De Ejecucion De Auditorias:</h3>
-    <div class="stats-container">
 
-        
+    <h3>Resultados De Ejecucion De Auditorias:</h3>
+
+    <div class="stats-container">
 
         <div class="stats">
             <h2>Suspensiones: {{ Suspensiones }}</h2>
             <img src="{% static 'img/flecha_abajo.png' %}" alt="Carga de auditorías">
         </div>
+
         <div class="stats">
             <h2>Reconexiones: {{ Reconexiones }}</h2>
             <img src="{% static 'img/flecha_arriba1.png' %}" alt="Carga de auditorías">
         </div>
+
         <div class="stats">
             <h2>Zvcl: {{ Zvcl }}</h2>
             <img src="{% static 'img/zvcl.png' %}" alt="Carga de auditorías">
         </div>
+
         <div class="stats">
             <h2>Total: {{ total_operaciones }}</h2>
             <img src="{% static 'img/total.png' %}" alt="Carga de auditorías">
         </div>
+
     </div>
 
-        <!-- Dos imágenes inferiores -->
-        <div class="bottom-cards">
 
-            <a href="{% url 'carga' %}" class="menu-card principal">
-                <img src="{% static 'img/carga.png' %}" alt="Carga de auditorías">
-                <div class="card-text">
-                    <h2>Cargar</h2>
-                    <p>Registrar una nueva auditoría</p>
-                </div>
-            </a>
+    <!-- BOTONES INFERIORES -->
+    <div class="bottom-cards">
 
-            <a href="{% url 'estadistica' %}" class="menu-card">
-                <img src="{% static 'img/estadisticas.png' %}" alt="Estadísticas">
-                <div class="card-text">
-                    <h2>Estadísticas</h2>
-                    <p>Consultar resultados y estadísticas</p>
-                </div>
-            </a>
+        <!-- CARGAR -->
+        {% if user|has_any_role:"Administrador,Digitador" %}
+        <a href="{% url 'carga' %}" class="menu-card principal">
+            <img src="{% static 'img/carga.png' %}" alt="Carga de auditorías">
 
-            <a href="{% url 'consulta' %}" class="menu-card">
-                <img src="{% static 'img/buscar.png' %}" alt="Consulta">
-                <div class="card-text">
-                    <h2>Consultar</h2>
-                    <p>Buscar auditorías registradas</p>
-                </div>
-            </a>
+            <div class="card-text">
+                <h2>Cargar</h2>
+                <p>Registrar una nueva auditoría</p>
+            </div>
+        </a>
+        {% endif %}
 
-        </div>
+
+        <!-- ESTADÍSTICAS -->
+        {% if user|has_any_role:"Administrador,Coordinador,Digitador,Invitado" %}
+        <a href="{% url 'estadistica' %}" class="menu-card">
+            <img src="{% static 'img/estadisticas.png' %}" alt="Estadísticas">
+
+            <div class="card-text">
+                <h2>Estadísticas</h2>
+                <p>Consultar resultados y estadísticas</p>
+            </div>
+        </a>
+        {% endif %}
+
+
+        <!-- CONSULTAR -->
+        {% if user|has_any_role:"Administrador,Coordinador,Digitador" %}
+        <a href="{% url 'consulta' %}" class="menu-card">
+            <img src="{% static 'img/buscar.png' %}" alt="Consulta">
+
+            <div class="card-text">
+                <h2>Consultar</h2>
+                <p>Buscar auditorías registradas</p>
+            </div>
+        </a>
+        {% endif %}
+
+    </div>
 
 </div>
 

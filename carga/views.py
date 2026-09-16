@@ -1,7 +1,7 @@
 from datetime import datetime, date
 import json
 import re
-
+from datetime import datetime
 from django.apps import apps
 from django.contrib import messages
 from django.db import transaction
@@ -21,10 +21,12 @@ from .forms import (
     AuditoriaForm,
     TecnicoForm,
     TecnicoCargaForm,
+    BitacoraForm,
 )
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from auditorias.models import Auditoria
-from .models import Tecnicos
+from .models import Tecnicos,Bitacora ,EstadoCarga
 
 # ==========================================================
 # CARGA
@@ -56,6 +58,8 @@ def carga(request):
     tecnico_total_supervisores = (
         tecnicos_por_supervisor.count()
     )
+    
+    estado_carga = EstadoCarga.get_solo()
 
     context = {
 
@@ -69,17 +73,13 @@ def carga(request):
         # ÚLTIMA CARGA DE AUDITORÍAS
         # ==================================================
 
-        "ultima_carga": request.session.get(
-            "ultima_carga_auditorias"
-        ),
+        "ultima_carga": estado_carga.ultima_carga_auditorias,
 
         # ==================================================
         # ÚLTIMA CARGA DE TÉCNICOS
         # ==================================================
 
-        "ultima_carga_tecnicos": request.session.get(
-            "ultima_carga_tecnicos"
-        ),
+        "ultima_carga_tecnicos": estado_carga.ultima_carga_tecnicos,
 
         # ==================================================
         # RESUMEN DE TÉCNICOS (BASE DE DATOS ACTUAL)
@@ -129,6 +129,8 @@ def carga(request):
             "tecnico_errors",
             [],
         ),
+        "usuario_ultima_carga_auditorias": estado_carga.usuario_carga_auditorias,
+        "usuario_ultima_carga_tecnicos": estado_carga.usuario_carga_tecnicos,
     }
 
     return render(
@@ -137,14 +139,304 @@ def carga(request):
         context,
     )
 
-@role_required("Administrador", "Coordinador")
+@role_required("Administrador", "Coordinador", "Digitador")
 def bitacora(request):
-    
+
+    # =========================================================
+    # PERMISOS
+    # =========================================================
+
+    puede_editar = (
+        request.user.is_superuser
+        or request.user.groups.filter(
+            name__in=[
+                "Administrador",
+                "Coordinador"
+            ]
+        ).exists()
+    )
+
+
+    # =========================================================
+    # CREAR BITÁCORA
+    # SOLO ADMINISTRADOR Y COORDINADOR
+    # =========================================================
+
+    if request.method == 'POST':
+
+        # Si no tiene permiso para crear,
+        # simplemente vuelve a la página.
+        if not puede_editar:
+            return redirect('bitacora')
+
+
+        form = BitacoraForm(request.POST)
+
+
+        if form.is_valid():
+
+            registro = form.save(commit=False)
+
+            # Usuario que está diligenciando
+            registro.usuario = request.user
+
+            # La fecha se genera automáticamente
+            # gracias a auto_now_add=True
+            registro.save()
+
+            return redirect('bitacora')
+
+
+    else:
+
+        form = BitacoraForm()
+
+
+    # =========================================================
+    # REGISTROS
+    # =========================================================
+
+    registros = Bitacora.objects.select_related(
+        'usuario'
+    ).order_by('-fecha')
+
+
+    # =========================================================
+    # FILTROS
+    # =========================================================
+
+    dia = request.GET.get('dia', '')
+    mes = request.GET.get('mes', '')
+    anio = request.GET.get('anio', '')
+
+
+    # ---------------------------------------------------------
+    # FILTRO POR DÍA
+    # ---------------------------------------------------------
+
+    if dia:
+
+        try:
+
+            dia = int(dia)
+
+            if 1 <= dia <= 31:
+
+                registros = registros.filter(
+                    fecha__day=dia
+                )
+
+            else:
+
+                dia = ''
+
+        except (ValueError, TypeError):
+
+            dia = ''
+
+
+    # ---------------------------------------------------------
+    # FILTRO POR MES
+    # ---------------------------------------------------------
+
+    if mes:
+
+        try:
+
+            mes = int(mes)
+
+            if 1 <= mes <= 12:
+
+                registros = registros.filter(
+                    fecha__month=mes
+                )
+
+            else:
+
+                mes = ''
+
+        except (ValueError, TypeError):
+
+            mes = ''
+
+
+    # ---------------------------------------------------------
+    # FILTRO POR AÑO
+    # ---------------------------------------------------------
+
+    if anio:
+
+        try:
+
+            anio = int(anio)
+
+            if anio > 0:
+
+                registros = registros.filter(
+                    fecha__year=anio
+                )
+
+            else:
+
+                anio = ''
+
+        except (ValueError, TypeError):
+
+            anio = ''
+
+
+    # =========================================================
+    # AÑOS EXISTENTES EN LA BASE DE DATOS
+    # =========================================================
+
+    fechas = (
+        Bitacora.objects
+        .exclude(fecha__isnull=True)
+        .values_list('fecha', flat=True)
+    )
+
+
+    anios = sorted(
+        {
+            fecha.year
+            for fecha in fechas
+            if fecha is not None
+        },
+        reverse=True
+    )
+
+
+    # =========================================================
+    # DÍAS
+    # =========================================================
+
+    dias = range(1, 32)
+
+
+    # =========================================================
+    # MESES
+    # =========================================================
+
+    meses = [
+        (1, 'Enero'),
+        (2, 'Febrero'),
+        (3, 'Marzo'),
+        (4, 'Abril'),
+        (5, 'Mayo'),
+        (6, 'Junio'),
+        (7, 'Julio'),
+        (8, 'Agosto'),
+        (9, 'Septiembre'),
+        (10, 'Octubre'),
+        (11, 'Noviembre'),
+        (12, 'Diciembre'),
+    ]
+
+
+    # =========================================================
+    # RESPUESTA
+    # =========================================================
+
     return render(
-            request,
-            "carga/bitacora.html"
-            
+        request,
+        'carga/bitacora.html',
+        {
+            'form': form,
+
+            'registros': registros,
+
+            'dias': dias,
+
+            'meses': meses,
+
+            'anios': anios,
+
+            'filtro_dia': dia,
+
+            'filtro_mes': mes,
+
+            'filtro_anio': anio,
+
+            # Permite ocultar/mostrar botones
+            # de crear, editar y eliminar.
+            'puede_editar': puede_editar,
+        }
+    )
+
+
+
+@role_required("Administrador", "Coordinador")
+def editar_bitacora(request, id):
+
+    registro = get_object_or_404(
+        Bitacora,
+        id=id
+    )
+
+    if request.method == 'POST':
+
+        form = BitacoraForm(
+            request.POST,
+            instance=registro
         )
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('bitacora')
+
+    else:
+
+        form = BitacoraForm(
+            instance=registro
+        )
+
+
+    registros = Bitacora.objects.select_related(
+        'usuario'
+    ).order_by('-fecha')
+
+
+    return render(request, 'carga/bitacora.html', {
+        'form': form,
+        'registros': registros,
+
+        'editando': True,
+        'registro_editando': registro,
+
+        'puede_editar': True,
+    })
+
+
+# ==============================
+# ELIMINAR
+# ==============================
+
+@role_required("Administrador", "Coordinador")
+def eliminar_bitacora(request, id):
+
+    registro = get_object_or_404(
+        Bitacora,
+        id=id
+    )
+
+    if request.method == 'POST':
+
+        registro.delete()
+
+        return redirect('bitacora')
+
+
+    return render(
+        request,
+        'carga/eliminar_bitacora.html',
+        {
+            'registro': registro
+        }
+    )
+
+
 # ==========================================================
 # CONVERTIR TEXTO
 # ==========================================================
@@ -1466,13 +1758,13 @@ def auditoria_crear(request):
             # ÚLTIMA CARGA
             # --------------------------------------------------
 
-            request.session[
-                "ultima_carga_auditorias"
-            ] = (
-                timezone.localtime().strftime(
-                    "%d/%m/%Y %H:%M:%S"
-                )
-            )
+            estado_carga = EstadoCarga.get_solo()
+            estado_carga.ultima_carga_auditorias = timezone.localtime()
+            estado_carga.usuario_carga_auditorias = request.user
+            estado_carga.save(update_fields=[
+                "ultima_carga_auditorias",
+                "usuario_carga_auditorias",
+            ])
 
             request.session.modified = True
 
@@ -1618,7 +1910,7 @@ def auditoria_crear(request):
             errores_json,
 
         "ultima_carga":
-            ultima_carga,
+            EstadoCarga.get_solo().ultima_carga_auditorias,
     }
 
     return render(
@@ -2136,20 +2428,13 @@ def tecnicos_crear(request):
     # FECHA DE ÚLTIMA CARGA
     # ======================================================
 
-    ahora = timezone.localtime()
-
-    ultima_carga = ahora.strftime(
-        "%d/%m/%Y %H:%M:%S"
-    )
-
-
-    # ======================================================
-    # GUARDAR RESULTADO EN SESIÓN
-    # ======================================================
-
-    request.session["ultima_carga_tecnicos"] = (
-        ultima_carga
-    )
+    estado_carga = EstadoCarga.get_solo()
+    estado_carga.ultima_carga_tecnicos = timezone.localtime()
+    estado_carga.usuario_carga_tecnicos = request.user
+    estado_carga.save(update_fields=[
+        "ultima_carga_tecnicos",
+        "usuario_carga_tecnicos",
+    ])
 
     request.session["tecnico_report_generated"] = True
 

@@ -4,7 +4,7 @@ from carga.models import Tecnicos
 from django.utils import timezone
 import re
 import unicodedata
-
+from carga.models import EstadoCarga
 
 # ============================================================
 # FUNCIONES AUXILIARES
@@ -2708,12 +2708,16 @@ def estadisticas_auditorias(request):
     total_zvcl = queryset.filter(
         tipo_operacion__iexact="ZVCL"
     ).count()
+    
+    estado = EstadoCarga.get_solo()
 
     total_operaciones = (
         total_dc00
         + total_rc00
         + total_zvcl
     )
+    
+    
 
     # ========================================================
     # CONTEXTO
@@ -2805,6 +2809,11 @@ def estadisticas_auditorias(request):
                 queryset,
                 filtros["supervisor"]
             ),
+            
+        "ultima_carga_auditorias_global": estado.ultima_carga_auditorias,
+        "ultima_carga_tecnicos_global": estado.ultima_carga_tecnicos,
+        "usuario_ultima_carga_auditorias_global": estado.usuario_carga_auditorias,
+        "usuario_ultima_carga_tecnicos_global": estado.usuario_carga_tecnicos,
     }
 
     return contexto

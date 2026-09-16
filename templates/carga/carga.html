@@ -84,17 +84,19 @@
                         </span>
 
                         {% if ultima_carga %}
-
                             <strong class="ultima-carga-fecha">
-                                {{ ultima_carga }}
+                                {{ ultima_carga|date:"d/m/Y H:i" }}
                             </strong>
 
+                            {% if usuario_ultima_carga_auditorias %}
+                                <span class="ultima-carga-usuario">
+                                    por {{ usuario_ultima_carga_auditorias.get_full_name|default:usuario_ultima_carga_auditorias.username }}
+                                </span>
+                            {% endif %}
                         {% else %}
-
                             <strong class="ultima-carga-fecha sin-carga">
                                 Sin cargas realizadas
                             </strong>
-
                         {% endif %}
 
                     </div>
@@ -210,15 +212,18 @@
                         {% if ultima_carga_tecnicos %}
 
                             <strong class="ultima-carga-fecha">
-                                {{ ultima_carga_tecnicos }}
+                                {{ ultima_carga_tecnicos|date:"d/m/Y H:i" }}
                             </strong>
 
+                        {% if usuario_ultima_carga_auditorias %}
+                                <span class="ultima-carga-usuario">
+                                    por {{ usuario_ultima_carga_auditorias.get_full_name|default:usuario_ultima_carga_auditorias.username }}
+                                </span>
+                            {% endif %}
                         {% else %}
-
                             <strong class="ultima-carga-fecha sin-carga">
                                 Sin cargas realizadas
                             </strong>
-
                         {% endif %}
 
                     </div>

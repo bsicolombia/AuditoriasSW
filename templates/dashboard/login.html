@@ -1,7 +1,15 @@
 {% load static %}
+<!DOCTYPE html>
+<html lang="es">
 
-<link rel="stylesheet" href="{% static 'css/reset.css' %}">
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iniciar sesión · Sistema de Auditorías</title>
+
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
 
 <body>
 
@@ -9,25 +17,38 @@
 
         <!-- Panel izquierdo: marca -->
         <section class="login__brand">
-            <img src="{% static 'img/LOGOBSI (3).png' %}" alt="logoLogin" class="login__logo">
-            <h2>Bienvenido de nuevo</h2>
-            <p>Para mantenerte conectado con nosotros por favor inicia sesión con tus datos.</p>
+            <img src="{% static 'img/LOGOBSI (3).png' %}" alt="BSI" class="login__logo">
+
+            <h2>Bienvenid@</h2>
+            <p>
+                Gestiona tus auditorías, hallazgos y evidencias en un solo lugar.
+                Inicia sesión para continuar donde lo dejaste.
+            </p>
+
+            <small>© 2026 BSI. Todos los derechos reservados.</small>
         </section>
 
         <!-- Panel derecho: formulario -->
         <section class="login__form">
-            <h1>Iniciar Sesión para Entrar al Sistema de Auditorías</h1>
-            <p class="login__subtitle">Ingresa tus datos para continuar</p>
+            <h1>Iniciar sesión</h1>
+            <p class="login__subtitle">
+                Ingresa tus datos para entrar al sistema de auditorías.
+            </p>
 
-            <form method="post">
+            <form method="post" novalidate>
                 {% csrf_token %}
                 {{ form.as_p }}
 
-                <button type="submit">
-                    Iniciar sesión
-                </button>
+                <button type="submit">Entrar</button>
             </form>
+
+            <p class="login__help">
+                ¿Problemas para entrar? Contactar con un Administrador
+            </p>
         </section>
 
     </main>
+
 </body>
+
+</html>

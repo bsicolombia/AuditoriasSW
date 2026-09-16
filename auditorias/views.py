@@ -158,7 +158,7 @@ def filtrar_auditorias(request):
 
     return auditorias
 
-@role_required("Administrador", "Coordinador")
+@role_required("Administrador", "Coordinador", "Digitador")
 def consulta(request):
 
     # =====================================================

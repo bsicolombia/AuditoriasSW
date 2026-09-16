@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'auditorias',
     'carga',
     'dashboard',
+    "panel",
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,461 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Eliminar Bitácora
+{% endblock %}
+
+
+{% block extra_css %}
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/eliminar_bitacora.css' %}">
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="eliminar-container">
+
+    <div class="eliminar-card">
+
+        <div class="eliminar-icon">
+            !
+        </div>
+
+        <h1>
+            Eliminar registro
+        </h1>
+
+        <p class="mensaje">
+            ¿Está seguro de que desea eliminar esta bitácora?
+        </p>
+
+
+        <div class="registro-info">
+
+            <div class="info-row">
+
+                <span>
+                    Usuario
+                </span>
+
+                <strong>
+                    {{ registro.usuario.username }}
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Fecha
+                </span>
+
+                <strong>
+                    {{ registro.fecha|date:"d/m/Y H:i:s" }}
+                </strong>
+
+            </div>
+
+
+            <div class="observacion">
+
+                <span>
+                    Observaciones
+                </span>
+
+                <p>
+                    {{ registro.observaciones|linebreaksbr }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="eliminar-actions">
+
+                <a
+                    href="{% url 'bitacora' %}"
+                    class="btn-cancelar"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-confirmar"
+                >
+                    Eliminar registro
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+<style>
+    /* =========================================
+   CONTENEDOR
+========================================= */
+
+.eliminar-container {
+    width: 100%;
+
+    min-height: calc(100vh - 40px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 30px 20px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.eliminar-card {
+    width: 100%;
+
+    max-width: 570px;
+
+    padding: 35px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #d6e2ea;
+
+    border-radius: 18px;
+
+    text-align: center;
+
+    box-shadow:
+        0 12px 35px
+        rgba(6, 24, 38, 0.10);
+}
+
+
+/* =========================================
+   ICONO
+========================================= */
+
+.eliminar-icon {
+    width: 60px;
+    height: 60px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 18px;
+
+    border-radius: 50%;
+
+    background: #fff1f0;
+
+    border: 1px solid #f5c2c0;
+
+    color: #c62828;
+
+    font-size: 30px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================
+   TÍTULO
+========================================= */
+
+.eliminar-card h1 {
+    margin: 0 0 8px;
+
+    color: #09283d;
+
+    font-size: 26px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================
+   MENSAJE
+========================================= */
+
+.mensaje-principal {
+    margin: 0 0 25px;
+
+    color: #607789;
+
+    font-size: 14px;
+}
+
+
+/* =========================================
+   INFORMACIÓN
+========================================= */
+
+.registro-info {
+    padding: 18px;
+
+    margin-bottom: 18px;
+
+    text-align: left;
+
+    background: #f7fafc;
+
+    border: 1px solid #dce7ed;
+
+    border-radius: 12px;
+}
+
+
+/* =========================================
+   ITEMS
+========================================= */
+
+.info-item {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 9px 0;
+
+    border-bottom: 1px solid #e4edf2;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+
+.info-label {
+    color: #718594;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.3px;
+}
+
+
+.info-item strong {
+    color: #183d54;
+
+    font-size: 13px;
+
+    text-align: right;
+}
+
+
+/* =========================================
+   OBSERVACIÓN
+========================================= */
+
+.info-observacion {
+    padding-top: 12px;
+}
+
+.info-observacion p {
+    margin: 8px 0 0;
+
+    padding: 10px;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e9ee;
+
+    border-radius: 7px;
+
+    color: #405867;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    word-break: break-word;
+}
+
+
+/* =========================================
+   ADVERTENCIA
+========================================= */
+
+.advertencia {
+    padding: 10px 14px;
+
+    margin-bottom: 22px;
+
+    border-radius: 8px;
+
+    background: #fff8e6;
+
+    border: 1px solid #f2dfad;
+
+    color: #856404;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   BOTONES
+========================================= */
+
+.acciones-eliminar {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+}
+
+
+.btn-cancelar,
+.btn-confirmar {
+    min-width: 145px;
+
+    height: 40px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0 18px;
+
+    box-sizing: border-box;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 650;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   CANCELAR
+========================================= */
+
+.btn-cancelar {
+    background: #edf2f5;
+
+    border: 1px solid #d2dee5;
+
+    color: #405867;
+}
+
+.btn-cancelar:hover {
+    background: #e3eaee;
+}
+
+
+/* =========================================
+   ELIMINAR
+========================================= */
+
+.btn-confirmar {
+    background:
+        linear-gradient(
+            90deg,
+            #b42318,
+            #d92d20
+        );
+
+    border: none;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 4px 12px
+        rgba(180, 35, 24, 0.18);
+}
+
+.btn-confirmar:hover {
+    background:
+        linear-gradient(
+            90deg,
+            #981b12,
+            #b42318
+        );
+
+    box-shadow:
+        0 7px 17px
+        rgba(180, 35, 24, 0.25);
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 550px) {
+
+    .eliminar-container {
+        padding: 20px 12px;
+    }
+
+    .eliminar-card {
+        padding: 25px 18px;
+    }
+
+    .eliminar-card h1 {
+        font-size: 23px;
+    }
+
+    .info-item {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 3px;
+    }
+
+    .info-item strong {
+        text-align: left;
+    }
+
+    .acciones-eliminar {
+        flex-direction: column;
+    }
+
+    .btn-cancelar,
+    .btn-confirmar {
+        width: 100%;
+    }
+}
+</style>

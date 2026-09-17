@@ -41,6 +41,17 @@
                 </li>
 
 
+                <!-- NUEVA AUDITORÍA (registro manual desde el software) -->
+                {% if user|has_any_role:"Administrador,Coordinador,Digitador" %}
+                <li>
+                    <a href="{% url 'auditoria_manual_crear' %}">
+                        <img src="{% static 'img/revision.png' %}" alt="Nueva auditoría">
+                        <span>Nueva Auditoría</span>
+                    </a>
+                </li>
+                {% endif %}
+
+
                 <!-- CARGA -->
                 {% if user|has_any_role:"Administrador,Digitador" %}
                 <li>
@@ -106,41 +117,73 @@
                 </li>
                 {% endif %}
 
-                <div class="tarjeta-ultima-carga-item">
-                    <span class="tarjeta-ultima-carga-label">Auditorías</span>
-                    <div class="tarjeta-ultima-carga-datos">
-                        <strong class="tarjeta-ultima-carga-fecha">
-                            {% if ultima_carga_auditorias_global %}
-                                {{ ultima_carga_auditorias_global|date:"d/m/Y H:i" }}
-                            {% else %}
-                                Sin cargas
-                            {% endif %}
-                        </strong>
-                        {% if usuario_ultima_carga_auditorias_global %}
-                            <span class="tarjeta-ultima-carga-usuario">
-                                {{ usuario_ultima_carga_auditorias_global.get_full_name|default:usuario_ultima_carga_auditorias_global.username }}
+                <div class="tarjetas-ultimas-cargas">
+
+                    <!-- Última carga Auditorías -->
+                    <div class="tarjeta-carga tarjeta-carga-auditorias">
+
+                        <div class="tarjeta-carga-icono">
+                            📋
+                        </div>
+
+                        <div class="tarjeta-carga-contenido">
+
+                            <span class="tarjeta-carga-label">
+                                Última Carga Auditorías
                             </span>
-                        {% endif %}
+
+                            <strong class="tarjeta-carga-fecha">
+                                {% if ultima_carga_auditorias_global %}
+                                    {{ ultima_carga_auditorias_global|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    Sin cargas
+                                {% endif %}
+                            </strong>
+
+                            {% if usuario_ultima_carga_auditorias_global %}
+                                <span class="tarjeta-carga-usuario">
+                                    {{ usuario_ultima_carga_auditorias_global.get_full_name|default:usuario_ultima_carga_auditorias_global.username }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
                     </div>
+
+
+                    <!-- Última carga Técnicos -->
+                    <div class="tarjeta-carga tarjeta-carga-tecnicos">
+
+                        <div class="tarjeta-carga-icono">
+                            🔧
+                        </div>
+
+                        <div class="tarjeta-carga-contenido">
+
+                            <span class="tarjeta-carga-label">
+                                Última Carga Técnicos
+                            </span>
+
+                            <strong class="tarjeta-carga-fecha">
+                                {% if ultima_carga_tecnicos_global %}
+                                    {{ ultima_carga_tecnicos_global|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    Sin cargas
+                                {% endif %}
+                            </strong>
+
+                            {% if usuario_ultima_carga_tecnicos_global %}
+                                <span class="tarjeta-carga-usuario">
+                                    {{ usuario_ultima_carga_tecnicos_global.get_full_name|default:usuario_ultima_carga_tecnicos_global.username }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="tarjeta-ultima-carga-item">
-                    <span class="tarjeta-ultima-carga-label">Técnicos</span>
-                    <div class="tarjeta-ultima-carga-datos">
-                        <strong class="tarjeta-ultima-carga-fecha">
-                            {% if ultima_carga_tecnicos_global %}
-                                {{ ultima_carga_tecnicos_global|date:"d/m/Y H:i" }}
-                            {% else %}
-                                Sin cargas
-                            {% endif %}
-                        </strong>
-                        {% if usuario_ultima_carga_tecnicos_global %}
-                            <span class="tarjeta-ultima-carga-usuario">
-                                {{ usuario_ultima_carga_tecnicos_global.get_full_name|default:usuario_ultima_carga_tecnicos_global.username }}
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
 
 
                 <!-- CERRAR SESIÓN -->
@@ -156,6 +199,17 @@
 
 
     <section class="contenido">
+
+        {% if messages %}
+            <div class="mensajes-globales">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
     </section>

@@ -1,0 +1,266 @@
+/* static/css/auditoria_manual_form.css */
+
+:root {
+    --auditoria-color-primario: #1F2937;
+    --auditoria-color-primario-hover: #111827;
+    --auditoria-color-header: #D9EAF7;
+    --auditoria-color-borde: #CBD5E1;
+    --auditoria-color-texto: #1F2937;
+    --auditoria-color-texto-suave: #64748B;
+    --auditoria-color-error: #DC2626;
+    --auditoria-color-error-bg: #FEF2F2;
+    --auditoria-color-success: #15803D;
+    --auditoria-color-success-bg: #F0FDF4;
+    --auditoria-color-warning: #B45309;
+    --auditoria-color-warning-bg: #FFFBEB;
+    --auditoria-radio: 10px;
+}
+
+.auditoria-form-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+.auditoria-form-card {
+    width: 100%;
+    max-width: 900px;
+    background: #FFFFFF;
+    border: 1px solid var(--auditoria-color-borde);
+    border-radius: var(--auditoria-radio);
+    padding: 28px 32px 32px;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+}
+
+.auditoria-form-titulo {
+    margin: 0 0 20px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--auditoria-color-primario);
+    border-bottom: 2px solid var(--auditoria-color-header);
+    padding-bottom: 12px;
+}
+
+/* ==========================================================
+   ALERTAS / MENSAJES
+========================================================== */
+
+.auditoria-alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.92rem;
+    border: 1px solid transparent;
+}
+
+.auditoria-alert-success {
+    background: var(--auditoria-color-success-bg);
+    color: var(--auditoria-color-success);
+    border-color: #BBF7D0;
+}
+
+.auditoria-alert-error,
+.auditoria-alert-danger {
+    background: var(--auditoria-color-error-bg);
+    color: var(--auditoria-color-error);
+    border-color: #FECACA;
+}
+
+.auditoria-alert-warning {
+    background: var(--auditoria-color-warning-bg);
+    color: var(--auditoria-color-warning);
+    border-color: #FDE68A;
+}
+
+.auditoria-alert-info {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border-color: #BFDBFE;
+}
+
+/* ==========================================================
+   DATOS AUTOMÁTICOS (NO EDITABLES)
+========================================================== */
+
+.auditoria-auto-info {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    background: #F8FAFC;
+    border: 1px dashed var(--auditoria-color-borde);
+    border-radius: var(--auditoria-radio);
+    padding: 14px 18px;
+    margin-bottom: 24px;
+}
+
+.auto-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.auto-info-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--auditoria-color-texto-suave);
+    font-weight: 600;
+}
+
+.auto-info-valor {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--auditoria-color-primario);
+}
+
+/* ==========================================================
+   GRID DEL FORMULARIO
+========================================================== */
+
+.auditoria-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 24px;
+}
+
+.auditoria-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.auditoria-campo-full {
+    grid-column: 1 / -1;
+}
+
+.auditoria-campo label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--auditoria-color-texto);
+}
+
+/* ==========================================================
+   INPUTS / SELECT / TEXTAREA
+========================================================== */
+
+.auditoria-campo input[type="text"],
+.auditoria-campo input[type="date"],
+.auditoria-campo input[type="file"],
+.auditoria-campo select,
+.auditoria-campo textarea,
+.form-control,
+.form-select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--auditoria-color-borde);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    color: var(--auditoria-color-texto);
+    background: #FFFFFF;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+.auditoria-campo textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.auditoria-campo input:focus,
+.auditoria-campo select:focus,
+.auditoria-campo textarea:focus {
+    outline: none;
+    border-color: var(--auditoria-color-primario);
+    box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
+}
+
+/* Select del técnico: que se note que es buscable/clicable */
+.auditoria-campo select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 34px;
+}
+
+.auditoria-campo-ayuda {
+    font-size: 0.78rem;
+    color: var(--auditoria-color-texto-suave);
+}
+
+/* ==========================================================
+   ERRORES DE CAMPO
+========================================================== */
+
+.auditoria-error {
+    font-size: 0.8rem;
+    color: var(--auditoria-color-error);
+    font-weight: 500;
+}
+
+.auditoria-campo:has(.auditoria-error) input,
+.auditoria-campo:has(.auditoria-error) select,
+.auditoria-campo:has(.auditoria-error) textarea {
+    border-color: var(--auditoria-color-error);
+}
+
+/* ==========================================================
+   FOTO ACTUAL (MODO EDITAR)
+========================================================== */
+
+.auditoria-foto-actual {
+    margin-top: 8px;
+}
+
+.auditoria-foto-actual img {
+    max-height: 140px;
+    border-radius: 8px;
+    border: 1px solid var(--auditoria-color-borde);
+}
+
+/* ==========================================================
+   BOTÓN GUARDAR
+========================================================== */
+
+.auditoria-form-acciones {
+    margin-top: 26px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.auditoria-btn-guardar {
+    background: var(--auditoria-color-primario);
+    color: #FFFFFF;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.auditoria-btn-guardar:hover {
+    background: var(--auditoria-color-primario-hover);
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 768px) {
+    .auditoria-auto-info {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .auditoria-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .auditoria-form-card {
+        padding: 20px;
+    }
+}

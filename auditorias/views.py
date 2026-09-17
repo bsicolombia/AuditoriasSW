@@ -1,5 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from django.db.models import Count
 import pandas as pd
@@ -12,6 +13,9 @@ from .models import Auditoria
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from carga.decorators import role_required
+from django.shortcuts import get_object_or_404
+from .forms import AuditoriaManualForm
+from django.utils import timezone
 
 def cargar_excel(request):
 
@@ -3590,3 +3594,205 @@ def exportar_estadisticas(request):
     )
 
     return response
+
+# Agregar esto a auditorias/views.py
+# (recuerda importar arriba: AuditoriaManualForm y get_object_or_404)
+#
+# from django.shortcuts import get_object_or_404
+# from django.contrib.auth.decorators import login_required
+# from .forms import AuditoriaManualForm
+
+
+# Agregar/actualizar en auditorias/views.py
+#
+# Imports que debes tener arriba:
+# from django.contrib.auth.decorators import login_required
+# from django.shortcuts import get_object_or_404
+# from django.utils import timezone
+# from .forms import AuditoriaManualForm
+# from .models import Auditoria, PerfilUsuario
+
+
+@login_required
+@role_required("Administrador", "Coordinador", "Digitador")
+def auditoria_manual_crear(request):
+    """
+    Crea una auditoría directamente desde el software.
+
+    Automático (el usuario NO lo digita):
+        - fecha         -> fecha de hoy
+        - nombre_auditor -> nombre del usuario en sesión
+        - numero_cedula  -> cédula guardada en PerfilUsuario
+        - aplicativo     -> siempre "AuditoriasSW"
+        - creado_por     -> request.user
+        - origen         -> "manual"
+    """
+
+    # ------------------------------------------------------
+    # CÉDULA DEL USUARIO EN SESIÓN
+    # ------------------------------------------------------
+    perfil = getattr(request.user, "perfil", None)
+    cedula_usuario = perfil.numero_cedula if perfil else ""
+
+    if not cedula_usuario:
+        messages.error(
+            request,
+            "Su usuario no tiene una cédula registrada. "
+            "Pida a un Administrador que se la agregue en "
+            "/admin/ antes de registrar auditorías.",
+        )
+        return redirect("index")
+
+    nombre_auditor = (
+        request.user.get_full_name() or request.user.username
+    )
+
+    # ------------------------------------------------------
+    # INSTANCIA BASE CON LOS DATOS AUTOMÁTICOS YA PUESTOS
+    # ------------------------------------------------------
+    auditoria_base = Auditoria(
+        fecha=timezone.localdate(),
+        nombre_auditor=nombre_auditor,
+        numero_cedula=cedula_usuario,
+        aplicativo="AuditoriasSW",
+        origen="manual",
+        creado_por=request.user,
+    )
+
+    if request.method == "POST":
+
+        form = AuditoriaManualForm(
+            request.POST,
+            request.FILES,
+            instance=auditoria_base,
+        )
+
+        if form.is_valid():
+
+            auditoria = form.save()
+
+            messages.success(
+                request,
+                f"Auditoría registrada correctamente "
+                f"(Orden {auditoria.numero_orden}).",
+            )
+
+            return redirect("auditoria_manual_crear")
+
+        else:
+
+            messages.error(
+                request,
+                "Revise los errores del formulario. "
+                "No fue posible guardar la auditoría.",
+            )
+
+    else:
+
+        form = AuditoriaManualForm(instance=auditoria_base)
+
+    return render(
+        request,
+        "auditorias/auditoria_manual_form.html",
+        {
+            "form": form,
+            "modo": "crear",
+            "nombre_auditor": nombre_auditor,
+            "cedula_usuario": cedula_usuario,
+            "fecha_hoy": timezone.localdate(),
+        },
+    )
+
+
+@login_required
+@role_required("Administrador", "Coordinador", "Digitador")
+def auditoria_manual_editar(request, pk):
+    """
+    Edita una auditoría ya registrada.
+
+    IMPORTANTE: al editar NO se vuelve a pisar la fecha,
+    el auditor ni la cédula originales (esos quedan tal
+    cual quedaron al crearla). Solo Administrador y
+    Coordinador pueden editar cualquier registro; el
+    Digitador solo los que él mismo creó.
+    """
+
+    auditoria = get_object_or_404(Auditoria, pk=pk)
+
+    es_admin_o_coordinador = (
+        request.user.is_superuser
+        or request.user.groups.filter(
+            name__in=["Administrador", "Coordinador"]
+        ).exists()
+    )
+
+    if not es_admin_o_coordinador and auditoria.creado_por_id != request.user.id:
+        messages.error(
+            request,
+            "No tiene permiso para editar esta auditoría.",
+        )
+        return redirect("auditoria_manual_crear")
+
+    if request.method == "POST":
+
+        form = AuditoriaManualForm(
+            request.POST,
+            request.FILES,
+            instance=auditoria,
+        )
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Auditoría actualizada correctamente.")
+            return redirect("consulta")
+
+        else:
+            messages.error(request, "Revise los errores del formulario.")
+
+    else:
+        form = AuditoriaManualForm(instance=auditoria)
+
+    return render(
+        request,
+        "auditorias/auditoria_manual_form.html",
+        {
+            "form": form,
+            "modo": "editar",
+            "auditoria": auditoria,
+            "nombre_auditor": auditoria.nombre_auditor,
+            "cedula_usuario": auditoria.numero_cedula,
+            "fecha_hoy": auditoria.fecha,
+        },
+    )
+
+
+@login_required
+@role_required("Administrador", "Coordinador")
+def auditoria_manual_eliminar(request, pk):
+    """
+    Elimina una auditoría.
+
+    Solo Administrador y Coordinador pueden eliminar
+    (el Digitador NO tiene permiso de borrar).
+    """
+
+    auditoria = get_object_or_404(Auditoria, pk=pk)
+
+    if request.method == "POST":
+
+        auditoria.delete()
+
+        messages.success(
+            request,
+            "Auditoría eliminada correctamente.",
+        )
+
+        return redirect("consulta")
+
+    return render(
+        request,
+        "auditorias/auditoria_confirmar_eliminar.html",
+        {
+            "auditoria": auditoria,
+        },
+    )

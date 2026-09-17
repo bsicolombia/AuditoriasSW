@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auditoria_manual_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auditoria-form-wrapper">
+
+    <div class="auditoria-form-card">
+
+        <h2 class="auditoria-form-titulo">
+            {% if modo == "editar" %}
+                Editar auditoría
+            {% else %}
+                Registrar nueva auditoría
+            {% endif %}
+        </h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="auditoria-alert auditoria-alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- ================================================ -->
+        <!-- DATOS AUTOMÁTICOS (NO EDITABLES)                  -->
+        <!-- ================================================ -->
+        <div class="auditoria-auto-info">
+
+            <div class="auto-info-item">
+                <span class="auto-info-label">Auditor</span>
+                <span class="auto-info-valor">{{ nombre_auditor }}</span>
+            </div>
+
+            <div class="auto-info-item">
+                <span class="auto-info-label">Cédula</span>
+                <span class="auto-info-valor">{{ cedula_usuario }}</span>
+            </div>
+
+            <div class="auto-info-item">
+                <span class="auto-info-label">Fecha</span>
+                <span class="auto-info-valor">{{ fecha_hoy|date:"d/m/Y" }}</span>
+            </div>
+
+            <div class="auto-info-item">
+                <span class="auto-info-label">Aplicativo</span>
+                <span class="auto-info-valor">AuditoriasSW</span>
+            </div>
+
+        </div>
+
+        <!-- ================================================ -->
+        <!-- FORMULARIO                                        -->
+        <!-- ================================================ -->
+        <form method="post" enctype="multipart/form-data" class="auditoria-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="auditoria-alert auditoria-alert-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="auditoria-form-grid">
+
+                {% for field in form %}
+                    {% if field.name == "foto_evidencia" %}
+                        <div class="auditoria-campo auditoria-campo-full">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            <span class="auditoria-campo-ayuda">
+                                Opcional. JPG, PNG o WEBP, máx. 5MB.
+                            </span>
+                            {% if field.errors %}
+                                <div class="auditoria-error">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                            {% if modo == "editar" and auditoria.foto_evidencia %}
+                                <div class="auditoria-foto-actual">
+                                    <img src="{{ auditoria.foto_evidencia.url }}" alt="Evidencia actual">
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    {% elif field.name == "observacion" or field.name == "hallazgo" %}
+                        <div class="auditoria-campo auditoria-campo-full">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="auditoria-error">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+
+                    {% else %}
+                        <div class="auditoria-campo">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="auditoria-error">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+
+            <div class="auditoria-form-acciones">
+                <button type="submit" class="auditoria-btn-guardar">
+                    Guardar auditoría
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -215,9 +215,9 @@
                                 {{ ultima_carga_tecnicos|date:"d/m/Y H:i" }}
                             </strong>
 
-                        {% if usuario_ultima_carga_auditorias %}
-                                <span class="ultima-carga-usuario">
-                                    por {{ usuario_ultima_carga_auditorias.get_full_name|default:usuario_ultima_carga_auditorias.username }}
+                        {% if usuario_ultima_carga_tecnicos_global %}
+                                <span class="tarjeta-carga-usuario">
+                                    {{ usuario_ultima_carga_tecnicos_global.get_full_name|default:usuario_ultima_carga_tecnicos_global.username }}
                                 </span>
                             {% endif %}
                         {% else %}

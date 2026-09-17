@@ -8,4 +8,20 @@ urlpatterns = [
     path("consulta/pdf/", views.generate_pdf, name="generar_pdf"),
     path("exportar-excel/",views.exportar_excel, name="exportar-excel"),
     path("exportar-estadisticas/",views.exportar_estadisticas,name="exportar-estadisticas"),
+    path(
+        "nueva/",
+        views.auditoria_manual_crear,
+        name="auditoria_manual_crear",
+    ),
+    path(
+        "<int:pk>/editar/",
+        views.auditoria_manual_editar,
+        name="auditoria_manual_editar",
+    ),
+    path(
+        "<int:pk>/eliminar/",
+        views.auditoria_manual_eliminar,
+        name="auditoria_manual_eliminar",
+    ),
+    
 ]

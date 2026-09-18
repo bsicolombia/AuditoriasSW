@@ -1,10 +1,9 @@
 from django.db.models import Count, Q
-from .models import Auditoria
-from carga.models import Tecnicos
 from django.utils import timezone
+from .models import Auditoria
+from carga.models import Tecnicos, EstadoCarga
 import re
 import unicodedata
-from carga.models import EstadoCarga
 
 # ============================================================
 # FUNCIONES AUXILIARES
@@ -206,7 +205,6 @@ mes_actual = str(
     ahora.month
 )
 
-
 # ============================================================
 # FILTROS
 # ============================================================
@@ -324,6 +322,159 @@ def obtener_filtros(request):
         filtros["resultado"] = ""
 
     return filtros
+# ============================================================
+# FILTROS
+# ============================================================
+
+def obtener_opciones_filtros():
+
+    # ========================================================
+    # TÉCNICOS
+    # ========================================================
+
+    tecnicos = (
+        Tecnicos.objects
+        .exclude(
+            tecnico_apellido_nombres__isnull=True
+        )
+        .exclude(
+            tecnico_apellido_nombres__exact=""
+        )
+        .values_list(
+            "tecnico_apellido_nombres",
+            flat=True
+        )
+        .distinct()
+        .order_by(
+            "tecnico_apellido_nombres"
+        )
+    )
+
+    # ========================================================
+    # AUDITORES
+    # ========================================================
+
+    auditores = (
+        Auditoria.objects
+        .exclude(
+            nombre_auditor__isnull=True
+        )
+        .exclude(
+            nombre_auditor__exact=""
+        )
+        .values_list(
+            "nombre_auditor",
+            flat=True
+        )
+        .distinct()
+        .order_by(
+            "nombre_auditor"
+        )
+    )
+
+    # ========================================================
+    # HALLAZGOS
+    # ========================================================
+
+    hallazgos = (
+        Auditoria.objects
+        .exclude(
+            hallazgo__isnull=True
+        )
+        .exclude(
+            hallazgo__exact=""
+        )
+        .values_list(
+            "hallazgo",
+            flat=True
+        )
+        .distinct()
+        .order_by(
+            "hallazgo"
+        )
+    )
+
+    # ========================================================
+    # AÑOS
+    # ========================================================
+
+    fechas = (
+        Auditoria.objects
+        .exclude(
+            fecha__isnull=True
+        )
+        .values_list(
+            "fecha",
+            flat=True
+        )
+        .order_by(
+            "-fecha"
+        )
+    )
+
+    anios = sorted(
+        {
+            fecha.year
+            for fecha in fechas
+            if fecha is not None
+        },
+        reverse=True
+    )
+
+    # ========================================================
+    # SUPERVISORES
+    # ========================================================
+
+    supervisores = (
+        Tecnicos.objects
+        .exclude(
+            supervisor__isnull=True
+        )
+        .exclude(
+            supervisor__exact=""
+        )
+        .values_list(
+            "supervisor",
+            flat=True
+        )
+        .distinct()
+        .order_by(
+            "supervisor"
+        )
+    )
+
+    # ========================================================
+    # RESULTADO
+    # ========================================================
+
+    return {
+
+        "tecnicos_estadisticas": [
+            texto_seguro(t)
+            for t in tecnicos
+        ],
+
+        "auditores_estadisticas": [
+            texto_seguro(a)
+            for a in auditores
+        ],
+
+        "hallazgos_estadisticas": [
+            texto_seguro(h)
+            for h in hallazgos
+        ],
+
+        "supervisores_estadisticas": [
+            texto_seguro(s)
+            for s in supervisores
+        ],
+
+        "anios_estadisticas": anios,
+
+        "dias_estadisticas": list(
+            range(1, 32)
+        ),
+    }
 
 
 # ============================================================
@@ -726,129 +877,6 @@ def aplicar_filtros(queryset, filtros):
         )
 
     return queryset
-
-
-# ============================================================
-# OPCIONES DE FILTROS
-# ============================================================
-
-def obtener_opciones_filtros():
-
-    tecnicos = (
-        Tecnicos.objects
-        .exclude(
-            tecnico_apellido_nombres__isnull=True
-        )
-        .exclude(
-            tecnico_apellido_nombres__exact=""
-        )
-        .values_list(
-            "tecnico_apellido_nombres",
-            flat=True
-        )
-        .distinct()
-        .order_by(
-            "tecnico_apellido_nombres"
-        )
-    )
-
-    auditores = (
-        Auditoria.objects
-        .exclude(
-            nombre_auditor__isnull=True
-        )
-        .exclude(
-            nombre_auditor__exact=""
-        )
-        .values_list(
-            "nombre_auditor",
-            flat=True
-        )
-        .distinct()
-        .order_by(
-            "nombre_auditor"
-        )
-    )
-
-    hallazgos = (
-        Auditoria.objects
-        .exclude(
-            hallazgo__isnull=True
-        )
-        .exclude(
-            hallazgo__exact=""
-        )
-        .values_list(
-            "hallazgo",
-            flat=True
-        )
-        .distinct()
-        .order_by(
-            "hallazgo"
-        )
-    )
-
-    anios = (
-        Auditoria.objects
-        .exclude(
-            fecha__isnull=True
-        )
-        .dates(
-            "fecha",
-            "year",
-            order="DESC"
-        )
-    )
-
-    supervisores = (
-        Tecnicos.objects
-        .exclude(
-            supervisor__isnull=True
-        )
-        .exclude(
-            supervisor__exact=""
-        )
-        .values_list(
-            "supervisor",
-            flat=True
-        )
-        .distinct()
-        .order_by(
-            "supervisor"
-        )
-    )
-
-    return {
-
-        "tecnicos_estadisticas": [
-            texto_seguro(t)
-            for t in tecnicos
-        ],
-
-        "auditores_estadisticas": [
-            texto_seguro(a)
-            for a in auditores
-        ],
-
-        "hallazgos_estadisticas": [
-            texto_seguro(h)
-            for h in hallazgos
-        ],
-
-        "supervisores_estadisticas": [
-            texto_seguro(s)
-            for s in supervisores
-        ],
-
-        "anios_estadisticas": [
-            fecha.year
-            for fecha in anios
-        ],
-
-        "dias_estadisticas":
-            list(range(1, 32)),
-    }
-
 
 # ============================================================
 # 1. ESTADÍSTICA POR OPERACIÓN
@@ -2673,6 +2701,31 @@ def estadisticas_auditorias(request):
     )
 
     # ========================================================
+    # SEGURIDAD DEL FILTRO RESULTADO
+    # ========================================================
+
+    resultado = texto_seguro(
+        filtros.get(
+            "resultado"
+        )
+    ).strip().lower()
+
+    resultado_invalido = resultado in {
+        "",
+        "undefined",
+        "null",
+        "n/a",
+        "na",
+        "tecnico",
+        "tecnicos",
+        "todos",
+    }
+
+    if resultado_invalido:
+
+        filtros["resultado"] = ""
+
+    # ========================================================
     # QUERYSET BASE
     # ========================================================
 
@@ -2688,13 +2741,13 @@ def estadisticas_auditorias(request):
     )
 
     # ========================================================
-    # OPCIONES
+    # OPCIONES DE FILTROS
     # ========================================================
 
     opciones = obtener_opciones_filtros()
 
     # ========================================================
-    # TOTALES
+    # TOTALES POR OPERACIÓN
     # ========================================================
 
     total_dc00 = queryset.filter(
@@ -2708,16 +2761,26 @@ def estadisticas_auditorias(request):
     total_zvcl = queryset.filter(
         tipo_operacion__iexact="ZVCL"
     ).count()
-    
+
+    # ========================================================
+    # ESTADO DE CARGA
+    # ========================================================
+
     estado = EstadoCarga.get_solo()
+
+    if estado is None:
+        estado = EstadoCarga()
+
+
+    # ========================================================
+    # TOTAL GENERAL
+    # ========================================================
 
     total_operaciones = (
         total_dc00
         + total_rc00
         + total_zvcl
     )
-    
-    
 
     # ========================================================
     # CONTEXTO
@@ -2725,10 +2788,22 @@ def estadisticas_auditorias(request):
 
     contexto = {
 
+        # ----------------------------------------------------
+        # FILTROS
+        # ----------------------------------------------------
+
         "filtros_estadisticas":
             filtros,
 
+        # ----------------------------------------------------
+        # OPCIONES
+        # ----------------------------------------------------
+
         **opciones,
+
+        # ----------------------------------------------------
+        # TOTALES
+        # ----------------------------------------------------
 
         "Suspensiones":
             total_dc00,
@@ -2741,6 +2816,10 @@ def estadisticas_auditorias(request):
 
         "total_operaciones":
             total_operaciones,
+
+        # ----------------------------------------------------
+        # ESTADÍSTICAS
+        # ----------------------------------------------------
 
         "datos_operaciones":
             obtener_datos_operaciones(
@@ -2782,38 +2861,82 @@ def estadisticas_auditorias(request):
                 queryset
             ),
 
+        # ----------------------------------------------------
+        # RESULTADO POR TÉCNICO
+        # ----------------------------------------------------
+
         "Resultado_Auditorias_Tecnico":
             obtener_resultado_auditorias_tecnico(
                 queryset,
-                filtros["supervisor"]
+                filtros.get(
+                    "supervisor",
+                    ""
+                )
             ),
+
+        # ----------------------------------------------------
+        # RESULTADO POR DIGITADOR
+        # ----------------------------------------------------
 
         "Resultado_Auditorias_Digitador":
             obtener_resultado_auditorias_digitador(
                 queryset
             ),
 
+        # ----------------------------------------------------
+        # CANTIDAD DE AUDITORÍAS POR AUDITOR
+        # ----------------------------------------------------
+
         "Cantidad_Auditorias_Auditor":
             obtener_cantidad_auditorias_por_auditor(
                 queryset
             ),
 
+        # ----------------------------------------------------
+        # RESULTADO DIARIO POR TÉCNICO
+        # ----------------------------------------------------
+
         "Resultado_Diario_Tecnico":
             obtener_resultado_diario_tecnico(
                 queryset,
-                filtros["supervisor"]
+                filtros.get(
+                    "supervisor",
+                    ""
+                )
             ),
-            
+
+        # ----------------------------------------------------
+        # TOTAL DIARIO POR TÉCNICO
+        # ----------------------------------------------------
+
         "Resultado_Total_Diario_Tecnico":
             obtener_auditorias_totales_diario_tecnico(
                 queryset,
-                filtros["supervisor"]
+                filtros.get(
+                    "supervisor",
+                    ""
+                )
             ),
-            
-        "ultima_carga_auditorias_global": estado.ultima_carga_auditorias,
-        "ultima_carga_tecnicos_global": estado.ultima_carga_tecnicos,
-        "usuario_ultima_carga_auditorias_global": estado.usuario_carga_auditorias,
-        "usuario_ultima_carga_tecnicos_global": estado.usuario_carga_tecnicos,
+
+        # ----------------------------------------------------
+        # INFORMACIÓN DE ÚLTIMAS CARGAS
+        # ----------------------------------------------------
+
+        "ultima_carga_auditorias_global":
+            estado.ultima_carga_auditorias,
+
+        "ultima_carga_tecnicos_global":
+            estado.ultima_carga_tecnicos,
+
+        "usuario_ultima_carga_auditorias_global":
+            estado.usuario_carga_auditorias,
+
+        "usuario_ultima_carga_tecnicos_global":
+            estado.usuario_carga_tecnicos,
     }
+
+    # ========================================================
+    # RETORNAR CONTEXTO
+    # ========================================================
 
     return contexto

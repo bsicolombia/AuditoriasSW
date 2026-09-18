@@ -57,6 +57,9 @@ class TecnicoCargaForm(forms.Form):
 # ==========================================================
 # FORMULARIO INDIVIDUAL DE AUDITORÍA
 # ==========================================================
+# ==========================================================
+# FORMULARIO PARA CARGA MASIVA DE AUDITORÍAS
+# ==========================================================
 
 class AuditoriaForm(forms.ModelForm):
 
@@ -79,6 +82,96 @@ class AuditoriaForm(forms.ModelForm):
             "tipo_hallazgo",
             "hallazgo",
         ]
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        # --------------------------------------------------
+        # EN LA CARGA MASIVA LA OBSERVACIÓN PUEDE VENIR VACÍA
+        # --------------------------------------------------
+
+        self.fields["observacion"].required = False
+
+        # --------------------------------------------------
+        # HALLAZGO Y TIPO DE HALLAZGO
+        # NO SON OBLIGATORIOS PARA "CUMPLE"
+        # --------------------------------------------------
+
+        self.fields["tipo_hallazgo"].required = False
+        self.fields["hallazgo"].required = False
+
+    # ======================================================
+    # VALIDACIÓN GENERAL
+    # ======================================================
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        resultado = cleaned_data.get(
+            "resultado_auditoria"
+        )
+
+        observacion = cleaned_data.get(
+            "observacion"
+        )
+
+        tipo_hallazgo = cleaned_data.get(
+            "tipo_hallazgo"
+        )
+
+        hallazgo = cleaned_data.get(
+            "hallazgo"
+        )
+
+        # ==================================================
+        # CUMPLE
+        # ==================================================
+
+        if resultado == "cumple":
+
+            # Para una auditoría que cumple,
+            # estos campos pueden quedar vacíos.
+
+            cleaned_data["tipo_hallazgo"] = ""
+            cleaned_data["hallazgo"] = ""
+
+        # ==================================================
+        # NO CUMPLE
+        # ==================================================
+
+        elif resultado == "no_cumple":
+
+            # ------------------------------------------------
+            # TIPO DE HALLAZGO
+            # ------------------------------------------------
+
+            if not tipo_hallazgo:
+
+                self.add_error(
+                    "tipo_hallazgo",
+                    (
+                        "Debe seleccionar el tipo "
+                        "de hallazgo."
+                    )
+                )
+
+            # ------------------------------------------------
+            # HALLAZGO
+            # ------------------------------------------------
+
+            if not hallazgo:
+
+                self.add_error(
+                    "hallazgo",
+                    (
+                        "Debe seleccionar el hallazgo."
+                    )
+                )
+
+        return cleaned_data
+
 
 
 # ==========================================================

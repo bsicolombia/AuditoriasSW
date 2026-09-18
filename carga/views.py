@@ -1528,10 +1528,17 @@ def auditoria_crear(request):
         # ==================================================
         # VALIDAR FORMULARIO
         # ==================================================
+        if form_data.get("resultado_auditoria") == "cumple":
+            form_data["observacion"] = ""
+            form_data["tipo_hallazgo"] = ""
+            form_data["hallazgo"] = ""
+
 
         row_form = AuditoriaForm(
             data=form_data
         )
+
+        row_form.instance.origen = "excel"
 
         if not row_form.is_valid():
 
@@ -1553,6 +1560,29 @@ def auditoria_crear(request):
                     "errors": errors,
                 }
             )
+        
+        if not row_form.is_valid():
+
+
+            errors = {}
+
+            for field, error_list in row_form.errors.items():
+
+                errors[field] = ", ".join(
+                    str(error)
+                    for error in error_list
+                )
+
+            error_records.append(
+                {
+                    "row": row_number,
+                    "data": form_data.copy(),
+                    "errors": errors,
+                }
+            )
+
+            continue
+
 
             # IMPORTANTE:
             # No se guarda.
@@ -1739,9 +1769,7 @@ def auditoria_crear(request):
                 }
             )
 
-    # ======================================================
-    # GUARDAR AUDITORÍAS
-    # ======================================================
+
 
     if auditorias_creadas:
 

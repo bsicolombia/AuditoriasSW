@@ -386,11 +386,20 @@ def cargar_excel(request):
         }
     )
 
+<<<<<<< HEAD
 # ============================================================
 # FUNCIÓN GENERAL DE FILTROS
 # ============================================================
 
 def filtrar_auditorias(request):
+=======
+@role_required("Administrador", "Coordinador", "Digitador")
+def consulta(request):
+
+    # =====================================================
+    # QUERYSET BASE
+    # =====================================================
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 
     auditorias = Auditoria.objects.all()
 
@@ -635,6 +644,7 @@ def consulta(request):
     ).strip()
 
     nombre_auditor = request.GET.get(
+<<<<<<< HEAD
         "nombre_auditor",
         ""
     ).strip()
@@ -680,6 +690,80 @@ def consulta(request):
     ).strip()
 
     # ========================================================
+=======
+        "nombre_auditor", ""
+    ).strip()
+
+    numero_cedula = request.GET.get(
+        "numero_cedula", ""
+    ).strip()
+
+    aplicativo = request.GET.get(
+        "aplicativo", ""
+    ).strip()
+
+    nombre_tecnico = request.GET.get(
+        "nombre_tecnico", ""
+    ).strip()
+
+    numero_cuenta_contrato = request.GET.get(
+        "numero_cuenta_contrato", ""
+    ).strip()
+
+    numero_orden = request.GET.get(
+        "numero_orden", ""
+    ).strip()
+
+    tipo_operacion = request.GET.get(
+        "tipo_operacion", ""
+    ).strip()
+
+    resultado_auditoria = request.GET.get(
+        "resultado_auditoria", ""
+    ).strip()
+
+    tipo_hallazgo = request.GET.get(
+        "tipo_hallazgo", ""
+    ).strip()
+
+    hallazgo = request.GET.get(
+        "hallazgo", ""
+    ).strip()
+
+    # =====================================================
+    # FECHAS
+    # =====================================================
+
+    fecha_operacion_desde = request.GET.get(
+        "fecha_operacion_desde", ""
+    ).strip()
+
+    fecha_operacion_hasta = request.GET.get(
+        "fecha_operacion_hasta", ""
+    ).strip()
+
+    fecha_inicio_auditoria = request.GET.get(
+        "fecha_inicio_auditoria", ""
+    ).strip()
+
+    fecha_fin_auditoria = request.GET.get(
+        "fecha_fin_auditoria", ""
+    ).strip()
+
+    # =====================================================
+    # MES Y AÑO
+    # =====================================================
+
+    mes_auditoria = request.GET.get(
+        "mes_auditoria", ""
+    ).strip()
+
+    ano_auditoria = request.GET.get(
+        "ano_auditoria", ""
+    ).strip()
+
+    # =====================================================
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     # APLICAR FILTROS
     # ========================================================
 
@@ -827,7 +911,7 @@ def consulta(request):
     if nombre_auditor:
 
         auditorias = auditorias.filter(
-            nombre_auditor=nombre_auditor
+            nombre_auditor__icontains=nombre_auditor
         )
 
     if numero_cedula:
@@ -871,15 +955,27 @@ def consulta(request):
                 )
 
         auditorias = auditorias.filter(
+<<<<<<< HEAD
             id__in=ids_cedula
+=======
+            numero_cedula__icontains=numero_cedula
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         )
 
     if aplicativo:
 
         auditorias = auditorias.filter(
-            aplicativo=aplicativo
+            aplicativo__icontains=aplicativo
         )
 
+<<<<<<< HEAD
+=======
+    if nombre_tecnico:
+        auditorias = auditorias.filter(
+            nombre_tecnico__icontains=nombre_tecnico
+        )
+
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     if numero_cuenta_contrato:
 
         auditorias = auditorias.filter(
@@ -887,17 +983,44 @@ def consulta(request):
         )
 
     if numero_orden:
-
+<<<<<<< HEAD
+=======
         auditorias = auditorias.filter(
             numero_orden__icontains=numero_orden
+        )
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
+
+        auditorias = auditorias.filter(
+<<<<<<< HEAD
+            numero_orden__icontains=numero_orden
+=======
+            tipo_operacion__iexact=tipo_operacion
+        )
+
+    if resultado_auditoria:
+        auditorias = auditorias.filter(
+            resultado_auditoria__iexact=resultado_auditoria
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         )
 
     if tipo_hallazgo:
 
         auditorias = auditorias.filter(
-            tipo_hallazgo=tipo_hallazgo
+            tipo_hallazgo__iexact=tipo_hallazgo
         )
 
+<<<<<<< HEAD
+=======
+    if hallazgo:
+        auditorias = auditorias.filter(
+            hallazgo__icontains=hallazgo
+        )
+
+    # =====================================================
+    # FECHA DE OPERACIÓN
+    # =====================================================
+
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     if fecha_operacion_desde:
 
         auditorias = auditorias.filter(
@@ -910,6 +1033,7 @@ def consulta(request):
             fecha_operacion__lte=fecha_operacion_hasta
         )
 
+<<<<<<< HEAD
     if origen:
 
         auditorias = auditorias.filter(
@@ -919,6 +1043,50 @@ def consulta(request):
     # ========================================================
     # ORDEN
     # ========================================================
+=======
+    # =====================================================
+    # FECHA DE AUDITORÍA
+    #
+    # fecha = DateTimeField
+    # =====================================================
+
+    if fecha_inicio_auditoria:
+        auditorias = auditorias.filter(
+            fecha__date__gte=fecha_inicio_auditoria
+        )
+
+    if fecha_fin_auditoria:
+        auditorias = auditorias.filter(
+            fecha__date__lte=fecha_fin_auditoria
+        )
+
+    # =====================================================
+    # MES DE AUDITORÍA
+    # =====================================================
+
+    if mes_auditoria.isdigit():
+
+        mes = int(mes_auditoria)
+
+        if 1 <= mes <= 12:
+            auditorias = auditorias.filter(
+                fecha__month=mes
+            )
+
+    # =====================================================
+    # AÑO DE AUDITORÍA
+    # =====================================================
+
+    if ano_auditoria.isdigit():
+
+        auditorias = auditorias.filter(
+            fecha__year=int(ano_auditoria)
+        )
+
+    # =====================================================
+    # ORDEN
+    # =====================================================
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 
     auditorias = auditorias.order_by(
         "-fecha",
@@ -926,12 +1094,17 @@ def consulta(request):
         "-id"
     )
 
+<<<<<<< HEAD
     # ========================================================
+=======
+    # =====================================================
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     # CANTIDAD
     # ========================================================
 
     cantidad = auditorias.count()
 
+<<<<<<< HEAD
     # ========================================================
     # ESTADÍSTICAS
     # ========================================================
@@ -953,11 +1126,20 @@ def consulta(request):
     # ========================================================
     # OPCIONES DE LOS SELECT
     # ========================================================
+=======
+    # =====================================================
+    # OPCIONES PARA LOS SELECT
+    # =====================================================
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 
     nombres_auditores = (
         Auditoria.objects
         .exclude(nombre_auditor__isnull=True)
+<<<<<<< HEAD
         .exclude(nombre_auditor="")
+=======
+        .exclude(nombre_auditor__exact="")
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "nombre_auditor",
             flat=True
@@ -966,10 +1148,29 @@ def consulta(request):
         .order_by("nombre_auditor")
     )
 
+<<<<<<< HEAD
     aplicativos = (
         Auditoria.objects
         .exclude(aplicativo__isnull=True)
         .exclude(aplicativo="")
+=======
+    cedulas = (
+        Auditoria.objects
+        .exclude(numero_cedula__isnull=True)
+        .exclude(numero_cedula__exact="")
+        .values_list(
+            "numero_cedula",
+            flat=True
+        )
+        .distinct()
+        .order_by("numero_cedula")
+    )
+
+    aplicativos = (
+        Auditoria.objects
+        .exclude(aplicativo__isnull=True)
+        .exclude(aplicativo__exact="")
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "aplicativo",
             flat=True
@@ -981,7 +1182,11 @@ def consulta(request):
     nombres_tecnicos = (
         Auditoria.objects
         .exclude(nombre_tecnico__isnull=True)
+<<<<<<< HEAD
         .exclude(nombre_tecnico="")
+=======
+        .exclude(nombre_tecnico__exact="")
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "nombre_tecnico",
             flat=True
@@ -990,10 +1195,41 @@ def consulta(request):
         .order_by("nombre_tecnico")
     )
 
+<<<<<<< HEAD
     tipos_operacion = (
         Auditoria.objects
         .exclude(tipo_operacion__isnull=True)
         .exclude(tipo_operacion="")
+=======
+    cuentas_contrato = (
+        Auditoria.objects
+        .exclude(numero_cuenta_contrato__isnull=True)
+        .exclude(numero_cuenta_contrato__exact="")
+        .values_list(
+            "numero_cuenta_contrato",
+            flat=True
+        )
+        .distinct()
+        .order_by("numero_cuenta_contrato")
+    )
+
+    numeros_orden = (
+        Auditoria.objects
+        .exclude(numero_orden__isnull=True)
+        .exclude(numero_orden__exact="")
+        .values_list(
+            "numero_orden",
+            flat=True
+        )
+        .distinct()
+        .order_by("numero_orden")
+    )
+
+    tipos_operacion = (
+        Auditoria.objects
+        .exclude(tipo_operacion__isnull=True)
+        .exclude(tipo_operacion__exact="")
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "tipo_operacion",
             flat=True
@@ -1005,7 +1241,11 @@ def consulta(request):
     resultados_auditoria = (
         Auditoria.objects
         .exclude(resultado_auditoria__isnull=True)
+<<<<<<< HEAD
         .exclude(resultado_auditoria="")
+=======
+        .exclude(resultado_auditoria__exact="")
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "resultado_auditoria",
             flat=True
@@ -1017,7 +1257,11 @@ def consulta(request):
     tipos_hallazgo = (
         Auditoria.objects
         .exclude(tipo_hallazgo__isnull=True)
+<<<<<<< HEAD
         .exclude(tipo_hallazgo="")
+=======
+        .exclude(tipo_hallazgo__exact="")
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "tipo_hallazgo",
             flat=True
@@ -1029,7 +1273,11 @@ def consulta(request):
     hallazgos = (
         Auditoria.objects
         .exclude(hallazgo__isnull=True)
+<<<<<<< HEAD
         .exclude(hallazgo="")
+=======
+        .exclude(hallazgo__exact="")
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "hallazgo",
             flat=True
@@ -1038,6 +1286,7 @@ def consulta(request):
         .order_by("hallazgo")
     )
 
+<<<<<<< HEAD
     # ========================================================
     # AÑOS DISPONIBLES
     # ========================================================
@@ -1045,6 +1294,14 @@ def consulta(request):
     anos_auditoria = (
         Auditoria.objects
         .filter(fecha__isnull=False)
+=======
+    # =====================================================
+    # AÑOS DISPONIBLES
+    # =====================================================
+
+    anos_auditoria = (
+        Auditoria.objects
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .dates(
             "fecha",
             "year",
@@ -1052,6 +1309,7 @@ def consulta(request):
         )
     )
 
+<<<<<<< HEAD
     # ========================================================
     # SUPERVISORES
     # ========================================================
@@ -1069,13 +1327,14 @@ def consulta(request):
     )
 
     # ========================================================
+=======
+    # =====================================================
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     # CONTEXTO
     # ========================================================
 
     context = {
-
         "Auditorias": auditorias,
-
         "Cantidad": cantidad,
 
         "Suspensiones": suspensiones,
@@ -1087,7 +1346,6 @@ def consulta(request):
         "total_operaciones": total_operaciones,
 
         "ano_auditoria": ano_auditoria,
-
         "mes_auditoria": mes_auditoria,
 
         "nombres_auditores": nombres_auditores,
@@ -1114,6 +1372,86 @@ def consulta(request):
         "auditorias/consulta.html",
         context
     )
+<<<<<<< HEAD
+=======
+
+
+
+def generate_pdf(request):
+
+    auditorias = filtrar_auditorias(request)
+
+    cantidad = auditorias.count()
+
+    # Evitar generar PDFs demasiado grandes
+    if cantidad > 50000:
+
+        return HttpResponse(
+            f"""
+            <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Demasiados registros</title>
+                </head>
+
+                <body>
+
+                    <h2>Demasiados registros para generar el PDF</h2>
+
+                    <p>
+                        La consulta contiene
+                        <strong>{cantidad}</strong>
+                        registros.
+                    </p>
+
+                    <p>
+                        Por favor, aplique uno o varios filtros
+                        antes de generar el PDF.
+                    </p>
+
+                    <a href="/auditorias/consulta/">
+                        Volver a consultas
+                    </a>
+
+                </body>
+            </html>
+            """,
+            status=400
+        )
+
+    template = get_template(
+        "auditorias/pdf_auditorias.html"
+    )
+
+    context = {
+        "Auditorias": auditorias
+    }
+
+    html = template.render(context)
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="auditorias.pdf"'
+    )
+
+    pisa_status = pisa.CreatePDF(
+        html,
+        dest=response
+    )
+
+    if pisa_status.err:
+
+        return HttpResponse(
+            "Error al generar el PDF",
+            status=500
+        )
+
+    return response
+
+>>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 def exportar_excel(request):
 
     auditorias = filtrar_auditorias(request)

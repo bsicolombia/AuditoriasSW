@@ -2,6 +2,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from carga.models import Tecnicos
+
 from .models import (
     Auditoria,
     HALLAZGOS_ALTO,
@@ -12,10 +14,45 @@ from .models import (
 
 class AuditoriaManualForm(forms.ModelForm):
 
+    # ========================================================
+    # TÉCNICO
+    # ========================================================
+
+    nombre_tecnico = forms.ModelChoiceField(
+        queryset=(
+            Tecnicos.objects
+            .exclude(
+                tecnico_cedula__isnull=True
+            )
+            .exclude(
+                tecnico_cedula__exact=""
+            )
+            .exclude(
+                tecnico_apellido_nombres__isnull=True
+            )
+            .exclude(
+                tecnico_apellido_nombres__exact=""
+            )
+            .order_by(
+                "tecnico_apellido_nombres"
+            )
+        ),
+        empty_label="Seleccione un técnico",
+        required=True,
+        label="Técnico",
+        widget=forms.Select(
+            attrs={
+                "autocomplete": "off",
+            }
+        ),
+    )
+
     class Meta:
+
         model = Auditoria
 
         fields = [
+            "aplicativo",
             "fecha_operacion",
             "nombre_tecnico",
             "numero_cuenta_contrato",
@@ -30,16 +67,16 @@ class AuditoriaManualForm(forms.ModelForm):
 
         widgets = {
 
+            "aplicativo": forms.Select(
+                attrs={
+                    "autocomplete": "off",
+                }
+            ),
+
             "fecha_operacion": forms.DateInput(
                 attrs={
                     "type": "date",
                     "max": timezone.localdate().isoformat(),
-                }
-            ),
-
-            "nombre_tecnico": forms.TextInput(
-                attrs={
-                    "autocomplete": "off",
                 }
             ),
 
@@ -74,35 +111,100 @@ class AuditoriaManualForm(forms.ModelForm):
             "foto_evidencia": forms.ClearableFileInput(),
         }
 
+    # ========================================================
+    # INICIALIZACIÓN
+    # ========================================================
+
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
-        # ----------------------------------------------------
-        # HALLAZGO VACÍO INICIAL
-        # ----------------------------------------------------
-
         self.fields["hallazgo"].choices = [
-            ("", "Seleccione primero el tipo de hallazgo")
+            (
+                "",
+                "Seleccione primero el tipo de hallazgo"
+            )
         ]
 
-        # ----------------------------------------------------
-        # SI ESTAMOS EDITANDO
-        # ----------------------------------------------------
+        tipo = self.data.get("tipo_hallazgo")
 
-        tipo = self.data.get(
-            "tipo_hallazgo"
-        )
-
-        if not tipo and self.instance:
+        if not tipo and self.instance and self.instance.pk:
             tipo = self.instance.tipo_hallazgo
 
         if tipo:
-
             self._cargar_hallazgos(tipo)
 
+
     # ========================================================
-    # CARGAR HALLAZGOS SEGÚN TIPO
+    # GUARDAR
+    # ========================================================
+
+    def save(self, commit=True):
+
+        auditoria = super().save(
+            commit=False
+        )
+
+        tecnico = self.cleaned_data.get(
+            "nombre_tecnico"
+        )
+
+        if tecnico:
+
+            nombre = (
+                str(
+                    tecnico.tecnico_apellido_nombres
+                )
+                .strip()
+            )
+
+            cedula = (
+                str(
+                    tecnico.tecnico_cedula
+                )
+                .strip()
+            )
+
+            # -----------------------------------------------
+            # NORMALIZAR CÉDULA
+            # -----------------------------------------------
+
+            import re
+
+            cedula = re.sub(
+                r"\D",
+                "",
+                cedula
+            )
+
+            # -----------------------------------------------
+            # FORMATO HISTÓRICO DEL EXCEL
+            # -----------------------------------------------
+
+            if cedula:
+
+                auditoria.nombre_tecnico = (
+                    f"{nombre}-{cedula}"
+                )
+
+            else:
+
+                auditoria.nombre_tecnico = nombre
+
+        else:
+
+            auditoria.nombre_tecnico = ""
+
+        if commit:
+
+            auditoria.save()
+
+            self.save_m2m()
+
+        return auditoria
+
+    # ========================================================
+    # CARGAR HALLAZGOS
     # ========================================================
 
     def _cargar_hallazgos(self, tipo):
@@ -124,18 +226,27 @@ class AuditoriaManualForm(forms.ModelForm):
             choices = []
 
         self.fields["hallazgo"].choices = [
-            ("", "Seleccione un hallazgo")
+            (
+                "",
+                "Seleccione un hallazgo"
+            )
         ] + list(choices)
+        
+    def get_hallazgos_json(self):
+        return {
+            "alto": list(HALLAZGOS_ALTO),
+            "medio": list(HALLAZGOS_MEDIO),
+            "bajo": list(HALLAZGOS_BAJO),
+        }
 
     # ========================================================
-    # VALIDACIÓN
+    # VALIDAR CUENTA / CONTRATO
     # ========================================================
 
     def clean_numero_cuenta_contrato(self):
 
-        valor = (
-            self.cleaned_data
-            .get("numero_cuenta_contrato")
+        valor = self.cleaned_data.get(
+            "numero_cuenta_contrato"
         )
 
         if valor and not valor.isdigit():
@@ -146,11 +257,14 @@ class AuditoriaManualForm(forms.ModelForm):
 
         return valor
 
+    # ========================================================
+    # VALIDAR NÚMERO DE ORDEN
+    # ========================================================
+
     def clean_numero_orden(self):
 
-        valor = (
-            self.cleaned_data
-            .get("numero_orden")
+        valor = self.cleaned_data.get(
+            "numero_orden"
         )
 
         if valor and not valor.isdigit():
@@ -164,6 +278,7 @@ class AuditoriaManualForm(forms.ModelForm):
         )
 
         if self.instance.pk:
+
             qs = qs.exclude(
                 pk=self.instance.pk
             )
@@ -177,11 +292,14 @@ class AuditoriaManualForm(forms.ModelForm):
 
         return valor
 
+    # ========================================================
+    # VALIDAR FECHA
+    # ========================================================
+
     def clean_fecha_operacion(self):
 
-        fecha = (
-            self.cleaned_data
-            .get("fecha_operacion")
+        fecha = self.cleaned_data.get(
+            "fecha_operacion"
         )
 
         if fecha and fecha > timezone.localdate():
@@ -192,6 +310,10 @@ class AuditoriaManualForm(forms.ModelForm):
             )
 
         return fecha
+
+    # ========================================================
+    # VALIDACIÓN GENERAL
+    # ========================================================
 
     def clean(self):
 
@@ -213,15 +335,12 @@ class AuditoriaManualForm(forms.ModelForm):
             "observacion"
         )
 
-        # ----------------------------------------------------
-        # OBSERVACIÓN SIEMPRE OBLIGATORIA
-        # ----------------------------------------------------
-
-        # OBSERVACIÓN OBLIGATORIA SOLO PARA NO CUMPLE
-
         if resultado == "no_cumple":
 
-            if not observacion or not observacion.strip():
+            if (
+                not observacion
+                or not observacion.strip()
+            ):
 
                 self.add_error(
                     "observacion",
@@ -231,19 +350,10 @@ class AuditoriaManualForm(forms.ModelForm):
                     )
                 )
 
-
-        # ----------------------------------------------------
-        # CUMPLE
-        # ----------------------------------------------------
-
         if resultado == "cumple":
 
             cleaned_data["tipo_hallazgo"] = ""
             cleaned_data["hallazgo"] = ""
-
-        # ----------------------------------------------------
-        # NO CUMPLE
-        # ----------------------------------------------------
 
         elif resultado == "no_cumple":
 
@@ -261,32 +371,39 @@ class AuditoriaManualForm(forms.ModelForm):
                     "Debe seleccionar el hallazgo."
                 )
 
-            # ------------------------------------------------
-            # VALIDAR QUE EL HALLAZGO PERTENEZCA AL TIPO
-            # ------------------------------------------------
-
             if tipo == "alto":
 
-                permitidos = dict(HALLAZGOS_ALTO)
+                permitidos = dict(
+                    HALLAZGOS_ALTO
+                )
 
             elif tipo == "medio":
 
-                permitidos = dict(HALLAZGOS_MEDIO)
+                permitidos = dict(
+                    HALLAZGOS_MEDIO
+                )
 
             elif tipo == "bajo":
 
-                permitidos = dict(HALLAZGOS_BAJO)
+                permitidos = dict(
+                    HALLAZGOS_BAJO
+                )
 
             else:
 
                 permitidos = {}
 
-            if hallazgo and hallazgo not in permitidos:
+            if (
+                hallazgo
+                and hallazgo not in permitidos
+            ):
 
                 self.add_error(
                     "hallazgo",
-                    "El hallazgo seleccionado no "
-                    "corresponde al tipo seleccionado."
+                    (
+                        "El hallazgo seleccionado no "
+                        "corresponde al tipo seleccionado."
+                    )
                 )
 
         return cleaned_data

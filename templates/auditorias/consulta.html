@@ -3,20 +3,26 @@
 {% load static %}
 
 {% block extra_css %}
+
 <link rel="stylesheet" href="{% static 'css/consultas.css' %}">
+
 <style>
 
 .filtro label {
     font-weight: 700;
     font-size: 1.05em;
 }
+
+
 /* ==========================================
    FILTRO ACTIVO
    ========================================== */
 
 #form-filtros select.filtro-activo,
 #form-filtros input.filtro-activo {
+
     border: 1px solid #1976d2;
+
     border-bottom: 3px solid #1976d2;
 
     background-color: #f5faff;
@@ -27,58 +33,111 @@
     transition: all 0.2s ease;
 }
 
+
+/* ==========================================
+   GRID
+   ========================================== */
+
 #form-filtros {
+
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
     gap: 10px 12px;
+
     align-items: end;
 }
 
+
+/* ==========================================
+   FILTRO
+   ========================================== */
+
 .filtro {
+
     display: flex;
+
     flex-direction: column;
+
     gap: 3px;
 }
 
+
 .filtro label {
+
     font-size: 0.85em;
+
     margin-bottom: 0;
 }
 
+
 .filtro select,
-.filtro input[type="date"] {
+.filtro input[type="date"],
+.filtro input[type="text"] {
+
     padding: 4px 6px;
+
     font-size: 0.85em;
+
     height: 30px;
+
     box-sizing: border-box;
+
+    width: 100%;
 }
 
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
 @media (max-width: 1100px) {
+
     #form-filtros {
-        grid-template-columns: repeat(3, 1fr);
+
+        grid-template-columns:
+            repeat(3, 1fr);
     }
 }
 
+
 @media (max-width: 700px) {
+
     #form-filtros {
-        grid-template-columns: repeat(2, 1fr);
+
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 }
 
 </style>
+
 {% endblock %}
 
+
 {% block title %}
+
 Consultas
+
 {% endblock %}
+
 
 {% block content %}
 
+
 <div class="filtros">
 
-    <form method="GET" id="form-filtros">
+    <form
+        method="GET"
+        id="form-filtros"
+    >
 
-        <!-- AÑO AUDITORÍA -->
+
+        <!-- ======================================
+             AÑO
+             ====================================== -->
 
         <div class="filtro">
 
@@ -86,15 +145,26 @@ Consultas
 
             <select name="ano_auditoria">
 
+                <option
+                    value="todos"
+                    {% if not ano_auditoria or ano_auditoria == "todos" %}
+                        selected
+                    {% endif %}
+                >
+                    Todos los años
+                </option>
+
                 {% for ano in anos_auditoria %}
 
                     <option
-                        value="{{ ano.year }}"
-                        {% if ano_auditoria == ano.year|stringformat:"s" %}
+                        value="{{ ano|date:'Y' }}"
+                        {% if ano_auditoria == ano|date:'Y' %}
                             selected
                         {% endif %}
                     >
-                        {{ ano.year }}
+
+                        {{ ano|date:'Y' }}
+
                     </option>
 
                 {% endfor %}
@@ -104,7 +174,9 @@ Consultas
         </div>
 
 
-        <!-- MES AUDITORÍA -->
+        <!-- ======================================
+             MES
+             ====================================== -->
 
         <div class="filtro">
 
@@ -113,59 +185,119 @@ Consultas
             <select name="mes_auditoria">
 
                 <option
-                    value=""
-                    {% if not mes_auditoria %}
+                    value="todos"
+                    {% if not mes_auditoria or mes_auditoria == "todos" %}
                         selected
                     {% endif %}
                 >
                     Todos los meses
                 </option>
 
-                <option value="1" {% if mes_auditoria == "1" %}selected{% endif %}>
+
+                <option value="1"
+                    {% if mes_auditoria == "1" %}
+                        selected
+                    {% endif %}
+                >
                     Enero
                 </option>
 
-                <option value="2" {% if mes_auditoria == "2" %}selected{% endif %}>
+
+                <option value="2"
+                    {% if mes_auditoria == "2" %}
+                        selected
+                    {% endif %}
+                >
                     Febrero
                 </option>
 
-                <option value="3" {% if mes_auditoria == "3" %}selected{% endif %}>
+
+                <option value="3"
+                    {% if mes_auditoria == "3" %}
+                        selected
+                    {% endif %}
+                >
                     Marzo
                 </option>
 
-                <option value="4" {% if mes_auditoria == "4" %}selected{% endif %}>
+
+                <option value="4"
+                    {% if mes_auditoria == "4" %}
+                        selected
+                    {% endif %}
+                >
                     Abril
                 </option>
 
-                <option value="5" {% if mes_auditoria == "5" %}selected{% endif %}>
+
+                <option value="5"
+                    {% if mes_auditoria == "5" %}
+                        selected
+                    {% endif %}
+                >
                     Mayo
                 </option>
 
-                <option value="6" {% if mes_auditoria == "6" %}selected{% endif %}>
+
+                <option value="6"
+                    {% if mes_auditoria == "6" %}
+                        selected
+                    {% endif %}
+                >
                     Junio
                 </option>
 
-                <option value="7" {% if mes_auditoria == "7" %}selected{% endif %}>
+
+                <option value="7"
+                    {% if mes_auditoria == "7" %}
+                        selected
+                    {% endif %}
+                >
                     Julio
                 </option>
 
-                <option value="8" {% if mes_auditoria == "8" %}selected{% endif %}>
+
+                <option value="8"
+                    {% if mes_auditoria == "8" %}
+                        selected
+                    {% endif %}
+                >
                     Agosto
                 </option>
 
-                <option value="9" {% if mes_auditoria == "9" %}selected{% endif %}>
+
+                <option value="9"
+                    {% if mes_auditoria == "9" %}
+                        selected
+                    {% endif %}
+                >
                     Septiembre
                 </option>
 
-                <option value="10" {% if mes_auditoria == "10" %}selected{% endif %}>
+
+                <option value="10"
+                    {% if mes_auditoria == "10" %}
+                        selected
+                    {% endif %}
+                >
                     Octubre
                 </option>
 
-                <option value="11" {% if mes_auditoria == "11" %}selected{% endif %}>
+
+                <option value="11"
+                    {% if mes_auditoria == "11" %}
+                        selected
+                    {% endif %}
+                >
                     Noviembre
                 </option>
 
-                <option value="12" {% if mes_auditoria == "12" %}selected{% endif %}>
+
+                <option value="12"
+                    {% if mes_auditoria == "12" %}
+                        selected
+                    {% endif %}
+                >
                     Diciembre
                 </option>
 
@@ -173,7 +305,10 @@ Consultas
 
         </div>
 
-        <!-- NOMBRE TÉCNICO -->
+
+        <!-- ======================================
+             TÉCNICO
+             ====================================== -->
 
         <div class="filtro">
 
@@ -185,6 +320,7 @@ Consultas
                     Todos
                 </option>
 
+
                 {% for tecnico in nombres_tecnicos %}
 
                     <option
@@ -193,7 +329,9 @@ Consultas
                             selected
                         {% endif %}
                     >
+
                         {{ tecnico }}
+
                     </option>
 
                 {% endfor %}
@@ -202,26 +340,51 @@ Consultas
 
         </div>
 
-        <!-- HALLAZGO -->
+        <!-- ======================================
+             CÉDULA
+             ====================================== -->
 
         <div class="filtro">
 
-            <label>Hallazgo</label>
-            <select name="hallazgo">
+            <label>Cedula Tecnico</label>
+
+            <input
+                type="text"
+                name="numero_cedula"
+                value="{{ request.GET.numero_cedula|default:'' }}"
+                placeholder="Digite la cédula"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- ======================================
+             SUPERVISOR
+             ====================================== -->
+
+        <div class="filtro">
+
+            <label>Supervisor</label>
+
+            <select name="supervisor">
 
                 <option value="">
                     Todos
                 </option>
 
-                {% for item in hallazgos %}
+
+                {% for supervisor in supervisores %}
 
                     <option
-                        value="{{ item }}"
-                        {% if request.GET.hallazgo == item %}
+                        value="{{ supervisor }}"
+                        {% if request.GET.supervisor == supervisor %}
                             selected
                         {% endif %}
                     >
-                        {{ item }}
+
+                        {{ supervisor }}
+
                     </option>
 
                 {% endfor %}
@@ -230,7 +393,9 @@ Consultas
 
         </div>
 
-        <!-- RESULTADO AUDITORÍA -->
+        <!-- ======================================
+             RESULTADO AUDITORÍA
+             ====================================== -->
 
         <div class="filtro">
 
@@ -242,6 +407,7 @@ Consultas
                     Todos
                 </option>
 
+
                 {% for resultado in resultados_auditoria %}
 
                     <option
@@ -250,7 +416,9 @@ Consultas
                             selected
                         {% endif %}
                     >
+
                         {{ resultado }}
+
                     </option>
 
                 {% endfor %}
@@ -259,36 +427,10 @@ Consultas
 
         </div>
 
-        <!-- TIPO OPERACIÓN -->
 
-        <div class="filtro">
-
-            <label>Tipo Ope</label>
-
-            <select name="tipo_operacion">
-
-                <option value="">
-                    Todos
-                </option>
-
-                {% for tipo in tipos_operacion %}
-
-                    <option
-                        value="{{ tipo }}"
-                        {% if request.GET.tipo_operacion == tipo %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ tipo }}
-                    </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-        <!-- NOMBRE AUDITOR -->
+        <!-- ======================================
+             AUDITOR
+             ====================================== -->
 
         <div class="filtro">
 
@@ -300,6 +442,7 @@ Consultas
                     Todos
                 </option>
 
+
                 {% for nombre in nombres_auditores %}
 
                     <option
@@ -308,7 +451,9 @@ Consultas
                             selected
                         {% endif %}
                     >
+
                         {{ nombre }}
+
                     </option>
 
                 {% endfor %}
@@ -317,38 +462,9 @@ Consultas
 
         </div>
 
-
-        <!-- CÉDULA -->
-
-        <div class="filtro">
-
-            <label>Cédula</label>
-
-            <select name="numero_cedula">
-
-                <option value="">
-                    Todas
-                </option>
-
-                {% for cedula in cedulas %}
-
-                    <option
-                        value="{{ cedula }}"
-                        {% if request.GET.numero_cedula == cedula %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ cedula }}
-                    </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <!-- APLICATIVO -->
+        <!-- ======================================
+             APLICATIVO
+             ====================================== -->
 
         <div class="filtro">
 
@@ -360,6 +476,7 @@ Consultas
                     Todos
                 </option>
 
+
                 {% for aplicativo in aplicativos %}
 
                     <option
@@ -368,7 +485,9 @@ Consultas
                             selected
                         {% endif %}
                     >
+
                         {{ aplicativo }}
+
                     </option>
 
                 {% endfor %}
@@ -378,57 +497,70 @@ Consultas
         </div>
 
 
-        <!-- CUENTA CONTRATO -->
+        <!-- ======================================
+             CUENTA CONTRATO
+             ====================================== -->
 
         <div class="filtro">
 
             <label>N° Cta Contrato</label>
 
-            <select name="numero_cuenta_contrato">
-
-                <option value="">
-                    Todas
-                </option>
-
-                {% for cuenta in cuentas_contrato %}
-
-                    <option
-                        value="{{ cuenta }}"
-                        {% if request.GET.numero_cuenta_contrato == cuenta %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ cuenta }}
-                    </option>
-
-                {% endfor %}
-
-            </select>
+            <input
+                type="text"
+                name="numero_cuenta_contrato"
+                value="{{ request.GET.numero_cuenta_contrato|default:'' }}"
+                placeholder="Digite la cuenta"
+                autocomplete="off"
+            >
 
         </div>
 
 
-        <!-- NÚMERO ORDEN -->
+        <!-- ======================================
+             NÚMERO ORDEN
+             ====================================== -->
 
         <div class="filtro">
 
             <label>N° Orden</label>
 
-            <select name="numero_orden">
+            <input
+                type="text"
+                name="numero_orden"
+                value="{{ request.GET.numero_orden|default:'' }}"
+                placeholder="Digite el N° de orden"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- ======================================
+             TIPO OPERACIÓN
+             ====================================== -->
+
+        <div class="filtro">
+
+            <label>Tipo Ope</label>
+
+            <select name="tipo_operacion">
 
                 <option value="">
-                    Todas
+                    Todos
                 </option>
 
-                {% for orden in numeros_orden %}
+
+                {% for tipo in tipos_operacion %}
 
                     <option
-                        value="{{ orden }}"
-                        {% if request.GET.numero_orden == orden %}
+                        value="{{ tipo }}"
+                        {% if request.GET.tipo_operacion == tipo %}
                             selected
                         {% endif %}
                     >
-                        {{ orden }}
+
+                        {{ tipo }}
+
                     </option>
 
                 {% endfor %}
@@ -437,7 +569,13 @@ Consultas
 
         </div>
 
-        <!-- TIPO HALLAZGO -->
+
+        
+
+
+        <!-- ======================================
+             TIPO HALLAZGO
+             ====================================== -->
 
         <div class="filtro">
 
@@ -449,6 +587,7 @@ Consultas
                     Todos
                 </option>
 
+
                 {% for tipo in tipos_hallazgo %}
 
                     <option
@@ -457,7 +596,9 @@ Consultas
                             selected
                         {% endif %}
                     >
+
                         {{ tipo|capfirst }}
+
                     </option>
 
                 {% endfor %}
@@ -467,7 +608,44 @@ Consultas
         </div>
 
 
-        <!-- FECHA OPERACIÓN DESDE -->
+        <!-- ======================================
+             HALLAZGO
+             ====================================== -->
+
+        <div class="filtro">
+
+            <label>Hallazgo</label>
+
+            <select name="hallazgo">
+
+                <option value="">
+                    Todos
+                </option>
+
+
+                {% for item in hallazgos %}
+
+                    <option
+                        value="{{ item }}"
+                        {% if request.GET.hallazgo == item %}
+                            selected
+                        {% endif %}
+                    >
+
+                        {{ item }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- ======================================
+             FECHA OPERACIÓN DESDE
+             ====================================== -->
 
         <div class="filtro">
 
@@ -476,12 +654,15 @@ Consultas
             <input
                 type="date"
                 name="fecha_operacion_desde"
-                value="{{ request.GET.fecha_operacion_desde|default:'' }}">
+                value="{{ request.GET.fecha_operacion_desde|default:'' }}"
+            >
 
         </div>
 
 
-        <!-- FECHA OPERACIÓN HASTA -->
+        <!-- ======================================
+             FECHA OPERACIÓN HASTA
+             ====================================== -->
 
         <div class="filtro">
 
@@ -490,92 +671,203 @@ Consultas
             <input
                 type="date"
                 name="fecha_operacion_hasta"
-                value="{{ request.GET.fecha_operacion_hasta|default:'' }}">
+                value="{{ request.GET.fecha_operacion_hasta|default:'' }}"
+            >
 
         </div>
 
+
+        <!-- ======================================
+             ORIGEN
+             ====================================== -->
+
+        <div class="filtro">
+
+            <label>Origen</label>
+
+            <select name="origen">
+
+                <option value="">
+                    Todos
+                </option>
+
+
+                <option
+                    value="excel"
+                    {% if request.GET.origen == "excel" %}
+                        selected
+                    {% endif %}
+                >
+                    Cargue Excel
+                </option>
+
+
+                <option
+                    value="manual"
+                    {% if request.GET.origen == "manual" %}
+                        selected
+                    {% endif %}
+                >
+                    Auditorias SW
+                </option>
+
+            </select>
+
+        </div>
+
+
     </form>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
 
-        const filtros = document.querySelectorAll(
-            "#form-filtros select, #form-filtros input"
-        );
+    <!-- ======================================
+         JAVASCRIPT
+         ====================================== -->
+
+    <script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const formulario =
+                document.getElementById(
+                    "form-filtros"
+                );
 
 
-        function actualizarFiltros() {
+            if (!formulario) {
 
-            filtros.forEach(function (filtro) {
+                return;
 
-                if (filtro.value !== "") {
+            }
 
-                    filtro.classList.add("filtro-activo");
+
+            const filtros =
+                formulario.querySelectorAll(
+                    "select, input"
+                );
+
+
+            function actualizarFiltro(
+                filtro
+            ) {
+
+                if (
+                    filtro.value &&
+                    filtro.value.trim() !== "" &&
+                    filtro.value !== "todos"
+                ) {
+
+                    filtro.classList.add(
+                        "filtro-activo"
+                    );
 
                 } else {
 
-                    filtro.classList.remove("filtro-activo");
+                    filtro.classList.remove(
+                        "filtro-activo"
+                    );
 
                 }
 
-            });
-
-        }
+            }
 
 
-        // Al cambiar un filtro
-        filtros.forEach(function (filtro) {
+            // Al cargar la página
 
-            filtro.addEventListener(
-                "change",
-                actualizarFiltros
+            filtros.forEach(
+                function (filtro) {
+
+                    actualizarFiltro(
+                        filtro
+                    );
+
+                }
             );
 
-        });
+
+            // Al cambiar selects y fechas
+
+            filtros.forEach(
+                function (filtro) {
+
+                    filtro.addEventListener(
+                        "change",
+                        function () {
+
+                            actualizarFiltro(
+                                this
+                            );
+
+                        }
+                    );
 
 
-        // Al cargar la página
-        actualizarFiltros();
+                    // Mientras escribe
 
-    });
-</script>
+                    filtro.addEventListener(
+                        "input",
+                        function () {
 
-    <!-- RESUMEN Y BOTONES -->
+                            actualizarFiltro(
+                                this
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+    </script>
+
+
+    <!-- ======================================
+         RESUMEN Y BOTONES
+         ====================================== -->
 
     <div class="resumen-consulta">
 
-        <h2>Total de auditorías: {{ Cantidad }}</h2>
+        <h2>
+            Total de auditorías: {{ Cantidad }}
+        </h2>
 
-        <h2>CONSULTA DE AUDITORIAS REALIZADAS</h2>
+
+        <h2>
+            CONSULTA DE AUDITORIAS REALIZADAS
+        </h2>
+
 
         <div class="botones">
 
             <!-- FILTRAR -->
-            <button
-                type="submit"
-                form="form-filtros">
-                Filtrar
-            </button>
 
-            <!-- PDF -->
             <button
                 type="submit"
                 form="form-filtros"
-                formaction="{% url 'generar_pdf' %}"
-                formmethod="GET">
-                Generar PDF
+            >
+                Filtrar
             </button>
 
+
             <!-- EXCEL -->
+
             <button
                 type="submit"
                 form="form-filtros"
                 formaction="{% url 'exportar-excel' %}"
-                formmethod="GET">
+                formmethod="GET"
+            >
                 Generar Excel
             </button>
 
+
+
             <!-- LIMPIAR -->
+
             <a href="{% url 'consulta' %}">
                 Limpiar filtros
             </a>
@@ -587,9 +879,9 @@ Consultas
 </div>
 
 
-<!-- ====================================== -->
-<!-- TABLA -->
-<!-- ====================================== -->
+<!-- ======================================
+     TABLA
+     ====================================== -->
 
 <div class="contenedor-tabla">
 
@@ -598,25 +890,44 @@ Consultas
         <thead>
 
             <tr>
+
                 <th>Fecha</th>
+
                 <th>Nombre Auditor</th>
+
                 <th>N° Cédula</th>
+
                 <th>Aplicativo</th>
+
                 <th>Fecha Operación</th>
+
                 <th>Nombre Técnico</th>
+
                 <th>N° Cuenta Contrato</th>
+
                 <th>N° Orden</th>
+
                 <th>Tipo Operación</th>
+
                 <th>Resultado Auditoría</th>
+
                 <th>Observaciones</th>
+
                 <th>Tipo Hallazgo</th>
+
                 <th>Hallazgo</th>
+
+                <th>Evidencia</th>
+
+                <th>Origen</th>
+
             </tr>
 
         </thead>
 
 
         <tbody>
+
 
             {% for a in Auditorias %}
 
@@ -626,72 +937,134 @@ Consultas
                     {{ a.fecha|date:"d/m/Y" }}
                 </td>
 
+
                 <td>
                     {{ a.nombre_auditor }}
                 </td>
+
 
                 <td>
                     {{ a.numero_cedula }}
                 </td>
 
+
                 <td>
                     {{ a.aplicativo }}
                 </td>
+
 
                 <td>
                     {{ a.fecha_operacion|date:"d/m/Y" }}
                 </td>
 
+
                 <td>
                     {{ a.nombre_tecnico }}
                 </td>
+
 
                 <td>
                     {{ a.numero_cuenta_contrato }}
                 </td>
 
+
                 <td>
                     {{ a.numero_orden }}
                 </td>
+
 
                 <td>
                     {{ a.tipo_operacion }}
                 </td>
 
+
                 <td>
                     {{ a.get_resultado_auditoria_display }}
                 </td>
 
-                <!-- OBSERVACIONES -->
+
                 <td class="texto-largo">
                     {{ a.observacion|linebreaksbr }}
                 </td>
 
+
                 <td>
-                    {{ a.get_tipo_hallazgo_display }}
+
+                    {% if a.tipo_hallazgo %}
+
+                        {{ a.get_tipo_hallazgo_display }}
+
+                    {% endif %}
+
                 </td>
 
-                <!-- HALLAZGO -->
+
                 <td class="texto-largo">
-                    {{ a.hallazgo|linebreaksbr }}
+
+                    {% if a.hallazgo %}
+
+                        {{ a.hallazgo|linebreaksbr }}
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if a.resultado_auditoria == "no_cumple" %}
+
+                        {% if a.foto_evidencia %}
+
+                            <a
+                                href="{% url 'ver_foto_auditoria' a.numero_orden %}"
+                                target="_blank"
+                                class="btn-ver-foto"
+                            >
+                                Ver foto
+                            </a>
+
+                        {% else %}
+
+                            <span>No hay foto</span>
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </td>
+
+
+
+
+                <td>
+                    {{ a.get_origen_display }}
                 </td>
 
             </tr>
+
 
             {% empty %}
 
             <tr>
-                <td colspan="13">
-                    No se encontraron auditorías con los filtros seleccionados.
+
+                <td colspan="15">
+
+                    No se encontraron auditorías
+                    con los filtros seleccionados.
+
                 </td>
+
             </tr>
 
             {% endfor %}
+
 
         </tbody>
 
     </table>
 
 </div>
+
 
 {% endblock %}

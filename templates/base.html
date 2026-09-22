@@ -201,13 +201,7 @@
     <section class="contenido">
 
         {% if messages %}
-            <div class="mensajes-globales">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
+            
         {% endif %}
 
         {% block content %}

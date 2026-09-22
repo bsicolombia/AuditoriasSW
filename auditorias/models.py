@@ -4,6 +4,30 @@ from django.db import models
 import os
 from django.utils import timezone
 
+
+def ruta_foto_auditoria(instance, filename):
+    """
+    Guarda la evidencia utilizando el número de orden.
+
+    Ejemplo:
+
+    numero_orden = 123456789
+
+    Resultado:
+
+    auditorias/evidencias/2026/09/123456789.jpg
+    """
+
+    extension = os.path.splitext(filename)[1].lower()
+
+    numero_orden = instance.numero_orden
+
+    return (
+        f"auditorias/evidencias/"
+        f"{timezone.now().year}/"
+        f"{timezone.now().month:02d}/"
+        f"{numero_orden}{extension}"
+    )
 # ============================================================
 # HALLAZGOS
 # ============================================================
@@ -91,6 +115,12 @@ HALLAZGOS = (
 
 
 class Auditoria(models.Model):
+    
+    APLICATIVOS = [
+        ("SAP", "SAP"),
+        ("FIVE", "FIVE"),
+    ]
+
 
     RESULTADO = [
         ("cumple", "Cumple"),
@@ -111,7 +141,7 @@ class Auditoria(models.Model):
 
     ORIGEN = [
         ("excel", "Cargue Excel"),
-        ("manual", "Registrada en el software"),
+        ("manual", "Auditorias SW"),
     ]
 
     # ========================================================
@@ -138,9 +168,9 @@ class Auditoria(models.Model):
     )
 
     aplicativo = models.CharField(
-        max_length=100
+        max_length=100,
+        choices=APLICATIVOS,
     )
-
     # ========================================================
     # FECHA DE OPERACIÓN
     # ========================================================
@@ -225,7 +255,7 @@ class Auditoria(models.Model):
     # ========================================================
 
     foto_evidencia = models.ImageField(
-        upload_to="auditorias/evidencias/%Y/%m/",
+        upload_to=ruta_foto_auditoria,
         blank=True,
         null=True,
         verbose_name="Foto de evidencia",

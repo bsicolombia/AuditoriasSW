@@ -13,37 +13,28 @@
     <div class="auditoria-form-card">
 
         <h2 class="auditoria-form-titulo">
-
             {% if modo == "editar" %}
                 Editar auditoría
             {% else %}
                 Registrar nueva auditoría
             {% endif %}
-
         </h2>
 
 
         {% if messages %}
-
             {% for message in messages %}
-
                 <div class="auditoria-alert auditoria-alert-{{ message.tags }}">
                     {{ message }}
                 </div>
-
             {% endfor %}
-
         {% endif %}
 
 
-        <!-- ================================================= -->
-        <!-- DATOS AUTOMÁTICOS                                  -->
-        <!-- ================================================= -->
+        <!-- DATOS AUTOMÁTICOS -->
 
         <div class="auditoria-auto-info">
 
             <div class="auto-info-item">
-
                 <span class="auto-info-label">
                     Auditor
                 </span>
@@ -51,12 +42,10 @@
                 <span class="auto-info-valor">
                     {{ nombre_auditor }}
                 </span>
-
             </div>
 
 
             <div class="auto-info-item">
-
                 <span class="auto-info-label">
                     Cédula
                 </span>
@@ -64,45 +53,29 @@
                 <span class="auto-info-valor">
                     {{ cedula_usuario }}
                 </span>
-
             </div>
 
 
             <div class="auto-info-item">
-
                 <span class="auto-info-label">
                     Fecha y hora
                 </span>
 
                 <span class="auto-info-valor">
+
                     {% if auditoria %}
                         {{ auditoria.fecha|date:"d/m/Y H:i:s" }}
                     {% else %}
                         {{ fecha_hoy|date:"d/m/Y" }}
                     {% endif %}
+
                 </span>
-
-            </div>
-
-
-            <div class="auto-info-item">
-
-                <span class="auto-info-label">
-                    Aplicativo
-                </span>
-
-                <span class="auto-info-valor">
-                    AuditoriasSW
-                </span>
-
             </div>
 
         </div>
 
 
-        <!-- ================================================= -->
-        <!-- FORMULARIO                                         -->
-        <!-- ================================================= -->
+        <!-- FORMULARIO -->
 
         <form
             method="post"
@@ -115,91 +88,83 @@
 
 
             {% if form.non_field_errors %}
-
                 <div class="auditoria-alert auditoria-alert-error">
-
                     {{ form.non_field_errors }}
-
                 </div>
-
             {% endif %}
 
 
             <div class="auditoria-form-grid">
 
 
-                <!-- ========================================== -->
-                <!-- FECHA OPERACIÓN                             -->
-                <!-- ========================================== -->
+                <!-- APLICATIVO -->
+
+                <div class="auditoria-campo">
+
+                    <label for="{{ form.aplicativo.id_for_label }}">
+                        {{ form.aplicativo.label }}
+                        <span class="campo-obligatorio">*</span>
+                    </label>
+
+                    {{ form.aplicativo }}
+
+                    {% if form.aplicativo.errors %}
+                        <div class="auditoria-error">
+                            {{ form.aplicativo.errors|striptags }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- FECHA OPERACIÓN -->
 
                 <div class="auditoria-campo">
 
                     <label for="{{ form.fecha_operacion.id_for_label }}">
-
                         {{ form.fecha_operacion.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.fecha_operacion }}
 
                     {% if form.fecha_operacion.errors %}
-
                         <div class="auditoria-error">
                             {{ form.fecha_operacion.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- TÉCNICO                                     -->
-                <!-- ========================================== -->
+                <!-- TÉCNICO -->
 
                 <div class="auditoria-campo">
 
-                    <label for="{{ form.tecnico.id_for_label }}">
-
-                        {{ form.tecnico.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                    <label for="{{ form.nombre_tecnico.id_for_label }}">
+                        {{ form.nombre_tecnico.label }}
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
-                    {{ form.tecnico }}
+                    {{ form.nombre_tecnico }}
 
-                    {% if form.tecnico.errors %}
-
+                    {% if form.nombre_tecnico.errors %}
                         <div class="auditoria-error">
-                            {{ form.tecnico.errors|striptags }}
+                            {{ form.nombre_tecnico.errors|striptags }}
                         </div>
-
                     {% endif %}
+
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- CUENTA / CONTRATO                           -->
-                <!-- ========================================== -->
+                <!-- CUENTA / CONTRATO -->
 
                 <div class="auditoria-campo">
 
                     <label for="{{ form.numero_cuenta_contrato.id_for_label }}">
-
                         {{ form.numero_cuenta_contrato.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.numero_cuenta_contrato }}
@@ -209,30 +174,21 @@
                     </span>
 
                     {% if form.numero_cuenta_contrato.errors %}
-
                         <div class="auditoria-error">
                             {{ form.numero_cuenta_contrato.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- ORDEN                                       -->
-                <!-- ========================================== -->
+                <!-- ORDEN -->
 
                 <div class="auditoria-campo">
 
                     <label for="{{ form.numero_orden.id_for_label }}">
-
                         {{ form.numero_orden.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.numero_orden }}
@@ -242,77 +198,55 @@
                     </span>
 
                     {% if form.numero_orden.errors %}
-
                         <div class="auditoria-error">
                             {{ form.numero_orden.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- TIPO OPERACIÓN                              -->
-                <!-- ========================================== -->
+                <!-- TIPO OPERACIÓN -->
 
                 <div class="auditoria-campo">
 
                     <label for="{{ form.tipo_operacion.id_for_label }}">
-
                         {{ form.tipo_operacion.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.tipo_operacion }}
 
                     {% if form.tipo_operacion.errors %}
-
                         <div class="auditoria-error">
                             {{ form.tipo_operacion.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- RESULTADO                                   -->
-                <!-- ========================================== -->
+                <!-- RESULTADO -->
 
                 <div class="auditoria-campo">
 
                     <label for="{{ form.resultado_auditoria.id_for_label }}">
-
                         {{ form.resultado_auditoria.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.resultado_auditoria }}
 
                     {% if form.resultado_auditoria.errors %}
-
                         <div class="auditoria-error">
                             {{ form.resultado_auditoria.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- TIPO HALLAZGO                               -->
-                <!-- ========================================== -->
+                <!-- TIPO HALLAZGO -->
 
                 <div
                     class="auditoria-campo"
@@ -320,31 +254,22 @@
                 >
 
                     <label for="{{ form.tipo_hallazgo.id_for_label }}">
-
                         {{ form.tipo_hallazgo.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.tipo_hallazgo }}
 
                     {% if form.tipo_hallazgo.errors %}
-
                         <div class="auditoria-error">
                             {{ form.tipo_hallazgo.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- HALLAZGO                                    -->
-                <!-- ========================================== -->
+                <!-- HALLAZGO -->
 
                 <div
                     class="auditoria-campo"
@@ -352,42 +277,28 @@
                 >
 
                     <label for="{{ form.hallazgo.id_for_label }}">
-
                         {{ form.hallazgo.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.hallazgo }}
 
                     {% if form.hallazgo.errors %}
-
                         <div class="auditoria-error">
                             {{ form.hallazgo.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- OBSERVACIONES                               -->
-                <!-- ========================================== -->
+                <!-- OBSERVACIONES -->
 
                 <div class="auditoria-campo auditoria-campo-full">
 
                     <label for="{{ form.observacion.id_for_label }}">
-
                         {{ form.observacion.label }}
-
-                        <span class="campo-obligatorio">
-                            *
-                        </span>
-
+                        <span class="campo-obligatorio">*</span>
                     </label>
 
                     {{ form.observacion }}
@@ -397,45 +308,35 @@
                     </span>
 
                     {% if form.observacion.errors %}
-
                         <div class="auditoria-error">
                             {{ form.observacion.errors|striptags }}
                         </div>
-
                     {% endif %}
 
                 </div>
 
 
-                <!-- ========================================== -->
-                <!-- FOTO                                        -->
-                <!-- ========================================== -->
+                <!-- FOTO -->
 
                 <div class="auditoria-campo auditoria-campo-full">
 
                     <label for="{{ form.foto_evidencia.id_for_label }}">
-
                         {{ form.foto_evidencia.label }}
-
                     </label>
 
                     {{ form.foto_evidencia }}
 
                     <span class="auditoria-campo-ayuda">
-
                         Opcional. JPG, PNG o WEBP.
                         Máximo 5 MB.
                         El archivo se guardará utilizando
                         el número de orden.
-
                     </span>
 
                     {% if form.foto_evidencia.errors %}
-
                         <div class="auditoria-error">
                             {{ form.foto_evidencia.errors|striptags }}
                         </div>
-
                     {% endif %}
 
 
@@ -461,9 +362,7 @@
             </div>
 
 
-            <!-- ================================================= -->
-            <!-- BOTÓN                                             -->
-            <!-- ================================================= -->
+            <!-- BOTÓN -->
 
             <div class="auditoria-form-acciones">
 
@@ -471,11 +370,13 @@
                     type="submit"
                     class="auditoria-btn-guardar"
                 >
+
                     {% if modo == "editar" %}
                         Actualizar auditoría
                     {% else %}
                         Guardar auditoría
                     {% endif %}
+
                 </button>
 
             </div>
@@ -485,12 +386,6 @@
     </div>
 
 </div>
-
-
-<!-- ========================================================= -->
-<!-- HALLAZGOS + RESULTADO                                     -->
-<!-- ========================================================= -->
-
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -507,72 +402,227 @@ document.addEventListener("DOMContentLoaded", function () {
         "id_hallazgo"
     );
 
-    const datosHallazgos = {
-        alto: [
-            {% for valor, texto in form.fields.hallazgo.choices %}
-            {% endfor %}
-        ]
-    };
 
-    function actualizarHallazgo() {
+    if (!resultado || !tipoHallazgo || !hallazgo) {
+        return;
+    }
+
+
+    /* =====================================================
+       HALLAZGOS ENVIADOS DESDE DJANGO
+    ===================================================== */
+
+    const hallazgos = JSON.parse(
+        '{{ hallazgos_json|escapejs }}'
+    );
+
+
+    /* =====================================================
+       CARGAR HALLAZGOS
+    ===================================================== */
+
+    function cargarHallazgos() {
 
         const tipo = tipoHallazgo.value;
 
+        /*
+         * Guardamos el valor actual.
+         * Esto permite conservarlo cuando se edita
+         * una auditoría.
+         */
+
+        const valorActual = hallazgo.value;
+
+
+        /*
+         * Limpiar el select
+         */
+
         hallazgo.innerHTML = "";
 
-        const opcionInicial = document.createElement("option");
+
+        /*
+         * Opción inicial
+         */
+
+        const opcionInicial =
+            document.createElement("option");
 
         opcionInicial.value = "";
         opcionInicial.textContent =
             "Seleccione un hallazgo";
 
-        hallazgo.appendChild(opcionInicial);
+        hallazgo.appendChild(
+            opcionInicial
+        );
+
+
+        /*
+         * Si no hay tipo seleccionado,
+         * no cargamos nada.
+         */
 
         if (!tipo) {
             return;
         }
 
-        const opciones = {
 
-            alto: [
-                {% for valor, texto in form.fields.hallazgo.choices %}
-                {% if valor %}
-                ["{{ valor|escapejs }}", "{{ texto|escapejs }}"],
-                {% endif %}
-                {% endfor %}
-            ]
+        /*
+         * Obtener las opciones correspondientes.
+         */
 
-        };
+        const opciones =
+            hallazgos[tipo] || [];
+
+
+        /*
+         * Agregar hallazgos
+         */
+
+        opciones.forEach(function (opcion) {
+
+            const elemento =
+                document.createElement("option");
+
+            elemento.value = opcion[0];
+            elemento.textContent = opcion[1];
+
+            hallazgo.appendChild(
+                elemento
+            );
+
+        });
+
+
+        /*
+         * Restaurar selección anterior
+         * si existe.
+         */
+
+        if (valorActual) {
+
+            const existe =
+                Array.from(
+                    hallazgo.options
+                ).some(function (option) {
+
+                    return option.value === valorActual;
+
+                });
+
+
+            if (existe) {
+
+                hallazgo.value =
+                    valorActual;
+
+            }
+
+        }
+
     }
+
+
+    /* =====================================================
+       CONTROLAR RESULTADO
+    ===================================================== */
 
     function controlarCampos() {
 
-        if (resultado.value === "no_cumple") {
+        if (
+            resultado.value === "no_cumple"
+        ) {
+
+            /*
+             * Habilitar campos
+             */
 
             tipoHallazgo.disabled = false;
             hallazgo.disabled = false;
 
+
+            /*
+             * Cargar inmediatamente
+             * según el tipo seleccionado.
+             */
+
+            cargarHallazgos();
+
         } else {
 
+            /*
+             * Si cumple:
+             * limpiar y deshabilitar.
+             */
+
             tipoHallazgo.value = "";
+
             hallazgo.value = "";
 
+
             tipoHallazgo.disabled = true;
+
             hallazgo.disabled = true;
+
+
+            /*
+             * Dejar solamente la opción inicial.
+             */
+
+            hallazgo.innerHTML = "";
+
+            const opcion =
+                document.createElement("option");
+
+            opcion.value = "";
+
+            opcion.textContent =
+                "Seleccione un hallazgo";
+
+            hallazgo.appendChild(
+                opcion
+            );
+
         }
+
     }
 
-    resultado.addEventListener(
-        "change",
-        controlarCampos
-    );
+
+    /* =====================================================
+       CAMBIO DE TIPO DE HALLAZGO
+    ===================================================== */
 
     tipoHallazgo.addEventListener(
         "change",
-        actualizarHallazgo
+        function () {
+
+            cargarHallazgos();
+
+        }
     );
 
+
+    /* =====================================================
+       CAMBIO DE RESULTADO
+    ===================================================== */
+
+    resultado.addEventListener(
+        "change",
+        function () {
+
+            controlarCampos();
+
+        }
+    );
+
+
+    /* =====================================================
+       INICIALIZAR
+    ===================================================== */
+
     controlarCampos();
+
 });
 </script>
+
 {% endblock %}

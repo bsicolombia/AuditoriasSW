@@ -172,14 +172,83 @@ def cargar_excel(request):
 
         return redirect("cargar_excel")
 
+    # ========================================================
+    # NORMALIZAR ÓRDENES DEL EXCEL
+    # ========================================================
+
+    def normalizar_orden(valor):
+
+        if pd.isna(valor):
+            return ""
+
+        valor = str(valor).strip()
+
+        # Eliminar .0 cuando Excel convierte números
+        if valor.endswith(".0"):
+            valor = valor[:-2]
+
+        # Quitar espacios
+        valor = valor.strip()
+
+        return valor
+
+    # ========================================================
+    # OBTENER TODAS LAS ÓRDENES EXISTENTES EN LA BD
+    # ========================================================
+
+    ordenes_existentes = set(
+        Auditoria.objects
+        .values_list("numero_orden", flat=True)
+    )
+
+    # Normalizar también las órdenes que vienen de la BD
+    ordenes_existentes = {
+        normalizar_orden(orden)
+        for orden in ordenes_existentes
+        if orden is not None
+    }
+
     creadas = 0
+    ignoradas = 0
     errores = []
+
+    # ========================================================
+    # PROCESAR EXCEL
+    # ========================================================
 
     for numero_fila, fila in excel.iterrows():
 
         fila_excel = numero_fila + 2
 
         try:
+
+            # ------------------------------------------------
+            # ORDEN
+            # ------------------------------------------------
+
+            numero_orden = normalizar_orden(
+                fila["Orden"]
+            )
+
+            if not numero_orden:
+                raise ValueError(
+                    "La orden está vacía."
+                )
+
+            # ------------------------------------------------
+            # VERIFICAR SI YA EXISTE
+            # ------------------------------------------------
+
+            if numero_orden in ordenes_existentes:
+
+                ignoradas += 1
+
+                # IMPORTANTE:
+                # No se agrega a errores.
+                # No se ejecuta full_clean().
+                # No se intenta guardar.
+
+                continue
 
             # ------------------------------------------------
             # FECHAS
@@ -215,17 +284,6 @@ def cargar_excel(request):
 
             if numero_cuenta.endswith(".0"):
                 numero_cuenta = numero_cuenta[:-2]
-
-            # ------------------------------------------------
-            # ORDEN
-            # ------------------------------------------------
-
-            numero_orden = str(
-                fila["Orden"]
-            ).strip()
-
-            if numero_orden.endswith(".0"):
-                numero_orden = numero_orden[:-2]
 
             # ------------------------------------------------
             # RESULTADO
@@ -285,6 +343,7 @@ def cargar_excel(request):
             ).strip()
 
             if observacion.lower() in (
+                "",
                 "nan",
                 "none",
             ):
@@ -354,52 +413,84 @@ def cargar_excel(request):
 
             creadas += 1
 
+            # IMPORTANTE:
+            # Agregamos la nueva orden al conjunto.
+            #
+            # Esto evita que si el mismo Excel tiene
+            # dos veces la misma orden, la segunda también
+            # sea tratada como nueva.
+
+            ordenes_existentes.add(numero_orden)
+            
+            print("Cantidad de órdenes en BD:", len(ordenes_existentes))
+
+            print(
+                "Primeras 10 órdenes BD:",
+                list(ordenes_existentes)[:10]
+            )
+
+
         except Exception as e:
 
             errores.append(
                 f"Fila {fila_excel}: {str(e)}"
             )
 
-    if creadas:
+    # ========================================================
+    # RESUMEN
+    # ========================================================
 
+    total_procesadas = len(excel)
+
+    mensaje = (
+        f"Se procesaron {total_procesadas} órdenes auditadas.\n"
+        f"Creadas: {creadas}\n"
+        f"Ya registradas: {ignoradas}\n"
+        f"Errores: {len(errores)}"
+    )
+
+
+    # ========================================================
+    # MENSAJES
+    # ========================================================
+
+    if creadas:
         messages.success(
             request,
-            f"Se cargaron correctamente {creadas} auditorías."
+            f"{creadas} auditorías nuevas fueron creadas correctamente."
+        )
+
+    if ignoradas:
+        messages.info(
+            request,
+            f"{ignoradas} auditorías ya estaban registradas y fueron ignoradas."
         )
 
     if errores:
-
         messages.warning(
             request,
-            f"No se pudieron cargar {len(errores)} filas."
+            f"{len(errores)} auditorías nuevas presentan errores."
         )
 
     return render(
         request,
         "carga/carga.html",
         {
-            "mensaje": (
-                f"Registros cargados: {creadas}. "
-                f"Errores: {len(errores)}."
-            ),
+            "mensaje": mensaje,
             "errores": errores,
+            "creadas": creadas,
+            "ignoradas": ignoradas,
+            "total_procesadas": total_procesadas,
         }
     )
 
-<<<<<<< HEAD
+
+
 # ============================================================
-# FUNCIÓN GENERAL DE FILTROS
+# FUNCIÓN GENERAL DE FILTROS (usada por PDF y Excel)
 # ============================================================
 
 def filtrar_auditorias(request):
-=======
-@role_required("Administrador", "Coordinador", "Digitador")
-def consulta(request):
-
-    # =====================================================
-    # QUERYSET BASE
-    # =====================================================
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 
     auditorias = Auditoria.objects.all()
 
@@ -523,6 +614,20 @@ def consulta(request):
         )
 
     # ========================================================
+    # ORIGEN
+    # ========================================================
+
+    origen = request.GET.get(
+        "origen",
+        ""
+    ).strip()
+
+    if origen:
+        auditorias = auditorias.filter(
+            origen=origen
+        )
+
+    # ========================================================
     # ORDEN
     # ========================================================
 
@@ -532,6 +637,10 @@ def consulta(request):
         "-id"
     )
 
+
+# ============================================================
+# CONSULTA
+# ============================================================
 
 @role_required(
     "Administrador",
@@ -644,7 +753,6 @@ def consulta(request):
     ).strip()
 
     nombre_auditor = request.GET.get(
-<<<<<<< HEAD
         "nombre_auditor",
         ""
     ).strip()
@@ -690,80 +798,6 @@ def consulta(request):
     ).strip()
 
     # ========================================================
-=======
-        "nombre_auditor", ""
-    ).strip()
-
-    numero_cedula = request.GET.get(
-        "numero_cedula", ""
-    ).strip()
-
-    aplicativo = request.GET.get(
-        "aplicativo", ""
-    ).strip()
-
-    nombre_tecnico = request.GET.get(
-        "nombre_tecnico", ""
-    ).strip()
-
-    numero_cuenta_contrato = request.GET.get(
-        "numero_cuenta_contrato", ""
-    ).strip()
-
-    numero_orden = request.GET.get(
-        "numero_orden", ""
-    ).strip()
-
-    tipo_operacion = request.GET.get(
-        "tipo_operacion", ""
-    ).strip()
-
-    resultado_auditoria = request.GET.get(
-        "resultado_auditoria", ""
-    ).strip()
-
-    tipo_hallazgo = request.GET.get(
-        "tipo_hallazgo", ""
-    ).strip()
-
-    hallazgo = request.GET.get(
-        "hallazgo", ""
-    ).strip()
-
-    # =====================================================
-    # FECHAS
-    # =====================================================
-
-    fecha_operacion_desde = request.GET.get(
-        "fecha_operacion_desde", ""
-    ).strip()
-
-    fecha_operacion_hasta = request.GET.get(
-        "fecha_operacion_hasta", ""
-    ).strip()
-
-    fecha_inicio_auditoria = request.GET.get(
-        "fecha_inicio_auditoria", ""
-    ).strip()
-
-    fecha_fin_auditoria = request.GET.get(
-        "fecha_fin_auditoria", ""
-    ).strip()
-
-    # =====================================================
-    # MES Y AÑO
-    # =====================================================
-
-    mes_auditoria = request.GET.get(
-        "mes_auditoria", ""
-    ).strip()
-
-    ano_auditoria = request.GET.get(
-        "ano_auditoria", ""
-    ).strip()
-
-    # =====================================================
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     # APLICAR FILTROS
     # ========================================================
 
@@ -911,7 +945,7 @@ def consulta(request):
     if nombre_auditor:
 
         auditorias = auditorias.filter(
-            nombre_auditor__icontains=nombre_auditor
+            nombre_auditor=nombre_auditor
         )
 
     if numero_cedula:
@@ -932,7 +966,7 @@ def consulta(request):
 
         for auditoria in auditorias_cedula:
 
-            nombre_tecnico = texto_seguro(
+            nombre_tecnico_valor = texto_seguro(
                 auditoria.get(
                     "nombre_tecnico"
                 )
@@ -940,7 +974,7 @@ def consulta(request):
 
             cedula_tecnico = (
                 extraer_cedula_nombre_tecnico(
-                    nombre_tecnico
+                    nombre_tecnico_valor
                 )
             )
 
@@ -955,27 +989,15 @@ def consulta(request):
                 )
 
         auditorias = auditorias.filter(
-<<<<<<< HEAD
             id__in=ids_cedula
-=======
-            numero_cedula__icontains=numero_cedula
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         )
 
     if aplicativo:
 
         auditorias = auditorias.filter(
-            aplicativo__icontains=aplicativo
+            aplicativo=aplicativo
         )
 
-<<<<<<< HEAD
-=======
-    if nombre_tecnico:
-        auditorias = auditorias.filter(
-            nombre_tecnico__icontains=nombre_tecnico
-        )
-
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     if numero_cuenta_contrato:
 
         auditorias = auditorias.filter(
@@ -983,44 +1005,17 @@ def consulta(request):
         )
 
     if numero_orden:
-<<<<<<< HEAD
-=======
-        auditorias = auditorias.filter(
-            numero_orden__icontains=numero_orden
-        )
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 
         auditorias = auditorias.filter(
-<<<<<<< HEAD
             numero_orden__icontains=numero_orden
-=======
-            tipo_operacion__iexact=tipo_operacion
-        )
-
-    if resultado_auditoria:
-        auditorias = auditorias.filter(
-            resultado_auditoria__iexact=resultado_auditoria
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         )
 
     if tipo_hallazgo:
 
         auditorias = auditorias.filter(
-            tipo_hallazgo__iexact=tipo_hallazgo
+            tipo_hallazgo=tipo_hallazgo
         )
 
-<<<<<<< HEAD
-=======
-    if hallazgo:
-        auditorias = auditorias.filter(
-            hallazgo__icontains=hallazgo
-        )
-
-    # =====================================================
-    # FECHA DE OPERACIÓN
-    # =====================================================
-
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     if fecha_operacion_desde:
 
         auditorias = auditorias.filter(
@@ -1033,7 +1028,6 @@ def consulta(request):
             fecha_operacion__lte=fecha_operacion_hasta
         )
 
-<<<<<<< HEAD
     if origen:
 
         auditorias = auditorias.filter(
@@ -1043,50 +1037,6 @@ def consulta(request):
     # ========================================================
     # ORDEN
     # ========================================================
-=======
-    # =====================================================
-    # FECHA DE AUDITORÍA
-    #
-    # fecha = DateTimeField
-    # =====================================================
-
-    if fecha_inicio_auditoria:
-        auditorias = auditorias.filter(
-            fecha__date__gte=fecha_inicio_auditoria
-        )
-
-    if fecha_fin_auditoria:
-        auditorias = auditorias.filter(
-            fecha__date__lte=fecha_fin_auditoria
-        )
-
-    # =====================================================
-    # MES DE AUDITORÍA
-    # =====================================================
-
-    if mes_auditoria.isdigit():
-
-        mes = int(mes_auditoria)
-
-        if 1 <= mes <= 12:
-            auditorias = auditorias.filter(
-                fecha__month=mes
-            )
-
-    # =====================================================
-    # AÑO DE AUDITORÍA
-    # =====================================================
-
-    if ano_auditoria.isdigit():
-
-        auditorias = auditorias.filter(
-            fecha__year=int(ano_auditoria)
-        )
-
-    # =====================================================
-    # ORDEN
-    # =====================================================
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 
     auditorias = auditorias.order_by(
         "-fecha",
@@ -1094,17 +1044,12 @@ def consulta(request):
         "-id"
     )
 
-<<<<<<< HEAD
     # ========================================================
-=======
-    # =====================================================
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     # CANTIDAD
     # ========================================================
 
     cantidad = auditorias.count()
 
-<<<<<<< HEAD
     # ========================================================
     # ESTADÍSTICAS
     # ========================================================
@@ -1126,20 +1071,11 @@ def consulta(request):
     # ========================================================
     # OPCIONES DE LOS SELECT
     # ========================================================
-=======
-    # =====================================================
-    # OPCIONES PARA LOS SELECT
-    # =====================================================
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
 
     nombres_auditores = (
         Auditoria.objects
         .exclude(nombre_auditor__isnull=True)
-<<<<<<< HEAD
         .exclude(nombre_auditor="")
-=======
-        .exclude(nombre_auditor__exact="")
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "nombre_auditor",
             flat=True
@@ -1148,29 +1084,10 @@ def consulta(request):
         .order_by("nombre_auditor")
     )
 
-<<<<<<< HEAD
     aplicativos = (
         Auditoria.objects
         .exclude(aplicativo__isnull=True)
         .exclude(aplicativo="")
-=======
-    cedulas = (
-        Auditoria.objects
-        .exclude(numero_cedula__isnull=True)
-        .exclude(numero_cedula__exact="")
-        .values_list(
-            "numero_cedula",
-            flat=True
-        )
-        .distinct()
-        .order_by("numero_cedula")
-    )
-
-    aplicativos = (
-        Auditoria.objects
-        .exclude(aplicativo__isnull=True)
-        .exclude(aplicativo__exact="")
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "aplicativo",
             flat=True
@@ -1182,11 +1099,7 @@ def consulta(request):
     nombres_tecnicos = (
         Auditoria.objects
         .exclude(nombre_tecnico__isnull=True)
-<<<<<<< HEAD
         .exclude(nombre_tecnico="")
-=======
-        .exclude(nombre_tecnico__exact="")
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "nombre_tecnico",
             flat=True
@@ -1195,41 +1108,10 @@ def consulta(request):
         .order_by("nombre_tecnico")
     )
 
-<<<<<<< HEAD
     tipos_operacion = (
         Auditoria.objects
         .exclude(tipo_operacion__isnull=True)
         .exclude(tipo_operacion="")
-=======
-    cuentas_contrato = (
-        Auditoria.objects
-        .exclude(numero_cuenta_contrato__isnull=True)
-        .exclude(numero_cuenta_contrato__exact="")
-        .values_list(
-            "numero_cuenta_contrato",
-            flat=True
-        )
-        .distinct()
-        .order_by("numero_cuenta_contrato")
-    )
-
-    numeros_orden = (
-        Auditoria.objects
-        .exclude(numero_orden__isnull=True)
-        .exclude(numero_orden__exact="")
-        .values_list(
-            "numero_orden",
-            flat=True
-        )
-        .distinct()
-        .order_by("numero_orden")
-    )
-
-    tipos_operacion = (
-        Auditoria.objects
-        .exclude(tipo_operacion__isnull=True)
-        .exclude(tipo_operacion__exact="")
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "tipo_operacion",
             flat=True
@@ -1241,11 +1123,7 @@ def consulta(request):
     resultados_auditoria = (
         Auditoria.objects
         .exclude(resultado_auditoria__isnull=True)
-<<<<<<< HEAD
         .exclude(resultado_auditoria="")
-=======
-        .exclude(resultado_auditoria__exact="")
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "resultado_auditoria",
             flat=True
@@ -1257,11 +1135,7 @@ def consulta(request):
     tipos_hallazgo = (
         Auditoria.objects
         .exclude(tipo_hallazgo__isnull=True)
-<<<<<<< HEAD
         .exclude(tipo_hallazgo="")
-=======
-        .exclude(tipo_hallazgo__exact="")
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "tipo_hallazgo",
             flat=True
@@ -1273,11 +1147,7 @@ def consulta(request):
     hallazgos = (
         Auditoria.objects
         .exclude(hallazgo__isnull=True)
-<<<<<<< HEAD
         .exclude(hallazgo="")
-=======
-        .exclude(hallazgo__exact="")
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .values_list(
             "hallazgo",
             flat=True
@@ -1286,7 +1156,6 @@ def consulta(request):
         .order_by("hallazgo")
     )
 
-<<<<<<< HEAD
     # ========================================================
     # AÑOS DISPONIBLES
     # ========================================================
@@ -1294,14 +1163,6 @@ def consulta(request):
     anos_auditoria = (
         Auditoria.objects
         .filter(fecha__isnull=False)
-=======
-    # =====================================================
-    # AÑOS DISPONIBLES
-    # =====================================================
-
-    anos_auditoria = (
-        Auditoria.objects
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
         .dates(
             "fecha",
             "year",
@@ -1309,7 +1170,6 @@ def consulta(request):
         )
     )
 
-<<<<<<< HEAD
     # ========================================================
     # SUPERVISORES
     # ========================================================
@@ -1327,14 +1187,13 @@ def consulta(request):
     )
 
     # ========================================================
-=======
-    # =====================================================
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
     # CONTEXTO
     # ========================================================
 
     context = {
+
         "Auditorias": auditorias,
+
         "Cantidad": cantidad,
 
         "Suspensiones": suspensiones,
@@ -1346,6 +1205,7 @@ def consulta(request):
         "total_operaciones": total_operaciones,
 
         "ano_auditoria": ano_auditoria,
+
         "mes_auditoria": mes_auditoria,
 
         "nombres_auditores": nombres_auditores,
@@ -1372,10 +1232,11 @@ def consulta(request):
         "auditorias/consulta.html",
         context
     )
-<<<<<<< HEAD
-=======
 
 
+# ============================================================
+# PDF
+# ============================================================
 
 def generate_pdf(request):
 
@@ -1383,7 +1244,6 @@ def generate_pdf(request):
 
     cantidad = auditorias.count()
 
-    # Evitar generar PDFs demasiado grandes
     if cantidad > 50000:
 
         return HttpResponse(
@@ -1396,7 +1256,9 @@ def generate_pdf(request):
 
                 <body>
 
-                    <h2>Demasiados registros para generar el PDF</h2>
+                    <h2>
+                        Demasiados registros para generar el PDF
+                    </h2>
 
                     <p>
                         La consulta contiene
@@ -1451,7 +1313,11 @@ def generate_pdf(request):
 
     return response
 
->>>>>>> 9b69d244487016cd7df43227166cec5d27d14dd5
+
+# ============================================================
+# EXPORTAR EXCEL
+# ============================================================
+
 def exportar_excel(request):
 
     auditorias = filtrar_auditorias(request)
@@ -1538,6 +1404,8 @@ def exportar_excel(request):
         )
 
     return response
+
+
 # ============================================================
 # ESTADÍSTICAS
 # ============================================================
@@ -1565,6 +1433,164 @@ def reauditar(request):
         request,
         "auditorias/reauditar.html"
     )
+
+
+# ============================================================
+# EXPORTAR ESTADÍSTICAS
+# ============================================================
+
+def exportar_estadisticas_excel(request):
+
+    cantidad = Auditoria.objects.count()
+
+    suspensiones = Auditoria.objects.filter(
+        tipo_operacion="DC00"
+    ).count()
+
+    reconexiones = Auditoria.objects.filter(
+        tipo_operacion="RC00"
+    ).count()
+
+    zvcl = Auditoria.objects.filter(
+        tipo_operacion="ZVCL"
+    ).count()
+
+    estadisticas_tecnico = list(
+        Auditoria.objects
+        .values("nombre_tecnico")
+        .annotate(total=Count("id"))
+        .order_by("-total")
+    )
+
+    datos_tecnicos = []
+
+    for tecnico in estadisticas_tecnico:
+
+        datos_tecnicos.append({
+
+            "Nombre Técnico":
+                tecnico["nombre_tecnico"],
+
+            "Cantidad de Auditorías":
+                tecnico["total"]
+
+        })
+
+    df_tecnicos = pd.DataFrame(
+        datos_tecnicos
+    )
+
+    estadisticas_dia = list(
+        Auditoria.objects
+        .values("fecha_operacion")
+        .annotate(total=Count("id"))
+        .order_by("fecha_operacion")
+    )
+
+    datos_dias = []
+
+    for dia in estadisticas_dia:
+
+        datos_dias.append({
+
+            "Fecha":
+                dia["fecha_operacion"],
+
+            "Cantidad de Auditorías":
+                dia["total"]
+
+        })
+
+    df_dias = pd.DataFrame(
+        datos_dias
+    )
+
+    datos_resumen = [
+
+        {
+            "Estadística":
+                "Total de Auditorías",
+
+            "Cantidad":
+                cantidad
+        },
+
+        {
+            "Estadística":
+                "Suspensiones",
+
+            "Cantidad":
+                suspensiones
+        },
+
+        {
+            "Estadística":
+                "Reconexiones",
+
+            "Cantidad":
+                reconexiones
+        },
+
+        {
+            "Estadística":
+                "ZVCL",
+
+            "Cantidad":
+                zvcl
+        },
+
+        {
+            "Estadística":
+                "Total de Técnicos",
+
+            "Cantidad":
+                len(estadisticas_tecnico)
+        }
+
+    ]
+
+    df_resumen = pd.DataFrame(
+        datos_resumen
+    )
+
+    response = HttpResponse(
+
+        content_type=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        )
+
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="estadisticas_auditorias.xlsx"'
+    )
+
+    with pd.ExcelWriter(
+        response,
+        engine="openpyxl"
+    ) as writer:
+
+        df_resumen.to_excel(
+            writer,
+            index=False,
+            sheet_name="Resumen"
+        )
+
+        df_tecnicos.to_excel(
+            writer,
+            index=False,
+            sheet_name="Por Tecnico"
+        )
+
+        df_dias.to_excel(
+            writer,
+            index=False,
+            sheet_name="Por Dia"
+        )
+
+    return response
+
 
 # ============================================================
 # CREAR AUDITORÍA MANUAL
@@ -1652,24 +1678,24 @@ def auditoria_manual_crear(request):
         )
 
     return render(
-    request,
-    "auditorias/auditoria_manual_form.html",
-    {
-        "form": form,
+        request,
+        "auditorias/auditoria_manual_form.html",
+        {
+            "form": form,
 
-        "modo": "crear",
+            "modo": "crear",
 
-        "nombre_auditor": nombre_auditor,
+            "nombre_auditor": nombre_auditor,
 
-        "cedula_usuario": cedula_usuario,
+            "cedula_usuario": cedula_usuario,
 
-        "fecha_hoy": timezone.localdate(),
+            "fecha_hoy": timezone.localdate(),
 
-        "hallazgos_json": json.dumps(
-            form.get_hallazgos_json()
-        ),
-    },
-)
+            "hallazgos_json": json.dumps(
+                form.get_hallazgos_json()
+            ),
+        },
+    )
 
 
 # ============================================================
@@ -1803,6 +1829,7 @@ def auditoria_manual_eliminar(request, pk):
                 auditoria,
         },
     )
+
 
 def ver_foto_auditoria(request, numero_orden):
 

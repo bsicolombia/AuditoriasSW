@@ -984,35 +984,31 @@ def obtener_datos_operaciones(queryset):
 # ============================================================
 
 def obtener_auditorias_dia(queryset):
-
     datos = (
         queryset
         .exclude(
             fecha__isnull=True
         )
         .values(
-            "fecha"
+            "fecha__date"
         )
         .annotate(
-
             cumple=Count(
                 "id",
                 filter=Q(
                     resultado_auditoria__iexact="cumple"
                 )
             ),
-
             no_cumple=Count(
                 "id",
                 filter=Q(
                     resultado_auditoria__iexact="no_cumple"
                 )
             ),
-
             total=Count("id"),
         )
         .order_by(
-            "-fecha"
+            "-fecha__date"
         )
     )
 
@@ -1020,28 +1016,19 @@ def obtener_auditorias_dia(queryset):
 
     for item in datos:
 
-        fecha = item.get(
-            "fecha"
-        )
+        fecha = item.get("fecha__date")
 
         if not fecha:
             continue
 
         resultado.append({
+            "fecha": fecha.strftime("%Y-%m-%d"),
 
-            "fecha":
-                fecha.strftime(
-                    "%Y-%m-%d"
-                ),
+            "cumple": item["cumple"],
 
-            "cumple":
-                item["cumple"],
+            "no_cumple": item["no_cumple"],
 
-            "no_cumple":
-                item["no_cumple"],
-
-            "total":
-                item["total"],
+            "total": item["total"],
         })
 
     return resultado
@@ -1280,7 +1267,6 @@ def obtener_cantidad_por_hallazgo(queryset):
 # ============================================================
 # 7. AUDITORÍAS POR DIGITADOR
 # ============================================================
-
 def obtener_auditorias_por_digitador(queryset):
 
     datos = (
@@ -1290,10 +1276,9 @@ def obtener_auditorias_por_digitador(queryset):
         )
         .values(
             "nombre_auditor",
-            "fecha"
+            "fecha__date"
         )
         .annotate(
-
             total=Count("id"),
 
             cumple=Count(
@@ -1311,7 +1296,7 @@ def obtener_auditorias_por_digitador(queryset):
             ),
         )
         .order_by(
-            "-fecha",
+            "-fecha__date",
             "nombre_auditor"
         )
     )
@@ -1320,36 +1305,26 @@ def obtener_auditorias_por_digitador(queryset):
 
     for item in datos:
 
-        fecha = item.get(
-            "fecha"
-        )
+        fecha = item.get("fecha__date")
 
         if not fecha:
             continue
 
         resultado.append({
+            "fecha": fecha.strftime("%Y-%m-%d"),
 
-            "fecha":
-                fecha.strftime(
-                    "%Y-%m-%d"
+            "auditor": texto_seguro(
+                item.get(
+                    "nombre_auditor"
                 ),
+                "Sin auditor"
+            ),
 
-            "auditor":
-                texto_seguro(
-                    item.get(
-                        "nombre_auditor"
-                    ),
-                    "Sin auditor"
-                ),
+            "total": item["total"] or 0,
 
-            "total":
-                item["total"],
+            "cumple": item["cumple"] or 0,
 
-            "cumple":
-                item["cumple"],
-
-            "no_cumple":
-                item["no_cumple"],
+            "no_cumple": item["no_cumple"] or 0,
         })
 
     return resultado
@@ -1592,9 +1567,8 @@ def obtener_resultado_auditorias_tecnico(
             datos["no_cumple"] += 1
 
         datos["fechas"].add(
-            fecha
+            timezone.localtime(fecha).date()
         )
-
         # ----------------------------------------------------
         # MAPA POR NOMBRE
         # ----------------------------------------------------
@@ -2676,19 +2650,111 @@ def obtener_auditorias_totales_diario_tecnico(
             resultado,
     }
 
+# ============================================================
+# 13. AUDITORÍAS POR TIPO DE OPERACIÓN Y POR AUDITOR
+# ============================================================
+# Pegar esta función en context_processors.py
+# (junto a las demás funciones obtener_...)
+# ============================================================
+# 13. AUDITORÍAS POR TIPO DE OPERACIÓN Y POR AUDITOR
+# (reemplaza la versión anterior completa)
+# ============================================================
+
+def obtener_auditorias_operacion_auditor(queryset):
+    """
+    Por cada auditor devuelve cuántas auditorías hizo en cada
+    tipo de operación (DC00, RC00, ZVCL), con cumple / no_cumple.
+
+    El queryset ya viene filtrado por aplicar_filtros().
+    """
+
+    operaciones = ["DC00", "RC00", "ZVCL"]
+
+    datos = (
+        queryset
+        .values(
+            "nombre_auditor",
+            "tipo_operacion"
+        )
+        .annotate(
+            total=Count("id"),
+
+            cumple=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria__iexact="cumple"
+                )
+            ),
+
+            no_cumple=Count(
+                "id",
+                filter=Q(
+                    resultado_auditoria__iexact="no_cumple"
+                )
+            ),
+        )
+        .order_by(
+            "nombre_auditor",
+            "tipo_operacion"
+        )
+    )
+
+    auditores = {}
+
+    for item in datos:
+
+        auditor = texto_seguro(
+            item.get("nombre_auditor"),
+            "Sin auditor"
+        ) or "Sin auditor"
+
+        tipo = texto_seguro(
+            item.get("tipo_operacion")
+        ).upper()
+
+        if tipo not in operaciones:
+            continue
+
+        if auditor not in auditores:
+
+            auditores[auditor] = {
+                "auditor": auditor,
+                "total": 0,
+                "operaciones": {
+                    op: {
+                        "total": 0,
+                        "cumple": 0,
+                        "no_cumple": 0,
+                    }
+                    for op in operaciones
+                },
+            }
+
+        # SUMAR (no reemplazar): si en la BD hay variantes como
+        # "dc00" y "DC00", o auditores con espacios distintos,
+        # terminan en la misma clave y se deben acumular.
+        destino = auditores[auditor]["operaciones"][tipo]
+
+        destino["total"] += item["total"] or 0
+        destino["cumple"] += item["cumple"] or 0
+        destino["no_cumple"] += item["no_cumple"] or 0
+
+        auditores[auditor]["total"] += item["total"] or 0
+
+    resultado = list(auditores.values())
+
+    resultado.sort(
+        key=lambda x: (-x["total"], x["auditor"].lower())
+    )
+
+    return resultado
 
 # ============================================================
-# EN estadisticas_auditorias(request), DENTRO DEL DICCIONARIO
-# "contexto", AGREGAR:
+# EN estadisticas_auditorias(), DENTRO DE "contexto", AGREGAR:
 # ============================================================
 #
-#   "Auditorias_Totales_Diario_Tecnico":
-#       obtener_auditorias_totales_diario_tecnico(
-#           queryset,
-#           filtros["supervisor"]
-#       ),
+#   "
 #
-# ============================================================
 
 def estadisticas_auditorias(request):
 
@@ -2933,6 +2999,9 @@ def estadisticas_auditorias(request):
 
         "usuario_ultima_carga_tecnicos_global":
             estado.usuario_carga_tecnicos,
+            
+        "Auditorias_Operacion_Auditor":
+            obtener_auditorias_operacion_auditor(queryset),
     }
 
     # ========================================================

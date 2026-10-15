@@ -388,10 +388,10 @@ document.addEventListener("DOMContentLoaded", function () {
                                 cantidades,
 
                             backgroundColor:
-                                "#2563eb",
+                                "#ff0000",
 
                             hoverBackgroundColor:
-                                "#1d4ed8",
+                                "#f84141",
 
                             borderRadius:
                                 7,

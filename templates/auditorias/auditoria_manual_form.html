@@ -625,4 +625,294 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const numeroOrden = document.getElementById(
+        "id_numero_orden"
+    );
+
+    const formulario = document.getElementById(
+        "auditoria-form"
+    );
+
+    const botonGuardar = formulario.querySelector(
+        ".auditoria-btn-guardar"
+    );
+
+    if (!numeroOrden || !formulario || !botonGuardar) {
+        return;
+    }
+
+
+    /*
+     * Crear mensaje debajo del campo
+     */
+
+    const mensaje = document.createElement("div");
+
+    mensaje.id = "validacion-numero-orden";
+
+    mensaje.style.marginTop = "6px";
+    mensaje.style.fontSize = "14px";
+    mensaje.style.fontWeight = "500";
+
+    numeroOrden.parentNode.appendChild(
+        mensaje
+    );
+
+
+    /*
+     * ID de la auditoría cuando estamos editando.
+     *
+     * En creación no habrá ID.
+     */
+
+    const auditoriaId = "{% if auditoria %}{{ auditoria.pk }}{% endif %}";
+
+
+    /*
+     * Estado inicial
+     */
+
+    let ordenValida = false;
+
+
+    /*
+     * Validar número de orden
+     */
+
+    async function verificarOrden() {
+
+        const valor = numeroOrden.value.trim();
+
+
+        /*
+         * Si está vacío
+         */
+
+        if (!valor) {
+
+            mensaje.textContent = "";
+
+            numeroOrden.style.borderColor = "";
+
+            ordenValida = false;
+
+            botonGuardar.disabled = false;
+
+            return;
+        }
+
+
+        /*
+         * Solo números
+         */
+
+        if (!/^\d+$/.test(valor)) {
+
+            mensaje.textContent =
+                "El número de orden solo puede contener números.";
+
+            mensaje.style.color = "#dc3545";
+
+            numeroOrden.style.borderColor = "#dc3545";
+
+            ordenValida = false;
+
+            botonGuardar.disabled = true;
+
+            return;
+        }
+
+
+        /*
+         * Mostrar que estamos consultando
+         */
+
+        mensaje.textContent =
+            "Verificando orden...";
+
+        mensaje.style.color = "#6c757d";
+
+        numeroOrden.style.borderColor =
+            "#6c757d";
+
+
+        /*
+         * Construir URL
+         */
+
+        const url =
+            "{% url 'verificar_numero_orden' %}"
+            + "?numero_orden="
+            + encodeURIComponent(valor)
+            + "&auditoria_id="
+            + encodeURIComponent(auditoriaId);
+
+
+        try {
+
+            const response = await fetch(
+                url,
+                {
+                    method: "GET",
+                    headers: {
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    }
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Error al verificar la orden."
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            /*
+             * ORDEN EXISTENTE
+             */
+
+            if (data.existe) {
+
+                mensaje.textContent =
+                    "❌ " + data.mensaje;
+
+                mensaje.style.color =
+                    "#dc3545";
+
+                numeroOrden.style.borderColor =
+                    "#dc3545";
+
+                ordenValida = false;
+
+                botonGuardar.disabled = true;
+
+            }
+
+
+            /*
+             * ORDEN DISPONIBLE
+             */
+
+            else {
+
+                mensaje.textContent =
+                    "✓ " + data.mensaje;
+
+                mensaje.style.color =
+                    "#198754";
+
+                numeroOrden.style.borderColor =
+                    "#198754";
+
+                ordenValida = true;
+
+                botonGuardar.disabled = false;
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            mensaje.textContent =
+                "No fue posible verificar la orden.";
+
+            mensaje.style.color =
+                "#dc3545";
+
+            numeroOrden.style.borderColor =
+                "#dc3545";
+
+            ordenValida = false;
+
+            botonGuardar.disabled = true;
+        }
+
+    }
+
+
+    /*
+     * Validar cuando el usuario
+     * termina de escribir y sale del campo.
+     */
+
+    numeroOrden.addEventListener(
+        "blur",
+        verificarOrden
+    );
+
+
+    /*
+     * También podemos validar mientras escribe,
+     * pero esperamos un poco para no hacer
+     * una consulta por cada tecla.
+     */
+
+    let temporizador;
+
+    numeroOrden.addEventListener(
+        "input",
+        function () {
+
+            clearTimeout(
+                temporizador
+            );
+
+
+            mensaje.textContent = "";
+
+            numeroOrden.style.borderColor =
+                "";
+
+            botonGuardar.disabled =
+                false;
+
+
+            temporizador = setTimeout(
+                verificarOrden,
+                500
+            );
+
+        }
+    );
+
+
+    /*
+     * SEGURIDAD EXTRA
+     *
+     * Si intenta enviar el formulario mientras
+     * la orden está marcada como duplicada,
+     * no permitimos el submit.
+     */
+
+    formulario.addEventListener(
+        "submit",
+        function (event) {
+
+            if (!ordenValida) {
+
+                event.preventDefault();
+
+                numeroOrden.focus();
+
+                verificarOrden();
+
+            }
+
+        }
+    );
+
+});
+</script>
 {% endblock %}

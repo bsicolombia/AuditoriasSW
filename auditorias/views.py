@@ -7,12 +7,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import get_template
 from django.utils import timezone
 import json
-
+from django.http import JsonResponse
 from xhtml2pdf import pisa
 from carga.decorators import role_required
-
 from .forms import AuditoriaManualForm
-
 from .models import (
     Auditoria,
     HALLAZGOS_ALTO,
@@ -20,11 +18,8 @@ from .models import (
     HALLAZGOS_BAJO,
 )
 from carga.models import Tecnicos
-
-
 import re
 import unicodedata
-
 
 def texto_seguro(valor, defecto=""):
     if valor is None:
@@ -1591,7 +1586,53 @@ def exportar_estadisticas_excel(request):
 
     return response
 
+@login_required
+def verificar_numero_orden(request):
 
+    numero_orden = request.GET.get(
+        "numero_orden",
+        ""
+    ).strip()
+
+    auditoria_id = request.GET.get(
+        "auditoria_id",
+        ""
+    ).strip()
+
+    if not numero_orden:
+
+        return JsonResponse({
+            "existe": False,
+            "mensaje": "",
+        })
+
+    queryset = Auditoria.objects.filter(
+        numero_orden=numero_orden
+    )
+
+    # Si estamos editando, excluir
+    # la auditoría actual.
+    if auditoria_id:
+
+        queryset = queryset.exclude(
+            pk=auditoria_id
+        )
+
+    existe = queryset.exists()
+
+    if existe:
+
+        return JsonResponse({
+            "existe": True,
+            "mensaje": (
+                "Esta orden ya existe en la base de datos."
+            ),
+        })
+
+    return JsonResponse({
+        "existe": False,
+        "mensaje": "Orden disponible.",
+    })
 # ============================================================
 # CREAR AUDITORÍA MANUAL
 # ============================================================

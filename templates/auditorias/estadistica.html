@@ -162,6 +162,8 @@ Estadísticas
 
     {% include "auditorias/partials/auditorias_digitador.html" %}
 
+   {% include "auditorias/partials/auditorias_operacion_auditor.html" %}
+
 
     <!-- =====================================================
          RESULTADOS POR TÉCNICO
@@ -260,6 +262,8 @@ Estadísticas
 
 {{ Resultado_Total_Diario_Tecnico|json_script:"datos-Resultado-Total-Diario-Tecnico" }}
 
+{{ Auditorias_Operacion_Auditor|json_script:"datos-Auditorias-Operacion-Auditor" }}
+
 <!-- =========================================================
      LIBRERÍAS
 ========================================================= -->
@@ -306,6 +310,7 @@ Estadísticas
 
 <script src="{% static 'js/resultado_total_diario_tecnico.js' %}"></script>
 
+<script src="{% static 'js/auditorias_operacion_auditor.js' %}"></script>
 <!-- =========================================================
      CONTROL DE VISTAS
 ========================================================= -->

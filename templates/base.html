@@ -40,6 +40,15 @@
                     </a>
                 </li>
 
+                {% if user|has_any_role:"Administrador,Coordinador,Digitador" %}
+                <li>
+                    <a href="{% url 'instructivo' %}">
+                        <img src="{% static 'img/revision.png' %}" alt="Nueva auditoría">
+                        <span>Instructivos</span>
+                    </a>
+                </li>
+                {% endif %}
+
 
                 <!-- NUEVA AUDITORÍA (registro manual desde el software) -->
                 {% if user|has_any_role:"Administrador,Coordinador,Digitador" %}

@@ -10,3 +10,5 @@ def login(request):
 def index(request):
     return render(request, '../templates/dashboard/index.html')
 
+def instructivo(request):
+    return render (request, '../templates/dashboard/instructivo.html')

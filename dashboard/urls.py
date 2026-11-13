@@ -30,4 +30,9 @@ urlpatterns = [
         views.index,
         name="index",
     ),
+    path(
+            "instrucivo/",
+            views.instructivo,
+            name="instructivo",
+        ),
 ]

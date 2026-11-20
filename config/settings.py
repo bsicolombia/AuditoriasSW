@@ -46,7 +46,7 @@ if not SECRET_KEY:
 
 ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
-    "172.10.11.157,186.119.124.103,AuditoriasSW.local,localhost,127.0.0.1",
+    "172.10.11.39,186.119.124.103,AuditoriasSW.local,localhost,127.0.0.1",
 )
 
 # Orígenes confiables para CSRF (necesario al entrar por IP pública / dominio).
@@ -112,7 +112,7 @@ DATABASES = {
         "USER": os.environ.get("DB_USER", "auditorias_user"),
         "PASSWORD": os.environ.get("DB_PASSWORD", ""),
         "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "3307"),
+        "PORT": os.environ.get("DB_PORT", "33076"),
         "OPTIONS": {
             "charset": "utf8mb4",
         },
